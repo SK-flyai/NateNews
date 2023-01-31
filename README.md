@@ -26,3 +26,7 @@ L ml\
 L front\
 L back\
 L crawl
+
+
+* playground 디렉토리\
+디렉토리 내의 \*.ipynb 는 .gitignore 걸어놨습니다. 해당 디렉토리에서 자유롭게 실험해주세요 :)
