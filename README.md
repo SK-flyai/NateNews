@@ -8,6 +8,7 @@ Implement app to show NateNews easily
 3. back/`FEATURE_NAME`
 4. crawl/`FEATURE_NAME`
 
+
 * Commit message
 1. Feat: `DESC`
 2. FIX: `DESC`
@@ -18,7 +19,8 @@ Implement app to show NateNews easily
 7. Docs: `DESC`
 8. Initial commit
 
-* folders(temporary)
+
+* folders(temporary)\
 /\
 L ml\
 L front\
