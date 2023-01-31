@@ -19,8 +19,8 @@ Implement app to show NateNews easily
 8. Initial commit
 
 * folders(temporary)
-/
-L ml
-L front
-L back
+/\
+L ml\
+L front\
+L back\
 L crawl
