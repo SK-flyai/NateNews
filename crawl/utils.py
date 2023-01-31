@@ -1,7 +1,8 @@
 from typing import List
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Union
-from crawl import NateNews
+# from crawl import NateNews
+from sports_crawl import SportsNews
 
 import datetime as dt
 import pandas as pd
@@ -18,7 +19,7 @@ COLUMNS = [
 ]
 
 def get_news_df(
-    news_list: List[NateNews]
+    news_list: List[SportsNews]
 ):
     """make `pd.DataFrame` with `news_list`
 
@@ -31,18 +32,18 @@ def get_news_df(
 def get_news(
     url_list: List[str]
 ):
-    """Return `NateNews` list
+    """Return `SportsNews` list
 
     Args:
         url_list (List[str]): url list to be requested
 
     Returns:
         List[Union[Response, None]]:
-            1. NateNews: Normal Request
+            1. SportsNews: Normal Request
             2. None: Abnormal Request(won't get that page)
     """
     with ThreadPoolExecutor(max_workers=10) as mult:
-        _news_list = list(mult.map(NateNews.create, url_list))
+        _news_list = list(mult.map(SportsNews.create, url_list))
     news_list = [news for news in _news_list if news]
     return news_list
 
@@ -122,15 +123,15 @@ def _get_artc_list(
     """get article list
 
     Args:
-        `artc1` (int): first article in NateNews
-        `artc2` (Union[int,None]): last article in NateNews
+        `artc1` (int): first article in nate news
+        `artc2` (Union[int,None]): last article in nate news
             None: `artc2` = latest article on `date`
         `date` (int): the day you want to crawl
 
     Returns:
         List[int]: article list from `artc1` to `artc2`
     """
-    max_article = NateNews.get_recent(date)
+    max_article = SportsNews.get_recent(date)
     artc1 = artc1 if artc1 < max_article else max_article
 
     if not artc2 or artc2 > max_article:

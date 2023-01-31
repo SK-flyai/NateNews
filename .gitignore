@@ -78,6 +78,11 @@ target/
 .ipynb_checkpoints
 playground/*.ipynb
 
+# Data Frames
+*.csv
+*.xlsx
+*.pkl
+
 # IPython
 profile_default/
 ipython_config.py
