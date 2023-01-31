@@ -7,7 +7,8 @@ LINK = 'https://news.nate.com/view/'
 
 class SportsNews:
     def __init__(self, url:str):
-        res = requests.get(url)
+        headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
+        res = requests.get(url, headers=headers) # to prevent block crawling
         assert res.status_code == 200
         
         self.url = url
