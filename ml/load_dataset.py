@@ -9,117 +9,50 @@ import pandas as pd
 
 import torch
 
-class Aihub:
-    def __init__(self, data_dir, stopwords=[]):
-        self.data_dir = Path(data_dir)
-        self.stop_words = ["#@주소#", "#@이모티콘#", "#@이름#", "#@URL#", "#@소속#", "#@기타#",
-            "#@전번#", "#@계정#", "#@url#", "#@번호#", "#@금융#", "#@신원#", "#@장소#", "#@시스템#사진#", 
-            "#@시스템#동영상#", "#@시스템#기타#", "#@시스템#검색#", "#@시스템#지도#", "#@시스템#삭제#", 
-            "#@시스템#파일#", "#@시스템#송금#", "#@시스템#"]
-        self.stop_words += stopwords
-
-    def load_json_data_(self, path: str):
-        with open(path, encoding='UTF-8') as f:
-            data = json.load(f)
-
-        ids = []
-        dialogues = []
-        summaries = []
-        for datum in data["data"]:
-            ids.append(datum["header"]["dialogueInfo"]["dialogueID"])
-
-            prev_speaker_id = None
-            prev_line = ""
-            utts = []
-            for dialogue in datum["body"]["dialogue"]:
-                utterance = dialogue["utterance"].strip()
-
-                if dialogue["participantID"] == prev_speaker_id:
-                    prev_line += " " + utterance
-                else:
-                    if prev_line:
-                        utts.append(prev_line)
-                    prev_line = utterance
-                    prev_speaker_id = dialogue["participantID"]
-            if prev_line:
-                utts.append(prev_line)
-
-            dialogues.append(utts)
-            summaries.append(datum["body"].get("summary"))
-        return ids, dialogues, summaries
-    
-    def comb_stopwords_(self, x):
-        x = ' '.join(x)
-        if self.stopwords:
-            x = re.sub('|'.join(self.stop_words), '', x)
-        return x
-
-    def load_data(self, data_type, stopwords=True):
-        self.stopwords = stopwords
-        path_pattern = self.data_dir / data_type / '*.json'
-        paths = glob(str(path_pattern))[:5]
-
-        ids, dialogues, summaries, topics = [], [], [], []
-        for path in paths:
-            loader_fn = self.load_json_data_
-            topic = Path(path).stem
-            file_ids, file_dialogues, file_summaries = loader_fn(path)
-            ids.extend(file_ids)
-            topics += [topic]*len(file_ids)
-            dialogues.extend(file_dialogues)
-            summaries.extend(file_summaries)
-
-        docs = list(map(self.comb_stopwords_, dialogues))
-        
-        return docs, summaries, topics
-
-
 class News:
-    def __init__(self, data_dir, stopwords=[]):
+    """
+    네이버 뉴스 데이터셋
+    category: 정치(0), 경제(1), 사회(2), 생활/문화(3), 세계(4), 기술/IT(5), 연예(6), 스포츠(7)
+    directory: newsData/category_idx/*.txt
+    """
+    def __init__(self, data_dir='./newsData', stopwords=[]):
+        """
+        Args:
+            data_dir:
+            stopwords:
+        """
         self.data_dir = Path(data_dir)
         self.stop_words = ['\xa0', '\t']
         self.stop_words += stopwords
         self.idx2topic = ['정치', '경제', '사회', '생활/문화', '세계', '기술/IT', '연예', '스포츠']
 
-    def load_json_data_(self, path: str):
-        with open(path, encoding='UTF-8') as f:
-            data = json.load(f)
-
-        ids = []
-        dialogues = []
-        summaries = []
-        for datum in data["data"]:
-            ids.append(datum["header"]["dialogueInfo"]["dialogueID"])
-
-            prev_speaker_id = None
-            prev_line = ""
-            utts = []
-            for dialogue in datum["body"]["dialogue"]:
-                utterance = dialogue["utterance"].strip()
-
-                if dialogue["participantID"] == prev_speaker_id:
-                    prev_line += " " + utterance
-                else:
-                    if prev_line:
-                        utts.append(prev_line)
-                    prev_line = utterance
-                    prev_speaker_id = dialogue["participantID"]
-            if prev_line:
-                utts.append(prev_line)
-
-            dialogues.append(utts)
-            summaries.append(datum["body"].get("summary"))
-        return ids, dialogues, summaries
-
     def load_txt_data_(self, path: str):
+        """
+        하나의 .txt 형식의 뉴스데이터를 가져와 string으로 변환
+
+        Args:
+            path: .txt file path
+
+        Returns: string
+
+        """
         with open(path, "r", encoding='UTF8') as f:
             strings = f.readlines()
-        strings = list(map(lambda s: s.strip(), strings))
-        strings = list(filter(lambda s: s != '', strings))
+        strings = list(map(lambda s: s.strip(), strings))  # 앞뒤 공백제거
+        strings = list(filter(lambda s: s != '', strings)) # 빈 문자열 제거
         doc = ' '.join(strings)
         return doc
     
     def comb_stopwords_(self, x):
+        """
+        문자열에서 불용어 제거
+
+        Args:
+            x: string
+
+        Returns:
+
+        """
         if self.stopwords:
             x = re.sub('|'.join(self.stop_words), ' ', x)
             x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
@@ -128,6 +61,17 @@ class News:
         return x
 
     def load_data(self, stopwords=True):
+        """
+        메인 함수부분
+        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
+        각 뉴스가 string인 리스트로 리턴
+
+        Args:
+            stopwords: 사용자 정의 불용어
+
+        Returns: 여러 뉴스데이터 문자열 리스트
+
+        """
         self.stopwords = stopwords
         paths = list(self.data_dir.glob('*/*.txt'))
         docs, topics = [], []
@@ -145,7 +89,20 @@ class News:
 
 
 class NateNews:
+    """
+    네이트에서 크롤링한 뉴스 데이터셋
+    directory: natenews_data/크롤링날짜.csv
+    """
     def __init__(self, data_dir, stopwords=[]):
+        """
+        Args:
+            data_dir:
+            stopwords: 사용자 정의 불용어
+
+        self.df:
+            DataFrame
+            column: title, category, press, date, content, url
+        """
         self.data_dir = Path(data_dir)
         self.stop_words = ['\xa0', '\t', '\n']
         self.stop_words += stopwords
@@ -153,35 +110,35 @@ class NateNews:
         self.df['new_content'] = self.df['content'].apply(self.crop_article_)
 
     def crop_article_(self, data):
-        """Remove unnecessary text from an article
+        """기사에서 불필요한 내용 제거
 
         Args:
-            data(str): Raw text of news article.
+            data(str): df['content'], 뉴스의 원본 기사내용
 
         Returns:
-            str: Preprocessed text of news article.
+            str: df['new_content'], preprocessed 기사내용
         """
         data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
         data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
-        data = re.sub('[가-힣]{2,3}뉴스', '', data)
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
         data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
-        data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
-        data = re.sub('[-=+,#/·“”‘’\?:^$.@*■\"※~&%ㆍ!』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', ' ',
+        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
+        data = re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '',
                       data)  # remove special characters
         data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
         data = data.strip()
 
         return data
 
-    def load_txt_data_(self, path: str):
-        with open(path, "r", encoding='UTF8') as f:
-            strings = f.readlines()
-        strings = list(map(lambda s: s.strip(), strings))
-        strings = list(filter(lambda s: s != '', strings))
-        doc = ' '.join(strings)
-        return doc
-
     def comb_stopwords_(self, x):
+        """
+        불용어 제거
+        Args:
+            x(string): 뉴스 기사내용
+
+        Returns:
+            str: 불용어 제거된 기사 내용
+        """
         if self.stopwords:
             x = re.sub('|'.join(self.stop_words), ' ', x)
             x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "").strip()
@@ -190,6 +147,18 @@ class NateNews:
         return x
 
     def load_data(self, stopwords=True):
+        """
+        메인 함수부분
+        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
+        각 뉴스가 string인 리스트로 리턴
+        Args:
+            stopwords: 사용자 정의 불용어
+
+        Returns:
+            docs(list): df의 new_content 부분 (전처리된 뉴스내용)
+            topics(list): df의 title 부분
+
+        """
         self.stopwords = stopwords
         docs = list(self.df['new_content'])
         docs = list(map(self.comb_stopwords_, docs))
