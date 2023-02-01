@@ -15,7 +15,7 @@ class News:
     category: 정치(0), 경제(1), 사회(2), 생활/문화(3), 세계(4), 기술/IT(5), 연예(6), 스포츠(7)
     directory: newsData/category_idx/*.txt
     """
-    def __init__(self, data_dir='./newsData', stopwords=[]):
+    def __init__(self, data_dir: list = './newsData', stopwords: list = []):
         """
         Args:
             data_dir:
@@ -26,7 +26,7 @@ class News:
         self.stop_words += stopwords
         self.idx2topic = ['정치', '경제', '사회', '생활/문화', '세계', '기술/IT', '연예', '스포츠']
 
-    def load_txt_data_(self, path: str):
+    def load_txt_data_(self, path: str) -> str:
         """
         하나의 .txt 형식의 뉴스데이터를 가져와 string으로 변환
 
@@ -43,7 +43,7 @@ class News:
         doc = ' '.join(strings)
         return doc
     
-    def comb_stopwords_(self, x):
+    def comb_stopwords_(self, x: str) -> str:
         """
         문자열에서 불용어 제거
 
@@ -60,14 +60,14 @@ class News:
             # x = x.replace('\\', '')
         return x
 
-    def load_data(self, stopwords=True):
+    def load_data(self, stopwords: bool = True) -> Tuple[list, list]:
         """
         메인 함수부분
         뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
         각 뉴스가 string인 리스트로 리턴
 
         Args:
-            stopwords: 사용자 정의 불용어
+            stopwords: 불용어 사용할지 안할지
 
         Returns: 여러 뉴스데이터 문자열 리스트
 
@@ -93,7 +93,7 @@ class NateNews:
     네이트에서 크롤링한 뉴스 데이터셋
     directory: natenews_data/크롤링날짜.csv
     """
-    def __init__(self, data_dir, stopwords=[]):
+    def __init__(self, data_dir: str, stopwords: list = []):
         """
         Args:
             data_dir:
@@ -109,7 +109,7 @@ class NateNews:
         self.df = pd.read_csv(data_dir)
         self.df['new_content'] = self.df['content'].apply(self.crop_article_)
 
-    def crop_article_(self, data):
+    def crop_article_(self, data: str) -> str:
         """기사에서 불필요한 내용 제거
 
         Args:
@@ -130,7 +130,7 @@ class NateNews:
 
         return data
 
-    def comb_stopwords_(self, x):
+    def comb_stopwords_(self, x: str) -> str:
         """
         불용어 제거
         Args:
@@ -146,7 +146,7 @@ class NateNews:
             # x = x.replace('\\', '')
         return x
 
-    def load_data(self, stopwords=True):
+    def load_data(self, stopwords: bool = True) -> Tuple[list, list]:
         """
         메인 함수부분
         뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
