@@ -16,11 +16,31 @@ import numpy as np
 from load_dataset import *
 
 class CustomTokenizer:
-    def __init__(self, tagger, tag):
+    """
+    mecab을 활용한 한국어 tokenizer
+    키워드 후보군 추출에 사용
+    """
+    def __init__(self, tagger: Mecab, tag: str):
+        """
+        Args:
+            tagger: mecab 클래스
+            tag: 태그 방법
+                nouns: 명사만 추출
+                morphs: 모든 품사의 형태소 추출
+                NNP: 고유명사만 추출
+        """
         self.tagger = tagger
         self.tag = tag
 
-    def __call__(self, sent):
+    def __call__(self, sent: str) -> List[str]:
+        """
+        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 길이 1 이하의 단어는 삭제
+        Args:
+            sent: 원본 문장
+
+        Returns: tokenize 된 문장
+
+        """
         if self.tag == 'nouns':
             word_tokens = self.tagger.nouns(sent)
         elif self.tag == 'morphs':
@@ -34,11 +54,32 @@ class CustomTokenizer:
 
 
 class KeyBERT:
-    def __init__(self, tag='NNP'):
+    """
+    신문기사 내용에서 주요 키워드를 추출
+    """
+    def __init__(self, tag: str = 'NNP'):
+        """
+        self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
+        self.tokenizer: 키워드 후보군 추출에 사용되는 tokenizer
+        """
         self.model = SentenceTransformer("jhgan/ko-sbert-nli")
         self.tokenizer = CustomTokenizer(Mecab(), tag=tag)
 
-    def mss_(self, doc_embedding, candidate_embeddings, words, top_n, nr_candidates):
+    def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
+             words: np.ndarray, top_n: int, nr_candidates: int) -> List[str]:
+        """
+        Max Sum Similarity
+        후보간 유사성은 최소화, 문서와의 유사성은 최대화
+        Args:
+            doc_embedding: 신문 기사의 임베딩값
+            candidate_embeddings: 키워드 후보군들의 임베딩값들
+            words: 키워드 후보군 단어들
+            top_n: top n개의 단어들을 키워드로 리턴
+            nr_candidates: 처음에 추출할 문서와의 유사도가 높은 단어 개수
+
+        Returns:
+            top_n개의 키워드 리스트
+        """
         # 문서와 각 키워드들 간의 유사도
         distances = cosine_similarity(doc_embedding, candidate_embeddings)
 
@@ -46,12 +87,12 @@ class KeyBERT:
         distances_candidates = cosine_similarity(candidate_embeddings,
                                                  candidate_embeddings)
 
-        # 코사인 유사도에 기반하여 키워드들 중 상위 top_n개의 단어를 pick.
+        # 코사인 유사도에 기반하여 키워드들 중 상위 nr_candidates개의 단어를 pick.
         words_idx = list(distances.argsort()[0][-nr_candidates:])
         words_vals = [words[index] for index in words_idx]
         distances_candidates = distances_candidates[np.ix_(words_idx, words_idx)]
 
-        # 각 키워드들 중에서 가장 덜 유사한 키워드들간의 조합을 계산
+        # 각 키워드들 중에서 가장 덜 유사한 키워드들 top_n개를 최종 리턴
         min_sim = np.inf
         candidate = None
         for combination in itertools.combinations(range(len(words_idx)), top_n):
@@ -62,7 +103,22 @@ class KeyBERT:
 
         return [words_vals[idx] for idx in candidate]
 
-    def mmr_(self, doc_embedding, candidate_embeddings, words, top_n, diversity):
+    def mmr_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
+             words: np.ndarray, top_n: int, diversity: float) -> List[str]:
+        """
+        Maximal Marginal Relevance
+        문서와 유사도가 가장 높은 단어를 선택하고
+        이미 선택된 키워드와 유사하지 않으면서 문서와 유사한 단어르 반복적으로 선택
+        Args:
+            doc_embedding: 신문 기사의 임베딩값
+            candidate_embeddings: 키워드 후보군들의 임베딩값들
+            words: 키워드 후보군 단어들
+            top_n: top n개의 단어들을 키워드로 리턴
+            diversity: top_n개의 키워드들의 유사도정도 (0~1)
+
+        Returns:
+            top_n개의 키워드 리스트
+        """
 
         # 문서와 각 키워드들 간의 유사도가 적혀있는 리스트
         word_doc_similarity = cosine_similarity(candidate_embeddings, doc_embedding)
@@ -94,8 +150,21 @@ class KeyBERT:
 
         return [words[idx] for idx in keywords_idx]
 
-    def predict(self, doc, ngram_range=(1, 1), mode='mmr', top_n=5, nr_candidates=10,
-                diversity=0.2):  # **kwargs: 'nr_candidates': 10, 'diversity': 0.2
+    def predict(self, doc: str, ngram_range: Tuple[int, int] = (1, 1), mode: str = 'mmr', top_n: int = 5, nr_candidates: int = 10,
+                diversity: float = 0.2) -> List[str]:
+        """
+        뉴스기사에서 키워드들을 리턴
+        Args:
+            doc: 뉴스기사
+            ngram_range: 키워드 후보군들의 window 크기  ex) ngram_range=(1, 2) => window 크기가 1과 2의 후보군들을 뽑는다.
+            mode: mss or mmr
+            top_n: 추출할 키워드 개수
+            nr_candidates: mss의 파라미터
+            diversity: mmr의 파라미터
+
+        Returns:
+            top_n개의 키워드 리스트
+        """
         count = CountVectorizer(tokenizer=self.tokenizer, ngram_range=ngram_range).fit([doc])
         candidates = count.get_feature_names_out()
 
