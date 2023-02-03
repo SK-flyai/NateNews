@@ -58,7 +58,29 @@ class News:
             x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
             # x = re.sub(r"\\", '', x)
             # x = x.replace('\\', '')
+            x = self.crop_article_(x)
         return x
+
+    def crop_article_(self, data: str) -> str:
+        """기사에서 불필요한 내용 제거
+
+        Args:
+            data(str): df['content'], 뉴스의 원본 기사내용
+
+        Returns:
+            str: df['new_content'], preprocessed 기사내용
+        """
+        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
+        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
+        data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
+        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
+        data = re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '',
+                      data)  # remove special characters
+        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
+        data = data.strip()
+
+        return data
 
     def load_data(self, stopwords: bool = True) -> Tuple[list, list]:
         """
@@ -73,7 +95,7 @@ class News:
 
         """
         self.stopwords = stopwords
-        paths = list(self.data_dir.glob('*/*.txt'))
+        paths = list(self.data_dir.glob('7/*.txt'))
         docs, topics = [], []
         for path in paths:
             loader_fn = self.load_txt_data_
@@ -82,6 +104,7 @@ class News:
 
             topics += [topic]
             docs += [doc]
+        self.ord_docs = docs
 
         docs = list(map(self.comb_stopwords_, docs))
 
@@ -167,7 +190,8 @@ class NateNews:
 
 ##
 if __name__ == '__main__':
-    news = NateNews(data_dir='./natenews_data/20220301.csv')
+    # news = NateNews(data_dir='./natenews_data/20220301.csv')
+    news = News()
 
     docs, topics = news.load_data()
 
