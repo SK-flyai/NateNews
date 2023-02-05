@@ -94,7 +94,8 @@ class SportsNews:
     @classmethod
     def create(
         cls,
-        url:str
+        url:str,
+        sleep:bool=False,
     ):
         # TODO: 기사가 없는 경우 -> svcname='뉴스'
         """create `NateNews` if it satisfy some conditions
@@ -111,7 +112,7 @@ class SportsNews:
             Union[NateNews, None]: 
         """        
         # TODO: add exclusion rule for press('연합뉴스',etc..)
-        time.sleep(0.5)
+        # if sleep: time.sleep(0.5)
         new_class = cls(url)
         # article = new_class.content.find(
         #     'div',
