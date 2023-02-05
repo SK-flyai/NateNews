@@ -2,6 +2,8 @@ import requests
 import datetime as dt
 
 from bs4 import BeautifulSoup as bs
+from utils import retry
+
 
 LINK = 'https://news.nate.com/view/'
 
@@ -26,7 +28,7 @@ class SportsNews:
         ]
     
     def _get_press(self):
-        press = self.content.find('a', {'class': 'medium'})
+        press = self.content.find('dl', {'class': 'articleInfo'})
         # press.text
         return press.select("img")[0]['alt']
 
@@ -90,6 +92,7 @@ class SportsNews:
         return latest # return latest article number
 
     @classmethod
+    @retry((TimeoutError), tries=4, delay=15, backoff=2)
     def create(
         cls,
         url:str
