@@ -1,8 +1,8 @@
 import requests
 import datetime as dt
+import time
 
 from bs4 import BeautifulSoup as bs
-from retry import retry
 
 
 LINK = 'https://news.nate.com/view/'
@@ -92,7 +92,6 @@ class SportsNews:
         return latest # return latest article number
 
     @classmethod
-    @retry((TimeoutError, ConnectionError), tries=4, delay=15, backoff=2)
     def create(
         cls,
         url:str
@@ -112,6 +111,7 @@ class SportsNews:
             Union[NateNews, None]: 
         """        
         # TODO: add exclusion rule for press('연합뉴스',etc..)
+        time.sleep(0.5)
         new_class = cls(url)
         # article = new_class.content.find(
         #     'div',
