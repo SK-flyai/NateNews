@@ -2,6 +2,8 @@
 import requests
 import datetime as dt
 from bs4 import BeautifulSoup as bs
+from .retry import retry
+
 
 LINK = 'https://news.nate.com/view/'
 

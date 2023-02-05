@@ -2,7 +2,7 @@ import requests
 import datetime as dt
 
 from bs4 import BeautifulSoup as bs
-from utils import retry
+from retry import retry
 
 
 LINK = 'https://news.nate.com/view/'
@@ -92,7 +92,7 @@ class SportsNews:
         return latest # return latest article number
 
     @classmethod
-    @retry((TimeoutError), tries=4, delay=15, backoff=2)
+    @retry((TimeoutError, ConnectionError), tries=4, delay=15, backoff=2)
     def create(
         cls,
         url:str
