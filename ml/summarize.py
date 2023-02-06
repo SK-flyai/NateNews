@@ -184,23 +184,27 @@ class KeySentence:
 
 
 if __name__ == '__main__':
-    news = NateNews(data_dir='./natenews_data/20220301.csv')
+
+    # news = NateNews(data_dir='./natenews_data/20220301.csv')
+    news = NaverSports()
     # news = News()
-    docs, topics = news.load_data()
+    docs = news.load_data()
+
+
     keysent = KeySentence()
     textrank = TextRank()
 
     ##
-    idx = 56
+    idx = 95
     # print(textrank.predict(docs[idx]))
     # print(type(textrank.predict(docs[idx])[0]))
-    print("---------keysent----------")
-    for sent in keysent.predict(docs[idx], diversity=0):
-        print(sent)
-    print("---------textrank----------")
-    for sent in textrank.predict(docs[idx]):
-        print(sent)
-    print('topic: ', topics[idx])
+    # print("---------keysent----------")
+    # for sent in keysent.predict(docs[idx], diversity=0):
+    #     print(sent)
+    # print("---------textrank----------")
+    # for sent in textrank.predict(docs[idx]):
+    #     print(sent)
+    # print('topic: ', topics[idx])
     #
     print("---------original----------")
     for sent in kss.split_sentences(docs[idx]):

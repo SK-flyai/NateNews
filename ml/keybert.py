@@ -12,6 +12,7 @@ import itertools
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
+import warnings
 
 from load_dataset import *
 from preprocess import CustomTokenizer
@@ -132,6 +133,7 @@ class KeyBERT:
         candidates = count.get_feature_names_out()
 
         doc_embedding = self.model.encode([doc])
+        print(doc_embedding.shape)
         candidate_embeddings = self.model.encode(candidates)
 
         keyword = None
@@ -145,14 +147,19 @@ class KeyBERT:
 
         return keyword
 
-if __name__ == '__main__':
-    news = NateNews(data_dir='./natenews_data/20220301.csv')
 
-    docs, topics = news.load_data()
+
+if __name__ == '__main__':
+    warnings.filterwarnings('ignore')
+    # news = NateNews(data_dir='./natenews_data/20220301.csv')
+    news = NaverSports()
+
+    docs = news.load_data()
 
     ##
     keybert = KeyBERT()
 
     ##
-    print(keybert.predict(docs[2]))
+    print(keybert.predict(docs[3], top_n=10, ngram_range=(1, 1)))
+
     #################### docs[0]은 키워드가 한개 나와서 에러 나옴
