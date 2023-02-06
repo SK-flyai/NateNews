@@ -50,7 +50,8 @@ class TopicExtraction:
 
 ##
 if __name__ == '__main__':
-    news = NateNews(data_dir='./natenews_data/20220301.csv')
+    # news = NateNews(data_dir='./natenews_data/20220301.csv')
+    news = News()
     docs, topics = news.load_data()
 
     ##
