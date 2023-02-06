@@ -35,7 +35,7 @@ class SportsNews:
     def _get_category(self):
         nav = self.content.find('div', {'class': 'snbArea'})
         category = nav.find('li', {'class': 'on'})
-        return category.text
+        return category.text if category else 'X'
 
     def _get_content(self):
         # TODO: data cleaning -> <p> 태그 안만 기사인가???? : 확인 필요
