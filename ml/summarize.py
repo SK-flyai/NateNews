@@ -184,10 +184,13 @@ class KeySentence:
 
 
 if __name__ == '__main__':
+
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
     news = NaverSports()
     # news = News()
     docs = news.load_data()
+
+
     keysent = KeySentence()
     textrank = TextRank()
 

@@ -1,7 +1,9 @@
 import requests
 import datetime as dt
+import time
 
 from bs4 import BeautifulSoup as bs
+
 
 LINK = 'https://news.nate.com/view/'
 
@@ -26,7 +28,7 @@ class SportsNews:
         ]
     
     def _get_press(self):
-        press = self.content.find('a', {'class': 'medium'})
+        press = self.content.find('dl', {'class': 'articleInfo'})
         # press.text
         return press.select("img")[0]['alt']
 
@@ -109,6 +111,7 @@ class SportsNews:
             Union[NateNews, None]: 
         """        
         # TODO: add exclusion rule for press('연합뉴스',etc..)
+        time.sleep(0.5)
         new_class = cls(url)
         # article = new_class.content.find(
         #     'div',

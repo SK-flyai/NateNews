@@ -1,11 +1,11 @@
 from typing import List
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Union
-# from crawl import NateNews
 from sports_crawl import SportsNews
 
 import datetime as dt
 import pandas as pd
+
 
 # TODO: make *.ipynb for instruct how to use utils.py
 LINK = 'https://news.nate.com/view/'
@@ -25,8 +25,15 @@ def get_news_df(
 
     Returns:
         pd.DataFame: DataFrmae w.r.t `news_list`
-    """    
-    info_list = [news.get_info() for news in news_list]
+    """
+    info_list = list()
+    for news in news_list:
+        try:
+            info_list.append(news.get_info())
+        except:
+            print('Error occurs')
+            print(news.url)
+    # info_list = [news.get_info() for news in news_list]
     return pd.DataFrame(info_list, columns=COLUMNS)
 
 def get_news(
