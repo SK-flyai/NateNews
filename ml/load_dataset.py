@@ -188,12 +188,117 @@ class NateNews:
         topics = list(self.df['title'])
         return docs, topics
 
+
+class NaverSports:
+    """
+    네이버 뉴스 데이터셋에서 스포츠만
+    directory: newsData/7/*.txt
+    """
+
+    def __init__(self, data_dir: list = './newsData/7', stopwords: list = []):
+        """
+        Args:
+            data_dir:
+            stopwords:
+        """
+        self.data_dir = Path(data_dir)
+        self.stop_words = ['\xa0', '\t']
+        self.stop_words += stopwords
+
+    def load_txt_data_(self, path: str) -> str:
+        """
+        하나의 .txt 형식의 뉴스데이터를 가져와 string으로 변환
+
+        Args:
+            path: .txt file path
+
+        Returns: string
+
+        """
+        with open(path, "r", encoding='UTF8') as f:
+            strings = f.readlines()
+        strings = list(map(lambda s: s.strip(), strings))  # 앞뒤 공백제거
+        strings = list(filter(lambda s: s != '', strings))  # 빈 문자열 제거
+        doc = ' '.join(strings)
+        return doc
+
+    def comb_stopwords_(self, x: str) -> str:
+        """
+        문자열에서 불용어 제거
+
+        Args:
+            x: string
+
+        Returns:
+
+        """
+        if self.stopwords:
+            x = re.sub('|'.join(self.stop_words), ' ', x)
+            x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
+            # x = re.sub(r"\\", '', x)
+            # x = x.replace('\\', '')
+            x = self.crop_article_(x)
+        return x
+
+    def crop_article_(self, data: str) -> str:
+        """기사에서 불필요한 내용 제거
+
+        Args:
+            data(str): df['content'], 뉴스의 원본 기사내용
+
+        Returns:
+            str: df['new_content'], preprocessed 기사내용
+        """
+        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
+        # topic, topic = re.split(r'\\t', data)
+        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
+        data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
+        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
+        data = re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '',
+                      data)  # remove special characters
+        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
+        data = data.strip()
+
+        return data
+
+    def load_data(self, stopwords: bool = True) -> List[str]:
+        """
+        메인 함수부분
+        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
+        각 뉴스가 string인 리스트로 리턴
+
+        Args:
+            stopwords: 불용어 사용할지 안할지
+
+        Returns: 여러 뉴스데이터 문자열 리스트
+
+        """
+        self.stopwords = stopwords
+
+        paths = list(self.data_dir.glob('*.txt'))
+        docs = []
+        for path in paths:
+            loader_fn = self.load_txt_data_
+            doc = loader_fn(path)
+
+            docs += [doc]
+        self.ord_docs = docs
+
+        docs = list(map(self.comb_stopwords_, docs))
+
+        return docs
+
 ##
 if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    news = News()
+    news = NaverSports()
 
-    docs, topics = news.load_data()
+    docs = news.load_data()
+
+    ##
+    for doc in docs[0]:
+        print(doc)
 
     ##
     for idx in news.df.index:
