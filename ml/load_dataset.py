@@ -195,15 +195,16 @@ class NaverSports:
     directory: newsData/7/*.txt
     """
 
-    def __init__(self, data_dir: list = './newsData/7', stopwords: list = []):
+    def __init__(self, data_dir: list = './newsData/7', stop_words: list = []):
         """
         Args:
             data_dir:
             stopwords:
         """
         self.data_dir = Path(data_dir)
-        self.stop_words = ['\xa0', '\t']
-        self.stop_words += stopwords
+        # self.stop_words = ['\xa0', '\t']
+        self.stop_words = ['\xa0']
+        self.stop_words += stop_words
 
     def load_txt_data_(self, path: str) -> str:
         """
@@ -222,7 +223,7 @@ class NaverSports:
         doc = ' '.join(strings)
         return doc
 
-    def comb_stopwords_(self, x: str) -> str:
+    def comb_stopwords_(self, x: str) -> Tuple[str, str]:
         """
         문자열에서 불용어 제거
 
@@ -234,13 +235,14 @@ class NaverSports:
         """
         if self.stopwords:
             x = re.sub('|'.join(self.stop_words), ' ', x)
-            x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
+            # x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
             # x = re.sub(r"\\", '', x)
             # x = x.replace('\\', '')
-            x = self.crop_article_(x)
+            x, y = self.crop_article_(x)
+            return x, y
         return x
 
-    def crop_article_(self, data: str) -> str:
+    def crop_article_(self, data: str) -> Tuple[str, str]:
         """기사에서 불필요한 내용 제거
 
         Args:
@@ -250,7 +252,8 @@ class NaverSports:
             str: df['new_content'], preprocessed 기사내용
         """
         data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
-        # topic, topic = re.split(r'\\t', data)
+        # print(re.split('[TAB]', data))
+        topic, data = re.split('\t', data)
         data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
         data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
@@ -260,7 +263,7 @@ class NaverSports:
         data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
         data = data.strip()
 
-        return data
+        return data, topic
 
     def load_data(self, stopwords: bool = True) -> List[str]:
         """
@@ -284,21 +287,33 @@ class NaverSports:
 
             docs += [doc]
         self.ord_docs = docs
+        x, y = [], []
+        for doc in docs:
+            x_, y_ = self.comb_stopwords_(doc)
+            x += [x_]
+            y += [y_]
 
-        docs = list(map(self.comb_stopwords_, docs))
-
-        return docs
+        return x, y
 
 ##
 if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
     news = NaverSports()
 
-    docs = news.load_data()
+    docs, topics = news.load_data(stopwords=True)
 
     ##
-    for doc in docs[0]:
-        print(doc)
+    ord_docs = news.ord_docs
+    ord_doc = ord_docs[0]
+    # for doc in docs[0]:
+    #     print(doc)
+
+    ##
+    a = [1,2,3]
+    def f(x):
+        return x+1, x+2
+    b = list(map(f, a))
+    print(b)
 
     ##
     for idx in news.df.index:
