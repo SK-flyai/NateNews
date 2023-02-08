@@ -10,6 +10,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import kss
+import warnings
 
 from load_dataset import *
 
@@ -18,11 +19,11 @@ class TextRank:
     bert 기반 추출적 요약 텍스트 랭크 알고리즘
     문장들 간에 유사도를 구하고 그 기반으로 중요한 문장 추출
     """
-    def __init__(self):
+    def __init__(self, model_path="jhgan/ko-sbert-nli"):
         """
         self.embedding_model: kobert으로 학습시킨 sentencebert
         """
-        self.embedding_model = SentenceTransformer("jhgan/ko-sbert-nli")
+        self.embedding_model = SentenceTransformer(model_path)
 
     def similarity_matrix_(self, sentence_embedding: np.ndarray) -> np.ndarray:
         """
@@ -65,11 +66,11 @@ class KeySentence:
     """
     keybert 알고리즘을 기반으로 신문기사 내용에서 주요 문장 추출
     """
-    def __init__(self):
+    def __init__(self, model_path='jhgan/ko-sbert-nli'):
         """
         self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
         """
-        self.model = SentenceTransformer("jhgan/ko-sbert-nli")
+        self.model = SentenceTransformer(model_path)
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
              sents: np.ndarray, top_n: int, nr_candidates: int) -> List[str]:
@@ -184,13 +185,13 @@ class KeySentence:
 
 
 if __name__ == '__main__':
-
+    warnings.filterwarnings('ignore')
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
     news = NaverSports()
-    # news = News()
-    docs = news.load_data()
 
+    docs, topics = news.load_data()
 
+    ##
     keysent = KeySentence()
     textrank = TextRank()
 
@@ -211,23 +212,18 @@ if __name__ == '__main__':
         print(sent)
 
     ##
-#     a = kss.split_sentences(docs[1])
-#     for sen in a:
-#         print(sen)
-#
-#     ##
-#     textrank = TextRank()
-#     sentence_embeddings = textrank.embedding_model.encode(a)
-#
-#     ##
-#     sim_matrix = textrank.similarity_matrix_(sentence_embeddings)
-#
-#     ##
-#     scores = textrank.calculate_score(sim_matrix)
-#
-#     ##
-#     top_sents = textrank.ranked_sentences(a, scores, n=3)
-#
-# ##
-#     for sent in top_sents:
-#         print(sent)
+    # model = KeySentence()
+    # model = KeySentence(model_path='./model')
+    # model = TextRank()
+    model = TextRank(model_path='./model')
+
+    pred_idx = 3
+    sents = kss.split_sentences(docs[pred_idx])
+    keysents = model.predict(docs[pred_idx], top_n=3)
+
+    with open('result/naver_rank_good_sum.txt', 'w') as f:
+        for sent in sents:
+            f.write(sent + "\n")
+        f.write('\n')
+        for keysent in keysents:
+            f.write(keysent + '\n')

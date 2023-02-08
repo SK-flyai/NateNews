@@ -1,5 +1,10 @@
 .idea/
 crawling/
+.tmp.driveupload/
+.tmp.drivedownload/
+__pycache__/
+model/
+runs/
 
 *.txt
 *.csv

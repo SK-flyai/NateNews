@@ -3,9 +3,6 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
 from pathlib import Path
-from transformers import FeatureExtractionPipeline
-from transformers import BertTokenizer
-from transformers import BertConfig, BertModel
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 import itertools
@@ -13,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import warnings
+import kss
 
 from load_dataset import *
 from preprocess import CustomTokenizer
@@ -21,12 +19,12 @@ class KeyBERT:
     """
     신문기사 내용에서 주요 키워드를 추출
     """
-    def __init__(self, tag: str = 'NNP'):
+    def __init__(self, tag: str = 'NNP', model_path="jhgan/ko-sbert-nli"):
         """
         self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
         self.tokenizer: 키워드 후보군 추출에 사용되는 tokenizer
         """
-        self.model = SentenceTransformer("jhgan/ko-sbert-nli")
+        self.model = SentenceTransformer(model_path)
         self.tokenizer = CustomTokenizer(Mecab(), tag=tag)
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
@@ -133,7 +131,6 @@ class KeyBERT:
         candidates = count.get_feature_names_out()
 
         doc_embedding = self.model.encode([doc])
-        print(doc_embedding.shape)
         candidate_embeddings = self.model.encode(candidates)
 
         keyword = None
@@ -154,12 +151,23 @@ if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
     news = NaverSports()
 
-    docs = news.load_data()
+    docs, topics = news.load_data()
 
     ##
-    keybert = KeyBERT()
+    keybert = KeyBERT(model_path='./model')
+    # keybert = KeyBERT()
 
     ##
-    print(keybert.predict(docs[3], top_n=10, ngram_range=(1, 1)))
+    print(keybert.predict(docs[2], top_n=10, ngram_range=(1, 1)))
+
+    ##
+    pred_idx = 3
+    sents = kss.split_sentences(docs[pred_idx])
+    keywords = keybert.predict(docs[pred_idx], top_n=10, ngram_range=(1,1))
 
     #################### docs[0]은 키워드가 한개 나와서 에러 나옴
+    ##
+    with open('naver_good_ex.txt', 'w') as f:
+        for sent in sents:
+            f.write(sent + "\n")
+        f.write('\n' + ', '.join(keywords))
