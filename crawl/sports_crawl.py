@@ -95,7 +95,6 @@ class SportsNews:
     def create(
         cls,
         url:str,
-        sleep:bool=False,
     ):
         # TODO: 기사가 없는 경우 -> svcname='뉴스'
         """create `NateNews` if it satisfy some conditions
