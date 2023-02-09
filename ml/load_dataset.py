@@ -422,3 +422,6 @@ if __name__ == '__main__':
 
     ##
     df.to_csv('./newsData/Naver.csv')
+
+    ##
+    df = pd.read_csv('./newsData/Naver.csv')

@@ -1,4 +1,5 @@
 ##
+import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
@@ -15,8 +16,6 @@ from collections import defaultdict
 
 from load_dataset import *
 from preprocess import CustomTokenizer
-
-##
 
 class KeyBERT:
     """
@@ -130,10 +129,13 @@ class KeyBERT:
         Returns:
             top_n개의 키워드 리스트
         """
-        count = CountVectorizer(tokenizer=self.tokenizer, ngram_range=ngram_range).fit([doc])
-        print(1)
+        try:
+            count = CountVectorizer(tokenizer=self.tokenizer, ngram_range=ngram_range).fit([doc])
+        except ValueError:
+            return []
+
         candidates = count.get_feature_names_out()
-        print(candidates)
+
 
         doc_embedding = self.model.encode([doc])
         candidate_embeddings = self.model.encode(candidates)
@@ -157,7 +159,8 @@ if __name__ == '__main__':
     # news = NaverSports()
     #
     # docs, topics = news.load_data()
-    data_df = pd.read_csv('./newsData/Naver.csv')
+    data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
+
 
     ##
     keybert = KeyBERT(model_path='./model')
@@ -178,16 +181,62 @@ if __name__ == '__main__':
     #         f.write(sent + "\n")
     #     f.write('\n' + ', '.join(keywords))
 
-    # ## pred_keyword to dataframe
-    # top_n = 5
-    # top_n_dic = defaultdict(list)
-    #
-    # for i in range(len(data_df)):
-    #     keywords = keybert.predict(data_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1,1))
-    #     for j, keyword in enumerate(keywords):
-    #         print(j, keyword)
-    #         top_n_dic['top_{}'.format(j)] += [keyword]
-    #         print(top_n_dic)
+    ## pred_keyword to dataframe
+    top_n = 5
+    total_keywords = []
+    for i in tqdm(range(len(data_df))):
+        keywords = keybert.predict(data_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1,1))
+        total_keywords += keywords
+        for j, keyword in enumerate(keywords):
+            data_df.loc[i, 'top_{}'.format(j)] = keyword
+    total_keywords = pd.Series(total_keywords, name='count')
 
     ##
-    keybert.predict(data_df.loc[1, 'contents'], top_n=5, ngram_range=(1,1))
+    keywords_counts = total_keywords.value_counts()
+
+    ## save
+    data_df.to_csv('./newsData/Naver_keyword.csv')
+    keywords_counts.to_csv('./newsData/Naver_keywords_counts.csv')
+
+    ## load keywords_counts, news별 키워드 data_df
+    keywords_counts = pd.read_csv('./newsData/Naver_keywords_counts.csv', index_col=0)
+    data_df = pd.read_csv('./newsData/Naver_keyword.csv', index_col=0)
+
+    ##
+    keyword = keywords_counts.index[30]
+    print('keyword: ', keyword)
+    print(data_df[data_df['top_0'] == keyword]['titles'][:5])
+
+    ##
+    keyword = keywords_counts.index[120]
+    print('keyword: ', keyword)
+    print(data_df[(data_df['top_0'] == keyword) | (data_df['top_1'] == keyword) | \
+                  (data_df['top_2'] == keyword) | (data_df['top_3'] == keyword) | \
+                  (data_df['top_4'] == keyword)]['titles'][:5])
+
+    ## keywords 별로 타이틀 10개씩 csv save
+    keywords_title_df = pd.DataFrame(columns=['count'] + ['title_{}'.format(i) for i in range(10)])
+    keywords = keywords_counts.index
+    for keyword in tqdm(keywords):
+        data = data_df[(data_df['top_0'] == keyword) | (data_df['top_1'] == keyword) | \
+                  (data_df['top_2'] == keyword) | (data_df['top_3'] == keyword) | \
+                  (data_df['top_4'] == keyword)]['titles'][:10]
+        data = data.to_list()
+        data += [None] * (10-len(data))
+        keywords_title_df.loc[keyword] = [keywords_counts.loc[keyword, 'count']] + data
+
+    ##
+    keywords_title_df.to_csv('./newsData/keywords_title.csv')
+
+    ##
+    d = pd.DataFrame(
+        {
+            'a': [1,2,3],
+            'b': [4,5,6]
+        }
+    )
+
+    ##
+    # print(data_df[data_df['top_0'] == keyword | data_df['top_1'] == keyword])
+    # print((data_df['top_0'] == keyword) | (data_df['top_1'] == keyword))
+    print(data_df[(keyword in data_df[['top_0', 'top_1']])])

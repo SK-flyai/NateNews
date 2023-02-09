@@ -78,7 +78,8 @@ for i in idxs:
 #     eval_scores += [0.0]
 
 ## load model
-model = SentenceTransformer("jhgan/ko-sbert-nli")
+# model = SentenceTransformer("jhgan/ko-sbert-nli")
+model = SentenceTransformer('./model')
 
 ## prepare before train
 import shutil
