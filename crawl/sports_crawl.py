@@ -41,9 +41,9 @@ class SportsNews:
         ]
     
     def _get_press(self):
-        press = self.content.find('dl', {'class': 'articleInfo'})
-        # press.text
-        return press.select("img")[0]['alt']
+        _press = self.content.find('a', {'class': 'medium'})
+        press = _press.text if _press.text else _press.select('img')[0]['alt']
+        return press
 
     def _get_category(self):
         nav = self.content.find('div', {'class': 'snbArea'})
@@ -65,13 +65,13 @@ class SportsNews:
     
     def _get_title(self):
         title = self.content.find('h3', {'class': 'viewTite'})
+        if not title:
+            title = self.content.find('h3', {'class': 'articleSubecjt'})
         return title.text
     
-    
     def _get_date(self):
-        _date = self.content.find('dl', {'class': 'articleInfo'})
-        _date = _date.find('em').text
-        date: dt.datetime = dt.datetime.strptime(_date, "%Y-%m-%d %H:%M")
+        date = self.content.find('em').text
+        # date: dt.datetime = dt.datetime.strptime(_date, "%Y-%m-%d %H:%M")
         return date
     
     def _preprocessing(self, article):
@@ -178,24 +178,19 @@ class SportsNews:
         # TODO: add exclusion rule for press('연합뉴스',etc..)
         # if sleep: time.sleep(0.5)
         new_class = cls(url)
-        # article = new_class.content.find(
-        #     'div',
-        #     {'id': 'RealArtcContents'}
-        # )
-        # if not article:
-        #     article = new_class.content.find(
-        #         'div',
-        #         {'id': 'articleContetns'}
-        #     )
-        # if not article:
-        #     return None
-        
         which_news = new_class.content.find(
             'a',
             {'class': 'svcname'}
         ).text
-        if which_news == '스포츠':
+        if which_news != '뉴스':
             return new_class
-        else:
-            return None
 
+        article = new_class.content.find(
+            'div',
+            {'id': 'articleContetns'}
+        )
+        if not article:
+            print(f"Error occurs in {url}")
+            return None
+        else:
+            return new_class
