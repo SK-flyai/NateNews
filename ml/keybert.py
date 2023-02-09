@@ -163,11 +163,18 @@ if __name__ == '__main__':
 
 
     ##
-    keybert = KeyBERT(model_path='./model')
+    # keybert = KeyBERT(model_path='./model')
+    keybert = KeyBERT(model_path='sinjy1203/ko-sbert-navernews')
     # keybert = KeyBERT()
 
     ##
-    # print(keybert.predict(docs[2], top_n=10, ngram_range=(1, 1)))
+    data_df.loc[1000, 'contents']
+
+    ## mecab 사용자 사전 확인
+    keybert.tokenizer(data_df.loc[1000, 'contents'])
+
+    ##
+    print(keybert.predict(data_df.loc[1, 'contents'], top_n=5, ngram_range=(1, 1)))
 
     ##
     # pred_idx = 3
