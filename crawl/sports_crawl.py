@@ -6,6 +6,19 @@ from bs4 import BeautifulSoup as bs
 
 
 LINK = 'https://news.nate.com/view/'
+# TODO: rename SportsNews to NateNews
+# TODO: modulize
+"""
+/
+L crawl
+    L utils
+        L funcs
+    L nate
+        L NateNews
+"""
+# TODO: () handling
+# TODO: all domain handling 
+
 
 class SportsNews:
     def __init__(self, url:str):
