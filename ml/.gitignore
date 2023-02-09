@@ -5,6 +5,7 @@ crawling/
 __pycache__/
 model/
 runs/
+ko-sbert-navernews/
 
 *.txt
 *.csv
