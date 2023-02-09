@@ -53,7 +53,7 @@ def get_news(
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(SportsNews.create, url_list))
     else:
-        _news_list = [SportsNews.create(url, sleep=True) for url in url_list]
+        _news_list = [SportsNews.create(url) for url in url_list]
     
     news_list = [news for news in _news_list if news]
     return news_list
