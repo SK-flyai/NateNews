@@ -42,7 +42,10 @@ class SportsNews:
     
     def _get_press(self):
         _press = self.content.find('a', {'class': 'medium'})
-        press = _press.text if _press.text else _press.select('img')[0]['alt']
+        if _press:
+            press = _press.text
+        else:
+            press = self.content.find('dl', {'class': 'articleInfo'}).select('img')[0]['alt']
         return press
 
     def _get_category(self):
@@ -193,6 +196,8 @@ class SportsNews:
             'div',
             {'id': 'articleContetns'}
         )
+        
+        # 기사가 없는 경우
         if not article:
             print(f"Error occurs in {url}")
             return None
