@@ -11,9 +11,12 @@ from sentence_transformers import SentenceTransformer, util
 import numpy as np
 import warnings
 import kss
+from collections import defaultdict
 
 from load_dataset import *
 from preprocess import CustomTokenizer
+
+##
 
 class KeyBERT:
     """
@@ -100,7 +103,7 @@ class KeyBERT:
 
         # 최고의 키워드는 이미 추출했으므로 top_n-1번만큼 아래를 반복.
         # ex) top_n = 5라면, 아래의 loop는 4번 반복됨.
-        for _ in range(top_n - 1):
+        for _ in range(min(top_n, len(words)) - 1):
             candidate_similarities = word_doc_similarity[candidates_idx, :]
             target_similarities = np.max(word_similarity[candidates_idx][:, keywords_idx], axis=1)
             # MMR을 계산
@@ -128,7 +131,9 @@ class KeyBERT:
             top_n개의 키워드 리스트
         """
         count = CountVectorizer(tokenizer=self.tokenizer, ngram_range=ngram_range).fit([doc])
+        print(1)
         candidates = count.get_feature_names_out()
+        print(candidates)
 
         doc_embedding = self.model.encode([doc])
         candidate_embeddings = self.model.encode(candidates)
@@ -148,26 +153,41 @@ class KeyBERT:
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
-    # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    news = NaverSports()
-
-    docs, topics = news.load_data()
+    # # news = NateNews(data_dir='./natenews_data/20220301.csv')
+    # news = NaverSports()
+    #
+    # docs, topics = news.load_data()
+    data_df = pd.read_csv('./newsData/Naver.csv')
 
     ##
     keybert = KeyBERT(model_path='./model')
     # keybert = KeyBERT()
 
     ##
-    print(keybert.predict(docs[2], top_n=10, ngram_range=(1, 1)))
+    # print(keybert.predict(docs[2], top_n=10, ngram_range=(1, 1)))
 
     ##
-    pred_idx = 3
-    sents = kss.split_sentences(docs[pred_idx])
-    keywords = keybert.predict(docs[pred_idx], top_n=10, ngram_range=(1,1))
+    # pred_idx = 3
+    # sents = kss.split_sentences(docs[pred_idx])
+    # keywords = keybert.predict(docs[pred_idx], top_n=10, ngram_range=(1,1))
 
     #################### docs[0]은 키워드가 한개 나와서 에러 나옴
     ##
-    with open('naver_good_ex.txt', 'w') as f:
-        for sent in sents:
-            f.write(sent + "\n")
-        f.write('\n' + ', '.join(keywords))
+    # with open('naver_good_ex.txt', 'w') as f:
+    #     for sent in sents:
+    #         f.write(sent + "\n")
+    #     f.write('\n' + ', '.join(keywords))
+
+    # ## pred_keyword to dataframe
+    # top_n = 5
+    # top_n_dic = defaultdict(list)
+    #
+    # for i in range(len(data_df)):
+    #     keywords = keybert.predict(data_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1,1))
+    #     for j, keyword in enumerate(keywords):
+    #         print(j, keyword)
+    #         top_n_dic['top_{}'.format(j)] += [keyword]
+    #         print(top_n_dic)
+
+    ##
+    keybert.predict(data_df.loc[1, 'contents'], top_n=5, ngram_range=(1,1))
