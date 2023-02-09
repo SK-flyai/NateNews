@@ -182,8 +182,12 @@ class SportsNews:
             'a',
             {'class': 'svcname'}
         ).text
-        if which_news != '뉴스':
+        if which_news == '스포츠':
             return new_class
+        
+        # 연예 기사는 제외
+        elif which_news == '연예':
+            return None
 
         article = new_class.content.find(
             'div',
