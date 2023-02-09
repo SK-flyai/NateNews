@@ -95,7 +95,7 @@ class News:
 
         """
         self.stopwords = stopwords
-        paths = list(self.data_dir.glob('7/*.txt'))
+        paths = list(self.data_dir.glob('*/*.txt'))
         docs, topics = [], []
         for path in paths:
             loader_fn = self.load_txt_data_
@@ -202,7 +202,6 @@ class NaverSports:
             stopwords:
         """
         self.data_dir = Path(data_dir)
-        # self.stop_words = ['\xa0', '\t']
         self.stop_words = ['\xa0']
         self.stop_words += stop_words
 
@@ -295,48 +294,131 @@ class NaverSports:
 
         return x, y
 
+
+
+class NaverNews:
+    """
+    네이버 뉴스 데이터셋에서 스포츠만
+    category: 정치(0), 경제(1), 사회(2), 생활/문화(3), 세계(4), 기술/IT(5), 연예(6), 스포츠(7)
+    directory: newsData/category/*.txt
+    """
+
+    def __init__(self, data_dir: list = './newsData', stop_words: list = []):
+        """
+        Args:
+            data_dir:
+            stopwords:
+        """
+        self.data_dir = Path(data_dir)
+        self.stop_words = ['\xa0']
+        self.stop_words += stop_words
+
+    def load_txt_data_(self, path: str) -> str:
+        """
+        하나의 .txt 형식의 뉴스데이터를 가져와 string으로 변환
+
+        Args:
+            path: .txt file path
+
+        Returns: string
+
+        """
+        with open(path, "r", encoding='UTF8') as f:
+            strings = f.readlines()
+        strings = list(map(lambda s: s.strip(), strings))  # 앞뒤 공백제거
+        strings = list(filter(lambda s: s != '', strings))  # 빈 문자열 제거
+        doc = ' '.join(strings)
+        return doc
+
+    def comb_stopwords_(self, x: str) -> Tuple[str, str]:
+        """
+        문자열에서 불용어 제거
+
+        Args:
+            x: string
+
+        Returns:
+
+        """
+        if self.stopwords:
+            x = re.sub('|'.join(self.stop_words), ' ', x)
+            # x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
+            # x = re.sub(r"\\", '', x)
+            # x = x.replace('\\', '')
+            x, y = self.crop_article_(x)
+            return x, y
+        return x
+
+    def crop_article_(self, data: str) -> Tuple[str, str]:
+        """기사에서 불필요한 내용 제거
+
+        Args:
+            data(str): df['content'], 뉴스의 원본 기사내용
+
+        Returns:
+            str: df['new_content'], preprocessed 기사내용
+        """
+        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
+        topic, data = re.split('\t', data)
+        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
+        data = re.sub("[【\(\[].*?[\)\]】]", "", data)  # remove text surrounded by brackets
+        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
+        data = re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '',
+                      data)  # remove special characters
+        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
+        data = data.strip()
+
+        return data, topic
+
+    def load_data(self, stopwords: bool = True) -> Tuple[list, list, list]:
+        """
+        메인 함수부분
+        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
+        각 뉴스가 string인 리스트로 리턴
+
+        Args:
+            stopwords: 불용어 사용할지 안할지
+
+        Returns: 여러 뉴스데이터 문자열 리스트
+
+        """
+        self.stopwords = stopwords
+
+        paths = list(self.data_dir.glob('*/*.txt'))
+        docs = []
+        categories = []
+        for path in paths:
+            loader_fn = self.load_txt_data_
+            doc = loader_fn(path)
+            category = int(path.parts[-2])
+
+            categories += [category]
+            docs += [doc]
+        self.ord_docs = docs
+        contents, titles = [], []
+        for doc in docs:
+            content, title = self.comb_stopwords_(doc)
+            contents += [content]
+            titles += [title]
+
+        return contents, titles, categories
+
 ##
 if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    news = NaverSports()
+    news = NaverNews()
 
-    docs, topics = news.load_data(stopwords=True)
-
-    ##
-    ord_docs = news.ord_docs
-    ord_doc = ord_docs[0]
-    # for doc in docs[0]:
-    #     print(doc)
+    contents, titles, categories = news.load_data()
 
     ##
-    a = [1,2,3]
-    def f(x):
-        return x+1, x+2
-    b = list(map(f, a))
-    print(b)
+    df = pd.DataFrame(
+        {
+            'contents': contents,
+            'titles': titles,
+            'categories': categories
+        }
+    )
 
     ##
-    for idx in news.df.index:
-        if '한국공학한림원' in news.df.loc[idx, 'new_content']:
-            break
-    new_doc, doc = news.df.loc[idx, 'new_content'], news.df.loc[idx, 'content']
-    # new_df = news.df['한국공학한림원' in news.df['new_content']]
-
-    ##
-
-    for doc in docs:
-        if '한국공학한림원' in doc:
-            break
-
-    # print(docs, len(topics))
-
-    # ids, dialogues, summaries = [], [], []
-    # for path in paths:
-    #     loader_fn = load_json_data
-    #
-    #     file_ids, file_dialogues, file_summaries = loader_fn(path)
-    #     ids.extend(file_ids)
-    #     dialogues.extend(file_dialogues)
-    #     summaries.extend(file_summaries)
-    #
-    # dialogues[0]
+    df.to_csv('./newsData/Naver.csv')
