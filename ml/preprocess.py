@@ -1,6 +1,9 @@
+import os
 from konlpy.tag import Mecab
 from typing import *
 import pandas as pd
+import pickle
+from pathlib import Path
 
 class CustomTokenizer:
     """
@@ -20,7 +23,53 @@ class CustomTokenizer:
         self.tagger = tagger
         self.tag = tag
 
-    def __call__(self, sent: str) -> List[str]:
+    def add_userdic(self, words: List[str], userdic_path: str = 'C:/mecab/mecab-ko-dic/user-custom.csv'):
+        """
+        mecab에서 인식못하는 단어 사용자 사전에 추가
+        이 함수 실행후 windows powershell 관리자 모드로 C:/mecab 위치에서 .\tools\compile-win.ps1 실행
+        Args:
+            words: 추가할 단어들
+            userdic_path: 사용자 사전 위치
+        """
+        with open(userdic_path, 'a', encoding='utf-8') as f:
+            for word in words:
+                f.write('{},1788,3549,0,NNP,*,F,{},*,*,*,*,*\n'.format(word, word))
+
+    def add_mapping(self, add_dict: Dict[str, str], save_path='./user_words/word_mapping.pkl'):
+        """
+        버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 저장
+
+        Args:
+            add_dict: 추가할 단어 매핑 딕셔너리
+            save_path: 딕셔너리 저장 경로
+        """
+        if os.path.isfile(save_path):
+            with open(save_path, 'rb') as f:
+                user_dict = pickle.load(f)
+                user_dict.update(add_dict)
+        else:
+            user_dict = add_dict
+        with open(save_path, 'wb') as f:
+            pickle.dump(user_dict, f)
+
+    def add_filtering(self, add_filter: Set[str], save_path='./user_words/word_filtering.pkl'):
+        """
+        불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 저장
+
+        Args:
+            add_filter: 추가할 단어 집합
+            save_path: 집합 저장경로
+        """
+        if os.path.isfile(save_path):
+            with open(save_path, 'rb') as f:
+                user_filter = pickle.load(f)
+                user_filter = user_filter.union(add_filter)
+        else:
+            user_filter = add_filter
+        with open(save_path, 'wb') as f:
+            pickle.dump(user_filter, f)
+
+    def __call__(self, sent: str, user_words_path: str = './user_words') -> List[str]:
         """
         mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 길이 1 이하의 단어는 삭제
         Args:
@@ -37,11 +86,55 @@ class CustomTokenizer:
             word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(sent))))
         else:
             raise Exception('keyerror')
-        result = [word for word in word_tokens if len(word) > 1]
+        # result = [word for word in word_tokens if len(word) > 1]
+        result = word_tokens
+        user_words_path = Path(user_words_path)
+        f_filtering, f_mapping = open(str(user_words_path / 'word_filtering.pkl'), 'rb') \
+                                , open(str(user_words_path / 'word_mapping.pkl'), 'rb')
+        self.filtering = pickle.load(f_filtering)
+        self.mapping = pickle.load(f_mapping)
+        f_filtering.close()
+        f_mapping.close()
+
+        def func(x):
+            if x in self.mapping:
+                return self.mapping[x]
+            return x
+
+        result = list(map(func, result))
+        result = list(filter(lambda x: x not in self.filtering, result))
         return result
+
 
 if __name__ == '__main__':
     tokenizer = CustomTokenizer(Mecab())
+    print(tokenizer('신정열은 양의동과 김서현과 안치호와 같이 프로젝트를 진행하였다.'))
+
+    ##
+    tokenizer.add_mapping(
+        {
+            '안치호': '치호',
+            '양의동': '동'
+        }
+    )
+
+    ##
+    with open('./user_words/word_mapping.pkl', 'rb') as f:
+        my_dict = pickle.load(f)
+    print(my_dict)
+
+    ##
+    tokenizer.add_filtering(
+        {
+            '양의동', '김서현'
+        }
+    )
+
+    ##
+    with open('./user_words/word_filtering.pkl', 'rb') as f:
+        my_dict = pickle.load(f)
+    print(my_dict)
+
     ##
     df = pd.read_csv('./newsData/Naver.csv')
     print(tokenizer(df.loc[453, 'contents']))
