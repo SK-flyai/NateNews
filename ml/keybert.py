@@ -1,4 +1,5 @@
 ##
+from typing import *
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
@@ -21,7 +22,7 @@ class KeyBERT:
     """
     신문기사 내용에서 주요 키워드를 추출
     """
-    def __init__(self, tag: str = 'NNP', model_path="jhgan/ko-sbert-nli"):
+    def __init__(self, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'), model_path="jhgan/ko-sbert-nli"):
         """
         self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
         self.tokenizer: 키워드 후보군 추출에 사용되는 tokenizer
@@ -167,10 +168,10 @@ if __name__ == '__main__':
     # keybert = KeyBERT()
 
     ##
-    ord_data_df.loc[1000, 'contents']
+    ord_data_df.loc[453, 'contents']
 
     ## mecab 사용자 사전 확인
-    keybert.tokenizer(ord_data_df.loc[1000, 'contents'])
+    keybert.tokenizer(ord_data_df.loc[453, 'contents'])
 
     ##
     print(keybert.predict(ord_data_df.loc[453, 'contents'], top_n=5, ngram_range=(1, 1)))
