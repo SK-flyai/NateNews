@@ -159,8 +159,7 @@ if __name__ == '__main__':
     # news = NaverSports()
     #
     # docs, topics = news.load_data()
-    data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
-
+    ord_data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
 
     ##
     # keybert = KeyBERT(model_path='./model')
@@ -168,13 +167,13 @@ if __name__ == '__main__':
     # keybert = KeyBERT()
 
     ##
-    data_df.loc[1000, 'contents']
+    ord_data_df.loc[1000, 'contents']
 
     ## mecab 사용자 사전 확인
-    keybert.tokenizer(data_df.loc[1000, 'contents'])
+    keybert.tokenizer(ord_data_df.loc[1000, 'contents'])
 
     ##
-    print(keybert.predict(data_df.loc[1, 'contents'], top_n=5, ngram_range=(1, 1)))
+    print(keybert.predict(ord_data_df.loc[453, 'contents'], top_n=5, ngram_range=(1, 1)))
 
     ##
     # pred_idx = 3
@@ -191,18 +190,18 @@ if __name__ == '__main__':
     ## pred_keyword to dataframe
     top_n = 5
     total_keywords = []
+    data_df = ord_data_df.copy()
     for i in tqdm(range(len(data_df))):
         keywords = keybert.predict(data_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1,1))
         total_keywords += keywords
         for j, keyword in enumerate(keywords):
             data_df.loc[i, 'top_{}'.format(j)] = keyword
     total_keywords = pd.Series(total_keywords, name='count')
-
-    ##
     keywords_counts = total_keywords.value_counts()
 
     ## save
-    data_df.to_csv('./newsData/Naver_keyword.csv')
+    data_df[['titles', 'categories', 'top_0', 'top_1', 'top_2', 'top_3',
+       'top_4', 'contents']].to_csv('./newsData/Naver_keyword.csv')
     keywords_counts.to_csv('./newsData/Naver_keywords_counts.csv')
 
     ## load keywords_counts, news별 키워드 data_df
@@ -230,20 +229,11 @@ if __name__ == '__main__':
                   (data_df['top_4'] == keyword)]['titles'][:10]
         data = data.to_list()
         data += [None] * (10-len(data))
-        keywords_title_df.loc[keyword] = [keywords_counts.loc[keyword, 'count']] + data
+
+        try:
+            keywords_title_df.loc[keyword] = [keywords_counts.loc[keyword]] + data
+        except:
+            raise Exception('error')
 
     ##
     keywords_title_df.to_csv('./newsData/keywords_title.csv')
-
-    ##
-    d = pd.DataFrame(
-        {
-            'a': [1,2,3],
-            'b': [4,5,6]
-        }
-    )
-
-    ##
-    # print(data_df[data_df['top_0'] == keyword | data_df['top_1'] == keyword])
-    # print((data_df['top_0'] == keyword) | (data_df['top_1'] == keyword))
-    print(data_df[(keyword in data_df[['top_0', 'top_1']])])

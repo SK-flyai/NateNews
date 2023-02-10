@@ -282,21 +282,19 @@ class NaverNews:
         """
 
         paths = list(self.data_dir.glob('*/*.txt'))
-        docs = []
         categories = []
+        contents, titles = [], []
         for path in paths:
             loader_fn = self.load_txt_data_
             doc = loader_fn(path)
             category = int(path.parts[-2])
-
-            categories += [category]
-            docs += [doc]
-        # self.ord_docs = docs
-        contents, titles = [], []
-        for doc in docs:
             content, title = self.preprocess_(doc)
+
+            if len(content) < 10:
+                continue
             contents += [content]
             titles += [title]
+            categories += [category]
 
         return contents, titles, categories
 
