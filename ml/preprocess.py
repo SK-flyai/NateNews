@@ -23,18 +23,6 @@ class CustomTokenizer:
         self.tagger = tagger
         self.tag = tag
 
-    def add_userdic(self, words: List[str], userdic_path: str = 'C:/mecab/mecab-ko-dic/user-custom.csv'):
-        """
-        mecab에서 인식못하는 단어 사용자 사전에 추가
-        이 함수 실행후 windows powershell 관리자 모드로 C:/mecab 위치에서 .\tools\compile-win.ps1 실행
-        Args:
-            words: 추가할 단어들
-            userdic_path: 사용자 사전 위치
-        """
-        with open(userdic_path, 'a', encoding='utf-8') as f:
-            for word in words:
-                f.write('{},1788,3549,0,NNP,*,F,{},*,*,*,*,*\n'.format(word, word))
-
     def add_mapping(self, add_dict: Dict[str, str], save_path='./user_words/word_mapping.pkl'):
         """
         버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 저장
@@ -71,7 +59,7 @@ class CustomTokenizer:
 
     def __call__(self, sent: str, user_words_path: str = './user_words') -> List[str]:
         """
-        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 길이 1 이하의 단어는 삭제
+        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 mapping & filtering
         Args:
             sent: 원본 문장
 
@@ -136,5 +124,5 @@ if __name__ == '__main__':
     print(my_dict)
 
     ##
-    df = pd.read_csv('./newsData/Naver.csv')
-    print(tokenizer(df.loc[453, 'contents']))
+    df = pd.read_csv('./newsData/Naver.csv', index_col=0)
+    print(tokenizer(df.loc[23, 'contents']))
