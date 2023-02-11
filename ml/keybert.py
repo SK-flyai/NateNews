@@ -179,7 +179,7 @@ class KeyBERT:
         total_keywords = []
         news_keywords_df = data_df.copy()
         for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
-            keywords = keybert.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
+            keywords = self.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
             total_keywords += keywords
             for j, keyword in enumerate(keywords):
                 news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
