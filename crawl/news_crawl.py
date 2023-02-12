@@ -197,11 +197,13 @@ class NateNews:
             'a',
             {'class': 'svcname'}
         ).text
-        if which_news == '스포츠':
-            return new_class
         
         # 연예 기사는 제외
-        elif which_news == '연예':
+        if which_news == '연예':
+            return None
+
+        # 연합 뉴스들 제외
+        if new_class._get_press() == 'AP연합뉴스' or new_class._get_press() == 'EPA연합뉴스':
             return None
 
         article = new_class.content.find(
@@ -211,7 +213,7 @@ class NateNews:
         
         # 기사가 없는 경우
         if not article:
-            print(f"Error occurs in {url}")
+            print(f"There's no article in {url}")
             return None
         else:
             return new_class
