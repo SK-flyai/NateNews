@@ -31,6 +31,14 @@ class SportsNews:
         self.content = bs(html, 'html.parser')
     
     def get_info(self):
+        # return[
+        #     self._get_title(),
+        #     self._get_category(),
+        #     self._get_press(),
+        #     self._get_date(),
+        #     self._get_content(),
+        #     self.url,
+        # ]
         return[
             self._get_title(),
             self._get_category(),
@@ -81,11 +89,28 @@ class SportsNews:
         MESSAGE = '지원하지 않는 브라우저로 접근하셨습니다.\nInternet Explorer 10 이상으로 업데이트 해주시거나, 최신 버전의 Chrome에서 정상적으로 이용이 가능합니다.'
 
         article_text = str(article)
+            
+        pattern = '\[[^\]]*\]' # [] 내부 모두 제거
+        tmp = re.sub(pattern, '', article_text)
 
-        text = article_text.replace('\n', '').replace('\t', '').replace('\r', '') # 공백 제거
+        tmp = tmp.replace('\n', '').replace('\t', '').replace('\r', '') # 공백 제거
         pattern = "<br/?>" # <br> 태그 -> 개행으로 변경
-        tmp = re.sub(pattern, '\n', text)
+        tmp = re.sub(pattern, '\n', tmp)
         
+        # 캡션 표시
+        pattern = re.compile('(<p style="[^>]*>)([^<]*)(</p>)')
+        result = pattern.finditer(tmp)
+        for r in result:
+            tmp = tmp.replace(r.group(), f"[{r.group(2)}]")
+        # 캡션 표시
+        pattern = re.compile('(<span class="sub_tit">)([^<]*)(</span>)')
+        result = pattern.finditer(tmp)
+
+        for r in result:
+            tmp = tmp.replace(r.group(), f"[{r.group(2)}]")
+        
+        # print('after ###### caption eliminate')
+        # print(tmp)
         pattern = "</?p[^>]*>" # <p> or </p> -> 개행으로 변경
         tmp = re.sub(pattern, '\n', tmp)
         
@@ -96,21 +121,19 @@ class SportsNews:
         tmp = re.sub(pattern, '', tmp)
 
         pattern = "<img[^>]+>" # img들 모두 제거
-        tmp = re.sub(pattern, '\n(IMAGE)\n', tmp)
+        tmp = re.sub(pattern, '\n[IMAGE]\n', tmp)
         content = bs(tmp, 'html.parser') # 다시 parsing
         tmp = re.sub(' {2,}', ' ', content.text)
-        
-        pattern = '\[[^\]]*\]' # [] 내부 모두 제거
-        tmp = re.sub(pattern, '', tmp)
-        
+
         pattern = "<[^>]*>" # <> 내부 모두 제거
         text = re.sub(pattern, '', tmp)
         
-        last_text = ('').join([word for word in text if word.isalpha() or ord(word) < 128]) # 특수기호들 제거
+        pattern = "\([^\)]*\)" # () 내부 모두 제거
+        text = re.sub(pattern, '', text)
         
+        last_text = ('').join([word for word in text if word.isalpha() or ord(word) < 128])
         text = last_text.replace(MESSAGE, '')
         
-        # 이메일 제거
         pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.com'
         text = re.sub(pattern, '', text)
         pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.co.kr'
@@ -118,18 +141,17 @@ class SportsNews:
         pattern = '[a-zA-Z0-9+-_.]+@'
         text = re.sub(pattern, '', text)
         
-        # 공백 및 하단부 노이즈 제거
         text = re.sub('\n ', '\n\n', text)
-        text = re.sub('- ?\n', '\n\n', text)
+        text = re.sub('-\n', '\n\n', text)
         text = re.sub('\n{2,}', '\n\n', text)
         
-        # 기사 앞부분의 공백 및 개행 제거
         while text[0] == ' ' or text[0] == '\n':
             text = text[1:]
         if text[0] == ']': text = text[1:]
-        
-        # 기사내용 요약 부분 따로 구현
+        while text[-1] == ' ' or text[-1] == '\n':
+            text = text[:-1]
         text = text.replace('기사내용 요약', '[기사내용 요약]\n')
+
         return text
     
     
