@@ -3,6 +3,7 @@ import re
 import time
 
 from bs4 import BeautifulSoup as bs
+from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
@@ -62,7 +63,7 @@ class NateNews:
         #         {'id': 'RealArtcContents'}
         #     )
         # if not article: return None
-        return self._preprocessing(article)
+        return text_cleaning(article)
     
     def _get_title(self):
         title = self.content.find('h3', {'class': 'viewTite'})
@@ -74,75 +75,6 @@ class NateNews:
         date = self.content.find('em').text
         # date: dt.datetime = dt.datetime.strptime(_date, "%Y-%m-%d %H:%M")
         return date
-    
-    def _preprocessing(self, article):
-        MESSAGE = '지원하지 않는 브라우저로 접근하셨습니다.\nInternet Explorer 10 이상으로 업데이트 해주시거나, 최신 버전의 Chrome에서 정상적으로 이용이 가능합니다.'
-
-        article_text = str(article)
-            
-        pattern = '\[[^\]]*\]' # [] 내부 모두 제거
-        tmp = re.sub(pattern, '', article_text)
-
-        tmp = tmp.replace('\n', '').replace('\t', '').replace('\r', '') # 공백 제거
-        pattern = "<br/?>" # <br> 태그 -> 개행으로 변경
-        tmp = re.sub(pattern, '\n', tmp)
-        
-        # 캡션 표시
-        pattern = re.compile('(<p style="[^>]*>)([^<]*)(</p>)')
-        result = pattern.finditer(tmp)
-        for r in result:
-            tmp = tmp.replace(r.group(), f"[{r.group(2)}]")
-        # 캡션 표시
-        pattern = re.compile('(<span class="sub_tit">)([^<]*)(</span>)')
-        result = pattern.finditer(tmp)
-
-        for r in result:
-            tmp = tmp.replace(r.group(), f"[{r.group(2)}]")
-        
-        # print('after ###### caption eliminate')
-        # print(tmp)
-        pattern = "</?p[^>]*>" # <p> or </p> -> 개행으로 변경
-        tmp = re.sub(pattern, '\n', tmp)
-        
-        pattern = "<caption>[^>]+>" # caption 제거
-        tmp = re.sub(pattern, '', tmp)
-
-        pattern = "<a.+</a>" # [a] 태그 제거
-        tmp = re.sub(pattern, '', tmp)
-
-        pattern = "<img[^>]+>" # img들 모두 제거
-        tmp = re.sub(pattern, '\n[IMAGE]\n', tmp)
-        content = bs(tmp, 'html.parser') # 다시 parsing
-        tmp = re.sub(' {2,}', ' ', content.text)
-
-        pattern = "<[^>]*>" # <> 내부 모두 제거
-        text = re.sub(pattern, '', tmp)
-        
-        pattern = "\([^\)]*\)" # () 내부 모두 제거
-        text = re.sub(pattern, '', text)
-        
-        last_text = ('').join([word for word in text if word.isalpha() or ord(word) < 128])
-        text = last_text.replace(MESSAGE, '')
-        
-        pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.com'
-        text = re.sub(pattern, '', text)
-        pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.co.kr'
-        text = re.sub(pattern, '', text)
-        pattern = '[a-zA-Z0-9+-_.]+@'
-        text = re.sub(pattern, '', text)
-        
-        text = re.sub('\n ', '\n\n', text)
-        text = re.sub('-\n', '\n\n', text)
-        text = re.sub('\n{2,}', '\n\n', text)
-        
-        while text[0] == ' ' or text[0] == '\n':
-            text = text[1:]
-        if text[0] == ']': text = text[1:]
-        while text[-1] == ' ' or text[-1] == '\n':
-            text = text[:-1]
-        text = text.replace('기사내용 요약', '[기사내용 요약]\n')
-
-        return text
     
     
     @staticmethod
