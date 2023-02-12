@@ -1,6 +1,6 @@
 import requests
-import datetime as dt
 import re
+import time
 
 from bs4 import BeautifulSoup as bs
 
@@ -31,14 +31,6 @@ class SportsNews:
         self.content = bs(html, 'html.parser')
     
     def get_info(self):
-        # return[
-        #     self._get_title(),
-        #     self._get_category(),
-        #     self._get_press(),
-        #     self._get_date(),
-        #     self._get_content(),
-        #     self.url,
-        # ]
         return[
             self._get_title(),
             self._get_category(),
@@ -201,7 +193,7 @@ class SportsNews:
             Union[NateNews, None]: 
         """        
         # TODO: add exclusion rule for press('연합뉴스',etc..)
-        # if sleep: time.sleep(0.5)
+        time.sleep(0.5)
         new_class = cls(url)
         which_news = new_class.content.find(
             'a',
