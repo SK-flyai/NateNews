@@ -16,8 +16,6 @@ L crawl
     L nate
         L NateNews
 """
-# TODO: () handling
-# TODO: all domain handling 
 
 
 class SportsNews:

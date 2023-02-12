@@ -7,7 +7,6 @@ import datetime as dt
 import pandas as pd
 
 
-# TODO: make *.ipynb for instruct how to use utils.py
 LINK = 'https://news.nate.com/view/'
 COLUMNS = [
     'title',
@@ -37,18 +36,19 @@ def get_news_df(
     return pd.DataFrame(info_list, columns=COLUMNS)
 
 def get_news(
-    url_list: List[str]
+    url_list: Union[List[str], str]
 ):
     """Return `SportsNews` list
 
     Args:
-        url_list (List[str]): url list to be requested
+        url_list (Union[List[str], str]): url list to be requested
 
     Returns:
         List[Union[Response, None]]:
             1. SportsNews: Normal Request
             2. None: Abnormal Request(won't get that page)
     """
+    url_list = url_list if isinstance(url_list, list) else [url_list]
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(SportsNews.create, url_list))
