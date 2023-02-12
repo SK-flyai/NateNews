@@ -1,7 +1,6 @@
 ##
 import os
 from tqdm import tqdm
-from konlpy.tag import Mecab
 from pathlib import Path
 from sklearn.feature_extraction.text import CountVectorizer
 import itertools
@@ -12,7 +11,6 @@ import kss
 import shutil
 
 from load_dataset import *
-from preprocess import CustomTokenizer
 
 from sentence_transformers import SentenceTransformer, InputExample, losses, evaluation
 from torch.utils.data import DataLoader
@@ -68,13 +66,16 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
         model_path: 초기 모델 파라미터 경로
         output_path: finetuning 후 모델 저장 경로
     """
+    eval_path = os.path.join(output_path, 'eval/similarity_evaluation_results.csv')
+    if os.path.isfile(eval_path):
+        os.remove(eval_path)
     model = SentenceTransformer(model_path)
 
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=8)
     train_loss = losses.CosineSimilarityLoss(model)
     evaluator = evaluation.EmbeddingSimilarityEvaluator(*eval_dataset)
 
-    evaluator(model, output_path='model/eval')
+    evaluator(model, output_path=os.path.join(output_path, 'eval'))
 
     model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=10, evaluator=evaluator, warmup_steps=100,
               output_path=output_path)
