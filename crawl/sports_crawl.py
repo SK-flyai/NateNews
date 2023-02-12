@@ -42,7 +42,7 @@ class SportsNews:
     
     def _get_press(self):
         _press = self.content.find('a', {'class': 'medium'})
-        if _press:
+        if _press and _press.text:
             press = _press.text
         else:
             press = self.content.find('dl', {'class': 'articleInfo'}).select('img')[0]['alt']
