@@ -1,4 +1,5 @@
 ##
+from typing import *
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
@@ -21,7 +22,7 @@ class KeyBERT:
     """
     신문기사 내용에서 주요 키워드를 추출
     """
-    def __init__(self, tag: str = 'NNP', model_path="jhgan/ko-sbert-nli"):
+    def __init__(self, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'), model_path="jhgan/ko-sbert-nli"):
         """
         self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
         self.tokenizer: 키워드 후보군 추출에 사용되는 tokenizer
@@ -151,6 +152,59 @@ class KeyBERT:
 
         return keyword
 
+    def pred_df(self, top_n: int = 5, title_n: int = 10, path: str = './newsData'):
+        """
+        뉴스 데이터 프레임에 대해 예측한 키워드를 데이터 프레임으로 저장
+
+        Args:
+            top_n: 뉴스기사에서 예측할 키워드 개수
+            title_n: 각 키워드에 해당하는 뉴스기사 타이틀의 개수
+            path: 뉴스기사 데이터와 예측후 저장할 데이터 경로
+
+        Save:
+            news_keyword.df: 뉴스기사들과 각각의 예측 키워드
+                        columns => titles, categories, top_n.. , contents
+            keywords_titles.df: 많이 뽑힌 순으로 키워드들과 각각의 해당하는 기사
+                        columns => count, title_n...
+                        index => keyword
+
+        """
+        path = Path(path)
+        data_path = str(path / 'Naver.csv')
+        news_keywords_path = str(path / 'Naver_keyword.csv')
+        keywords_titles_path = str(path / 'keywords_title.csv')
+
+        data_df = pd.read_csv(data_path, index_col=0)
+
+        total_keywords = []
+        news_keywords_df = data_df.copy()
+        for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
+            keywords = self.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
+            total_keywords += keywords
+            for j, keyword in enumerate(keywords):
+                news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
+        total_keywords = pd.Series(total_keywords, name='count')
+        keywords_counts = total_keywords.value_counts()
+
+        # keywords 별로 title_n개씩 csv save
+        keywords_titles_df = pd.DataFrame(columns=['count'] + ['title_{}'.format(i) for i in range(title_n)])
+        keywords = keywords_counts.index
+        for keyword in tqdm(keywords, desc='find titles about keyword'):
+            data = []
+            for n in range(top_n):
+                data_ = news_keywords_df[news_keywords_df['top_{}'.format(n)] == keyword]['titles']
+                data += data_.to_list()
+
+            data = data[:title_n]
+            data += [None] * (title_n - len(data))
+
+            keywords_titles_df.loc[keyword] = [keywords_counts.loc[keyword]] + data
+
+        # save
+        news_keywords_df[['titles', 'categories'] + ['top_{}'.format(n) for n in range(top_n)] \
+                + ['contents']].to_csv(news_keywords_path)
+        keywords_titles_df.to_csv(keywords_titles_path)
+
 
 
 if __name__ == '__main__':
@@ -159,15 +213,21 @@ if __name__ == '__main__':
     # news = NaverSports()
     #
     # docs, topics = news.load_data()
-    data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
+    ord_data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
 
-
-    ##
-    keybert = KeyBERT(model_path='./model')
+    ## load model
+    # keybert = KeyBERT(model_path='./model')
+    keybert = KeyBERT(model_path='sinjy1203/ko-sbert-navernews')
     # keybert = KeyBERT()
 
-    ##
-    # print(keybert.predict(docs[2], top_n=10, ngram_range=(1, 1)))
+    # ## data check
+    # ord_data_df.loc[453, 'contents']
+
+    # ## mecab 사용자 사전 확인
+    # print(keybert.tokenizer(ord_data_df.loc[0, 'contents']))
+
+    # ## 예측 키워드 확인
+    # print(keybert.predict(ord_data_df.loc[453, 'contents'], top_n=10, ngram_range=(1, 1)))
 
     ##
     # pred_idx = 3
@@ -181,62 +241,7 @@ if __name__ == '__main__':
     #         f.write(sent + "\n")
     #     f.write('\n' + ', '.join(keywords))
 
-    ## pred_keyword to dataframe
-    top_n = 5
-    total_keywords = []
-    for i in tqdm(range(len(data_df))):
-        keywords = keybert.predict(data_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1,1))
-        total_keywords += keywords
-        for j, keyword in enumerate(keywords):
-            data_df.loc[i, 'top_{}'.format(j)] = keyword
-    total_keywords = pd.Series(total_keywords, name='count')
+    ## pred_keyword & titles about keyword to save
+    keybert.pred_df(path='./newsData')
 
-    ##
-    keywords_counts = total_keywords.value_counts()
 
-    ## save
-    data_df.to_csv('./newsData/Naver_keyword.csv')
-    keywords_counts.to_csv('./newsData/Naver_keywords_counts.csv')
-
-    ## load keywords_counts, news별 키워드 data_df
-    keywords_counts = pd.read_csv('./newsData/Naver_keywords_counts.csv', index_col=0)
-    data_df = pd.read_csv('./newsData/Naver_keyword.csv', index_col=0)
-
-    ##
-    keyword = keywords_counts.index[30]
-    print('keyword: ', keyword)
-    print(data_df[data_df['top_0'] == keyword]['titles'][:5])
-
-    ##
-    keyword = keywords_counts.index[120]
-    print('keyword: ', keyword)
-    print(data_df[(data_df['top_0'] == keyword) | (data_df['top_1'] == keyword) | \
-                  (data_df['top_2'] == keyword) | (data_df['top_3'] == keyword) | \
-                  (data_df['top_4'] == keyword)]['titles'][:5])
-
-    ## keywords 별로 타이틀 10개씩 csv save
-    keywords_title_df = pd.DataFrame(columns=['count'] + ['title_{}'.format(i) for i in range(10)])
-    keywords = keywords_counts.index
-    for keyword in tqdm(keywords):
-        data = data_df[(data_df['top_0'] == keyword) | (data_df['top_1'] == keyword) | \
-                  (data_df['top_2'] == keyword) | (data_df['top_3'] == keyword) | \
-                  (data_df['top_4'] == keyword)]['titles'][:10]
-        data = data.to_list()
-        data += [None] * (10-len(data))
-        keywords_title_df.loc[keyword] = [keywords_counts.loc[keyword, 'count']] + data
-
-    ##
-    keywords_title_df.to_csv('./newsData/keywords_title.csv')
-
-    ##
-    d = pd.DataFrame(
-        {
-            'a': [1,2,3],
-            'b': [4,5,6]
-        }
-    )
-
-    ##
-    # print(data_df[data_df['top_0'] == keyword | data_df['top_1'] == keyword])
-    # print((data_df['top_0'] == keyword) | (data_df['top_1'] == keyword))
-    print(data_df[(keyword in data_df[['top_0', 'top_1']])])
