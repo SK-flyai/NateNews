@@ -1,3 +1,4 @@
+import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
@@ -36,7 +37,10 @@ class TextRank:
         문장의 유사도 행렬을 이용해서 문장 인덱스 별 score 리턴 -> {idx: score}
         """
         nx_graph = nx.from_numpy_array(sim_matrix)
-        scores = nx.pagerank(nx_graph)
+        try:
+            scores = nx.pagerank(nx_graph)
+        except nx.exception.PowerIterationFailedConvergence:
+            scores = nx.pagerank(nx_graph, tol=1)
         return scores
 
     def ranked_sentences_(self, sentences: List[str], scores: dict, n: int = 3) -> List[str]:
@@ -55,11 +59,26 @@ class TextRank:
         뉴스기사 내용을 받으면 가장 중요한 top_n개의 문장을 리턴
         """
         sents_lst = kss.split_sentences(doc)
+        sents_lst = list(filter(lambda x: len(x) > 10, sents_lst))
         sent_embeddings = self.embedding_model.encode(sents_lst)
         sim_matrix = self.similarity_matrix_(sent_embeddings)
         scores = self.calculate_score_(sim_matrix)
         top_sents = self.ranked_sentences_(sents_lst, scores, n=top_n)
         return top_sents
+
+    def pred_df(self, df: pd.DataFrame, top_n: int) -> pd.DataFrame:
+        """
+        dataframe의 contents를 모두 예측
+        """
+        preds = []
+        for i, sent in tqdm(enumerate(df['contents']), desc='textrank pred'):
+            try:
+                preds += [self.predict(sent, top_n=top_n)]
+            except:
+                print(i, sent)
+                raise Exception('error')
+        df['textrank'] = preds
+        return df
 
 
 class KeySentence:
@@ -183,17 +202,45 @@ class KeySentence:
 
         return main_sents
 
+    def pred_df(self, df: pd.DataFrame, top_n: int) -> pd.DataFrame:
+        """
+        dataframe의 contents를 모두 예측
+        """
+        preds = []
+        for sent in tqdm(df['contents'], desc='keysentence pred'):
+            preds += [self.predict(sent, top_n=top_n)]
+        df['keysentence'] = preds
+        return df
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    news = NaverSports()
+    # news = NaverSports()
 
-    docs, topics = news.load_data()
+    # docs, topics = news.load_data()
+    df = pd.read_csv('./newsData/Naver_keyword.csv', index_col=0)
 
     ##
     keysent = KeySentence()
     textrank = TextRank()
+
+    ##
+    # len_lst = []
+    # for i in tqdm(range(len(df))):
+    #     sent = df.loc[i, 'contents']
+    #     len_lst += [len(kss.split_sentences(sent))]
+    # max(len_lst)
+    # for sent in kss.split_sentences(df.loc[460, 'contents']):
+    #     print(sent, len(sent))
+    # print(textrank.predict(df.loc[460, 'contents'], top_n=1))
+
+    ##
+    # df = keysent.pred_df(df, top_n=1)
+    # df = textrank.pred_df(df, top_n=1)
+    cols = list(df.columns)
+    cols.remove('contents')
+    cols += ['contents']
+    df[cols].to_csv('./newsData/Naver_keyword_sum.csv')
 
     ##
     idx = 95
