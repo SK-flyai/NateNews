@@ -9,85 +9,6 @@ import pandas as pd
 
 import torch
 
-
-class NateNews:
-    """
-    네이트에서 크롤링한 뉴스 데이터셋
-    directory: natenews_data/크롤링날짜.csv
-    """
-    def __init__(self, data_dir: str, stopwords: list = []):
-        """
-        Args:
-            data_dir:
-            stopwords: 사용자 정의 불용어
-
-        self.df:
-            DataFrame
-            column: title, category, press, date, content, url
-        """
-        self.data_dir = Path(data_dir)
-        self.stop_words = ['\xa0', '\t', '\n']
-        self.stop_words += stopwords
-        self.df = pd.read_csv(data_dir)
-        self.df['new_content'] = self.df['content'].apply(self.crop_article_)
-
-    def crop_article_(self, data: str) -> str:
-        """기사에서 불필요한 내용 제거
-
-        Args:
-            data(str): df['content'], 뉴스의 원본 기사내용
-
-        Returns:
-            str: df['new_content'], preprocessed 기사내용
-        """
-        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
-        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
-        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
-        data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
-        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
-        data = re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '',
-                      data)  # remove special characters
-        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
-        data = data.strip()
-
-        return data
-
-    def comb_stopwords_(self, x: str) -> str:
-        """
-        불용어 제거
-        Args:
-            x(string): 뉴스 기사내용
-
-        Returns:
-            str: 불용어 제거된 기사 내용
-        """
-        if self.stopwords:
-            x = re.sub('|'.join(self.stop_words), ' ', x)
-            x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "").strip()
-            # x = re.sub(r"\\", '', x)
-            # x = x.replace('\\', '')
-        return x
-
-    def load_data(self, stopwords: bool = True) -> Tuple[list, list]:
-        """
-        메인 함수부분
-        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
-        각 뉴스가 string인 리스트로 리턴
-        Args:
-            stopwords: 사용자 정의 불용어
-
-        Returns:
-            docs(list): df의 new_content 부분 (전처리된 뉴스내용)
-            topics(list): df의 title 부분
-
-        """
-        self.stopwords = stopwords
-        docs = list(self.df['new_content'])
-        docs = list(map(self.comb_stopwords_, docs))
-        topics = list(self.df['title'])
-        return docs, topics
-
-
 class NaverSports:
     """
     네이버 뉴스 데이터셋에서 스포츠만
@@ -325,25 +246,135 @@ class NaverNews:
         return df
 
 
+class NateNews:
+    """
+    네이트 뉴스 데이터셋
+    네이트 데이터셋을 읽어서 약간의 전처리
+    directory: natenews_data/20230212_100.csv
+    """
+
+    def __init__(self, data_dir: str = './natenews_data/20230212_100.csv',
+                 custom_symbols: list = []):
+        """
+        Args:
+            data_dir: 데이터 디렉토리
+            custom_symbols: 커스텀으로 제외시킬 이상한 기호들 (결과 보면서 구축 )
+        """
+        self.data_dir = Path(data_dir)
+        self.custom_symbols = ['\xa0'] + custom_symbols
+
+    def preprocess_(self, x: str) -> str:
+        """
+        문자열에서 이상한 기호들이랑 앞 뒤 자르고 본문이랑 제목 분리하기
+
+        Args:
+            x: 뉴스 내용
+
+        Returns:
+            str: 본문내용
+
+        """
+        x = re.sub('|'.join(self.custom_symbols), '', x) # del custom symbols
+        # x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
+        # x = re.sub(r"\\", '', x)
+        # x = x.replace('\\', '')
+        x = self.crop_article_(x) # 전처리 함수 사용
+        return x
+
+    def crop_article_(self, data: str) -> str:
+        """기사에서 불필요한 내용 제거
+
+        Args:
+            data(str): df['content'], 뉴스의 원본 기사내용
+
+        Returns:
+            str: 본문내용
+        """
+        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
+        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
+        data = re.sub("[【\(\[].*?[\)\]】]", "", data)  # remove text surrounded by brackets
+        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
+        data = re.sub('[-=+#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', ' ',
+                      data)  # remove special characters
+        data = re.sub('[→~]', '에서 ', data)
+        data = re.sub(' +', ' ', data)
+        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
+        data = data.strip()
+
+        return data
+
+    def crop_tail(self, data: str) -> str:
+        """
+        뒤에 의미없는 내용 제거
+        """
+        data = data.split('\n\n')
+        for i, sent in enumerate(data):
+            if len(sent) <= 10 and i > 4:
+                break
+        return ' '.join(data[:i])
+
+    def load_data(self) -> pd.DataFrame:
+        """
+        메인 함수부분
+        뉴스데이터셋을 불러와 불용어를 제거하고 약간의 전처리 후
+        각 뉴스가 string인 리스트로 리턴
+
+        Returns:
+            contents: 뉴스기사 본문들 리스트
+            titles: 뉴스기사 제목들 리스트
+            categories: 뉴스기사 카테고리들 리스트
+
+        """
+
+        df = pd.read_csv(self.data_dir, index_col=0)
+        df['contents'] = df['contents'].apply(self.crop_tail)
+        df['contents'] = df['contents'].apply(self.preprocess_)
+        df['titles'] = df['titles'].apply(self.preprocess_)
+        df.drop(df[df['contents'].apply(len) < 10].index, inplace=True)
+        # for path in paths:
+        #     loader_fn = self.load_txt_data_
+        #     doc = loader_fn(path)
+        #     category = int(path.parts[-2])
+        #     content, title = self.preprocess_(doc)
+        #
+        #     if len(content) < 10:
+        #         continue
+        #     contents += [content]
+        #     titles += [title]
+        #     categories += [category]
+
+        return df
+
+
+
 ##
 if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    news = NaverNews(custom_symbols=[])
+    # news = NaverNews(custom_symbols=[])
 
     # contents, titles, categories = news.load_data()
-    df = news.csv_data()
+    # df = news.csv_data()
+    ord_df = pd.read_csv('./natenews_data/20230212_100.csv', index_col=0)
+    # df = df.rename(columns={'category': 'categories'})
+    # df.to_csv('./natenews_data/20230212_100.csv')
 
     ##
-    # df = pd.DataFrame(
-    #     {
-    #         'contents': contents,
-    #         'titles': titles,
-    #         'categories': categories
-    #     }
-    # )
-    #
-    # ##
-    # df.to_csv('./newsData/Naver.csv')
-    #
-    # ##
-    # df = pd.read_csv('./newsData/Naver.csv')
+    # print(ord_df[len(ord_df['contents']) < 10])
+    print(ord_df['contents'].apply(len) < 10)
+
+    ##
+    news = NateNews()
+    df = news.load_data()
+
+    ##
+    df_ = pd.DataFrame({
+        'titles': ord_df['titles'],
+        'titles_': df['titles'],
+        'contents': ord_df['contents'],
+        'contents_': df['contents']
+    })
+    df_.to_csv('./natenews_data/preprocess.csv')
+
+    ##
+    re.sub('[-=+,#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', '', '...')
