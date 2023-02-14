@@ -305,6 +305,9 @@ class NateNews:
         return data
 
     def crop_tail(self, data: str) -> str:
+        """
+        뒤에 의미없는 내용 제거
+        """
         data = data.split('\n\n')
         for i, sent in enumerate(data):
             if len(sent) <= 10 and i > 4:
