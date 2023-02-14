@@ -55,9 +55,9 @@ def get_news(
     url_list = url_list if isinstance(url_list, list) else [url_list]
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
-            _news_list = list(mult.map(NateNews.create, url_list))
+            _news_list = list(mult.map(_create, url_list))
     else:
-        _news_list = [NateNews.create(url) for url in url_list]
+        _news_list = [_create(url) for url in url_list]
     
     news_list = [news for news in _news_list if news]
     return news_list
@@ -182,7 +182,7 @@ def _get_recent(date: int):
     return latest # return latest article number
 
 
-def create(url:str):
+def _create(url:str):
     """create `NateNews` if it satisfy some conditions
 
     Args:
