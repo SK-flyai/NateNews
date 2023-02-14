@@ -1,5 +1,7 @@
 ##
 import os
+
+import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
 from sklearn.feature_extraction.text import CountVectorizer
@@ -11,11 +13,12 @@ import kss
 import shutil
 
 from load_dataset import *
+from finetune import *
 
 from sentence_transformers import SentenceTransformer, InputExample, losses, evaluation
 from torch.utils.data import DataLoader
 
-def dataset(data_path: str = './newsData/Naver.csv') -> Tuple[List[InputExample], Tuple[List]]:
+def dataset(df: pd.DataFrame) -> Tuple[List[InputExample], Tuple[List]]:
     """
     뉴스 데이터에서 sbert finetuning을 위한 데이터셋 생성
     label 1: 뉴스 본문과 해당 제목
@@ -26,7 +29,6 @@ def dataset(data_path: str = './newsData/Naver.csv') -> Tuple[List[InputExample]
         training dataset
         validation dataset
     """
-    df = pd.read_csv(data_path, index_col=0)
 
     train_dataset = []
     eval_sents1 = []
@@ -69,6 +71,7 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
     eval_path = os.path.join(output_path, 'eval/similarity_evaluation_results.csv')
     if os.path.isfile(eval_path):
         os.remove(eval_path)
+    # os.makedir(os.path.join(output_path, 'eval'))
     model = SentenceTransformer(model_path)
 
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=8)
@@ -82,8 +85,10 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
     #   callback=transformers.integrations.TensorBoardCallback(SummaryWriter()))
     
 if __name__ == '__main__':
-    train_dataset, eval_dataset = dataset()
-    finetuning(train_dataset, eval_dataset)
+    news = NateNews()
+    df = news.load_data()
+    train_dataset, eval_dataset = dataset(df)
+    finetuning(train_dataset, eval_dataset, output_path='ko-sbert-natenews')
 
 
 
