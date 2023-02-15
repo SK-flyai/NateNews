@@ -7,16 +7,7 @@ from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
-# TODO: rename SportsNews to NateNews
 # TODO: modulize
-"""
-/
-L crawl
-    L utils
-        L funcs
-    L nate
-        L NateNews
-"""
 
 
 class NateNews:
