@@ -59,8 +59,15 @@ def _remove_html_tag(text):
     pattern = "<a.+</a>" # [a] 태그 제거
     text = re.sub(pattern, '', text)
 
-    pattern = "<img[^>]+>" # img들 모두 제거
-    text = re.sub(pattern, '\n[IMAGE]\n', text)
+    # pattern = "<img[^>]+>" # img들 모두 제거
+    pattern = re.compile('<img[^>]+>')
+    result = pattern.finditer(text)
+    images = bs(text, 'html.parser').find_all('img')
+    
+    i = 0
+    for r in result:
+        text = text.replace(r.group(), f"\n[http:{images[i]['src']}]\n")
+        i += 1
     
     return text
 
