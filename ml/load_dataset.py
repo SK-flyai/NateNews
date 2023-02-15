@@ -6,6 +6,7 @@ from pathlib import Path
 from glob import glob
 import re
 import pandas as pd
+import kss
 
 import torch
 
@@ -73,7 +74,7 @@ class NaverSports:
         data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
         # print(re.split('[TAB]', data))
         topic, data = re.split('\t', data)
-        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # remove reporter name information
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
         data = re.sub("[\(\[].*?[\)\]]", "", data)  # remove text surrounded by brackets
         # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
@@ -254,34 +255,14 @@ class NateNews:
     """
 
     def __init__(self, data_dir: str = './natenews_data/20230212_100.csv',
-                 custom_symbols: list = []):
+                 custom_filter_words: str = './user_words/'):
         """
         Args:
             data_dir: 데이터 디렉토리
-            custom_symbols: 커스텀으로 제외시킬 이상한 기호들 (결과 보면서 구축 )
         """
         self.data_dir = Path(data_dir)
-        self.custom_symbols = ['\xa0'] + custom_symbols
 
-    def preprocess_(self, x: str) -> str:
-        """
-        문자열에서 이상한 기호들이랑 앞 뒤 자르고 본문이랑 제목 분리하기
-
-        Args:
-            x: 뉴스 내용
-
-        Returns:
-            str: 본문내용
-
-        """
-        x = re.sub('|'.join(self.custom_symbols), '', x) # del custom symbols
-        # x = x.encode('utf-8', 'backslashreplace').decode().replace("\\", "")
-        # x = re.sub(r"\\", '', x)
-        # x = x.replace('\\', '')
-        x = self.crop_article_(x) # 전처리 함수 사용
-        return x
-
-    def crop_article_(self, data: str) -> str:
+    def preprocess_(self, data: str) -> str:
         """기사에서 불필요한 내용 제거
 
         Args:
@@ -290,29 +271,36 @@ class NateNews:
         Returns:
             str: 본문내용
         """
-        data = re.split('[▶☞ⓒ]', data)[0]  # remove related news that come at the end of article
-        data = re.sub('[가-힣]{2,3} 기자', '', data)  # remove reporter name information
+        data = re.sub('\[[^\]]*]', "", data)
+        data = re.sub("\\'", "", data)
+        if data[0] == '\n':
+            data = data[1:]
+        data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)
+        data = re.sub(r'\\', '', data)
+        data = re.sub('\.* *\\n+', '. ', data)
+        data = re.sub('[가-힣]{2,3} ?기자', '', data)  # remove reporter name information
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # remove news name info
-        data = re.sub("[【\(\[].*?[\)\]】]", "", data)  # remove text surrounded by brackets
-        # data = re.sub('([a-zA-Z])+', '', data)  # remove alphanumerical characters
-        data = re.sub('[-=+#/·“”‘’:^$@*■\"※~&%ㆍ』\\‘|\(\)\[\]\<\>`\'…《\》\n\t]+', ' ',
-                      data)  # remove special characters
-        data = re.sub('[→~]', '에서 ', data)
+        data = re.sub('[=]+', ' ', data)
         data = re.sub(' +', ' ', data)
-        data = re.sub('([ㄱ-ㅎㅏ-ㅣ]+)', '', data)  # remove Korean consonants and vowels
         data = data.strip()
 
         return data
 
-    def crop_tail(self, data: str) -> str:
+    def crop_tail_(self, data: str) -> str:
         """
         뒤에 의미없는 내용 제거
         """
-        data = data.split('\n\n')
-        for i, sent in enumerate(data):
-            if len(sent) <= 10 and i > 4:
+        data = data.split('\n')
+        data = list(filter(lambda x: x != '', data))
+        idx = 0
+        limit = int(len(data) * 0.75)
+        for sent in data:
+            if len(sent) <= 20 and idx >= limit:
                 break
-        return ' '.join(data[:i])
+            idx += 1
+        if idx < 5:
+            return ''
+        return '\n'.join(data[:idx])
 
     def load_data(self) -> pd.DataFrame:
         """
@@ -328,21 +316,11 @@ class NateNews:
         """
 
         df = pd.read_csv(self.data_dir, index_col=0)
-        df['contents'] = df['contents'].apply(self.crop_tail)
+        # df['contents'] = df['contents'].apply(self.crop_tail_)
         df['contents'] = df['contents'].apply(self.preprocess_)
         df['titles'] = df['titles'].apply(self.preprocess_)
         df.drop(df[df['contents'].apply(len) < 10].index, inplace=True)
-        # for path in paths:
-        #     loader_fn = self.load_txt_data_
-        #     doc = loader_fn(path)
-        #     category = int(path.parts[-2])
-        #     content, title = self.preprocess_(doc)
-        #
-        #     if len(content) < 10:
-        #         continue
-        #     contents += [content]
-        #     titles += [title]
-        #     categories += [category]
+        df = df.reset_index(drop=True)
 
         return df
 
@@ -352,12 +330,36 @@ class NateNews:
 if __name__ == '__main__':
     # news = NateNews(data_dir='./natenews_data/20220301.csv')
     # news = NaverNews(custom_symbols=[])
+    news = NateNews()
+    df = news.load_data()
 
     # contents, titles, categories = news.load_data()
     # df = news.csv_data()
     ord_df = pd.read_csv('./natenews_data/20230212_100.csv', index_col=0)
-    # df = df.rename(columns={'category': 'categories'})
-    # df.to_csv('./natenews_data/20230212_100.csv')
+    # f = lambda x: re.sub('\\n+', '\n', x)
+    # a = ord_df['contents'].apply(f)
+    # ord_df = ord_df.rename(columns={'content': 'contents', 'title': 'titles', 'category': 'categories'})
+    # ord_df.to_csv('./natenews_data/20230212_100.csv')
+
+    ##
+    # doc = df.loc[112, 'contents']
+    # print([doc])
+    # sents = kss.split_sentences(df.loc[112, 'contents'])
+    # print(sents)
+
+    ##
+    contents = ord_df.loc[[1, 2, 3, 5, 6], 'contents']
+    titles = ord_df.loc[[1, 2, 3, 5, 6], 'titles']
+    idx = 0
+    for title, content in zip(titles, contents):
+        content = re.sub("\\n\\n", '\\n', content)
+        with open(f'natenews_data/{idx}.txt', 'w') as f:
+            f.write("<title>\n")
+            f.write(title + "\n")
+            f.write("\n")
+            f.write("<content>\n")
+            f.write(content + "\n")
+        idx += 1
 
     ##
     # print(ord_df[len(ord_df['contents']) < 10])
@@ -368,10 +370,11 @@ if __name__ == '__main__':
     df = news.load_data()
 
     ##
+    f = lambda x: re.sub('\\n+', '\n', x)
     df_ = pd.DataFrame({
         'titles': ord_df['titles'],
         'titles_': df['titles'],
-        'contents': ord_df['contents'],
+        'contents': ord_df['contents'].apply(f),
         'contents_': df['contents']
     })
     df_.to_csv('./natenews_data/preprocess.csv')

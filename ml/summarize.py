@@ -186,7 +186,8 @@ class KeySentence:
         Returns:
             top_n개의 주요문장 리스트
         """
-        candidates = kss.split_sentences(doc)
+        # candidates = kss.split_sentences(doc)
+        candidates = doc.split('. ')
 
         doc_embedding = self.model.encode([doc])
         candidate_embeddings = self.model.encode(candidates)
@@ -218,11 +219,22 @@ if __name__ == '__main__':
     # news = NaverSports()
 
     # docs, topics = news.load_data()
-    df = pd.read_csv('./newsData/Naver_keyword.csv', index_col=0)
+    # df = pd.read_csv('./natenews_data/keyword.csv', index_col=0)
+    news = NateNews()
+    df = news.load_data()
 
     ##
-    keysent = KeySentence()
-    textrank = TextRank()
+    model_path = "./ko-sbert-natenews"
+    keysent = KeySentence(model_path=model_path)
+    textrank = TextRank(model_path=model_path)
+
+    ##
+    pred_sent = keysent.predict(df.loc[157, 'contents'], top_n=1)
+    print(pred_sent)
+
+    ##
+    sents = kss.split_sentences(df.loc[15, 'contents'])
+    print(sents)
 
     ##
     # len_lst = []
@@ -235,42 +247,43 @@ if __name__ == '__main__':
     # print(textrank.predict(df.loc[460, 'contents'], top_n=1))
 
     ##
+    # df = df.loc[:100]
     # df = keysent.pred_df(df, top_n=1)
     # df = textrank.pred_df(df, top_n=1)
-    cols = list(df.columns)
-    cols.remove('contents')
-    cols += ['contents']
-    df[cols].to_csv('./newsData/Naver_keyword_sum.csv')
-
-    ##
-    idx = 95
-    # print(textrank.predict(docs[idx]))
-    # print(type(textrank.predict(docs[idx])[0]))
-    # print("---------keysent----------")
-    # for sent in keysent.predict(docs[idx], diversity=0):
-    #     print(sent)
-    # print("---------textrank----------")
-    # for sent in textrank.predict(docs[idx]):
-    #     print(sent)
-    # print('topic: ', topics[idx])
+    # cols = list(df.columns)
+    # cols.remove('contents')
+    # cols += ['contents']
+    # df[cols].to_csv('./natenews_data/Nate_keyword_sum.csv')
     #
-    print("---------original----------")
-    for sent in kss.split_sentences(docs[idx]):
-        print(sent)
-
-    ##
-    # model = KeySentence()
-    # model = KeySentence(model_path='./model')
-    # model = TextRank()
-    model = TextRank(model_path='./model')
-
-    pred_idx = 3
-    sents = kss.split_sentences(docs[pred_idx])
-    keysents = model.predict(docs[pred_idx], top_n=3)
-
-    with open('result/naver_rank_good_sum.txt', 'w') as f:
-        for sent in sents:
-            f.write(sent + "\n")
-        f.write('\n')
-        for keysent in keysents:
-            f.write(keysent + '\n')
+    # ##
+    # idx = 95
+    # # print(textrank.predict(docs[idx]))
+    # # print(type(textrank.predict(docs[idx])[0]))
+    # # print("---------keysent----------")
+    # # for sent in keysent.predict(docs[idx], diversity=0):
+    # #     print(sent)
+    # # print("---------textrank----------")
+    # # for sent in textrank.predict(docs[idx]):
+    # #     print(sent)
+    # # print('topic: ', topics[idx])
+    # #
+    # print("---------original----------")
+    # for sent in kss.split_sentences(docs[idx]):
+    #     print(sent)
+    #
+    # ##
+    # # model = KeySentence()
+    # # model = KeySentence(model_path='./model')
+    # # model = TextRank()
+    # model = TextRank(model_path='./model')
+    #
+    # pred_idx = 3
+    # sents = kss.split_sentences(docs[pred_idx])
+    # keysents = model.predict(docs[pred_idx], top_n=3)
+    #
+    # with open('result/naver_rank_good_sum.txt', 'w') as f:
+    #     for sent in sents:
+    #         f.write(sent + "\n")
+    #     f.write('\n')
+    #     for keysent in keysents:
+    #         f.write(keysent + '\n')

@@ -93,7 +93,6 @@ class CustomTokenizer:
         result = list(filter(lambda x: x not in self.filtering, result))
         return result
 
-
 if __name__ == '__main__':
     tokenizer = CustomTokenizer(Mecab())
     print(tokenizer('신정열은 양의동과 김서현과 안치호와 같이 프로젝트를 진행하였다.'))
