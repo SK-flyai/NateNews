@@ -71,7 +71,7 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
     eval_path = os.path.join(output_path, 'eval/similarity_evaluation_results.csv')
     if os.path.isfile(eval_path):
         os.remove(eval_path)
-    # os.makedir(os.path.join(output_path, 'eval'))
+    # os.mkdir(os.path.join(output_path, 'eval'), exist)
     model = SentenceTransformer(model_path)
 
     train_dataloader = DataLoader(train_dataset, shuffle=True, batch_size=8)
@@ -80,7 +80,7 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
 
     evaluator(model, output_path=os.path.join(output_path, 'eval'))
 
-    model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=10, evaluator=evaluator, warmup_steps=100,
+    model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=5, evaluator=evaluator, warmup_steps=100,
               output_path=output_path)
     #   callback=transformers.integrations.TensorBoardCallback(SummaryWriter()))
     
