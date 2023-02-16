@@ -5,6 +5,9 @@ import warnings
 from tqdm import tqdm
 import numpy as np
 import kss
+from preprocess import CustomTokenizer
+from konlpy.tag import Mecab
+from sklearn.feature_extraction.text import CountVectorizer
 
 def pred_keyword_sent(doc, word_top_n=10):
     keywords = word_model.predict(doc=doc, top_n=word_top_n)
@@ -12,7 +15,7 @@ def pred_keyword_sent(doc, word_top_n=10):
     keysent_sent = keysent_model.predict(doc=doc, top_n=1)[0]
     return keywords, textrank_sent, keysent_sent
 
-def enter(sent, length=20):
+def enter(sent, length=10):
     res = ''
     for j, c in enumerate(sent):
         res += c
@@ -20,8 +23,34 @@ def enter(sent, length=20):
             res += '\n'
     return res
 
+def words_(doc):
+    try:
+        count = CountVectorizer(tokenizer=tokenizer, ngram_range=(1,1)).fit([doc])
+    except ValueError:
+        return []
+
+    candidates = count.get_feature_names_out()
+    return candidates
+
+def words(doc):
+    words = words_(doc)
+    total = []
+    tmp = []
+    for j, word in enumerate(words):
+        tmp += [word]
+        if j % 10 == 9:
+            total += ["_".join(tmp)]
+            tmp = []
+    if tmp:
+        total += ["_".join(tmp)]
+
+    words = '\n'.join(total)
+    return words
+
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
+
+    tokenizer = CustomTokenizer(Mecab())
 
     pred_range = (0, 1000)
 
@@ -41,11 +70,12 @@ if __name__ == '__main__':
         keysent_sent = enter(keysent_sent)
         title = enter(df.loc[i, 'titles'])
         df.loc[i, 'keywords'] = keywords
-        df.loc[i, 'textrank'] = textrank_sent
-        df.loc[i, 'keysentence'] = keysent_sent
+        # df.loc[i, 'textrank'] = textrank_sent
+        # df.loc[i, 'keysentence'] = keysent_sent
         df.loc[i, 'titles'] = title
         df.loc[i, 'contents'] = '\n'.join(kss.split_sentences(df.loc[i, 'contents']))
+        df.loc[i, 'words'] = words(df.loc[i, 'contents'])
 
-    df[['titles', 'keywords', 'textrank', 'keysentence', 'contents']].to_csv('./natenews_data/keyword_sent.csv')
+    df[['titles', 'keywords', 'words', 'contents']].to_csv('./natenews_data/keyword_words.csv')
 
 
