@@ -6,7 +6,7 @@ import datetime as dt
 import requests
 
 
-CATEGORY=['sisa', 'spo', 'pol', 'eco', 'soc', 'int', 'its']
+CATEGORY=['all', 'sisa', 'spo', 'pol', 'eco', 'soc', 'int', 'its']
 
 
 def get_ranking(num: int=20):
@@ -17,7 +17,7 @@ def get_ranking(num: int=20):
     for category in CATEGORY:
         url_list = _get_ranking(category, date)
         news_list = get_news(url_list)[:num]
-        ranking_dict[category] = {news.url: news for news in news_list}
+        ranking_dict[category] = {news.url: news.get_dict() for news in news_list}
     
     return ranking_dict
 
