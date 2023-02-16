@@ -203,82 +203,6 @@ class KeyBERT:
                 + ['contents']].to_csv(news_keywords_path)
         keywords_titles_df.to_csv(keywords_titles_path)
 
-#     def pred_df(self, df: pd.DataFrame, top_n: int = 5, title_n: int = 10) -> pd.DataFrame:
-#         """
-#         뉴스 데이터 프레임에 대해 예측한 키워드를 데이터 프레임으로 저장
-#
-#         Args:
-#             df: 뉴스기사 데이터셋
-#             top_n: 뉴스기사에서 예측할 키워드 개수
-#             title_n: 각 키워드에 해당하는 뉴스기사 타이틀의 개수
-#
-#         Save:
-#             news_keyword.df: 뉴스기사들과 각각의 예측 키워드
-#                         columns => titles, categories, top_n.. , contents
-#             keywords_titles.df: 많이 뽑힌 순으로 키워드들과 각각의 해당하는 기사
-#                         columns => count, title_n...
-#                         index => keyword
-#
-#         """
-#         news_keywords_df = df.copy()
-#         for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
-#             keywords = self.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
-#             for j, keyword in enumerate(keywords):
-#                 news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
-#
-#         return news_keywords_df
-#
-# def save_keywords(df: pd.DataFrame, title_n: int = 10, output_path: str = "natenews_data"):
-#     """
-#     뉴스 데이터 프레임에 대해 예측한 키워드를 데이터 프레임으로 저장
-#
-#     Args:
-#         df: 뉴스기사 데이터셋
-#         top_n: 뉴스기사에서 예측할 키워드 개수
-#         title_n: 각 키워드에 해당하는 뉴스기사 타이틀의 개수
-#
-#     Save:
-#         news_keyword.df: 뉴스기사들과 각각의 예측 키워드
-#                     columns => titles, categories, top_n.. , contents
-#         keywords_titles.df: 많이 뽑힌 순으로 키워드들과 각각의 해당하는 기사
-#                     columns => count, title_n...
-#                     index => keyword
-#
-#     """
-#     path = Path(output_path)
-#     news_keywords_path = str(path / 'keyword.csv')
-#     keywords_titles_path = str(path / 'keywords_title.csv')
-#
-#     total_keywords = []
-#     news_keywords_df = df.copy()
-#     for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
-#         keywords = self.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
-#         total_keywords += keywords
-#         for j, keyword in enumerate(keywords):
-#             news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
-#     total_keywords = pd.Series(total_keywords, name='count')
-#     keywords_counts = total_keywords.value_counts()
-#
-#     # keywords 별로 title_n개씩 csv save
-#     keywords_titles_df = pd.DataFrame(columns=['count'] + ['title_{}'.format(i) for i in range(title_n)])
-#     keywords = keywords_counts.index
-#     for keyword in tqdm(keywords, desc='find titles about keyword'):
-#         data = []
-#         for n in range(top_n):
-#             data_ = news_keywords_df[news_keywords_df['top_{}'.format(n)] == keyword]['titles']
-#             data += data_.to_list()
-#
-#         data = data[:title_n]
-#         data += [None] * (title_n - len(data))
-#
-#         keywords_titles_df.loc[keyword] = [keywords_counts.loc[keyword]] + data
-#
-#     # save
-#     news_keywords_df[['titles', 'categories'] + ['top_{}'.format(n) for n in range(top_n)] \
-#             + ['contents']].to_csv(news_keywords_path)
-#     keywords_titles_df.to_csv(keywords_titles_path)
-
-
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
@@ -286,7 +210,6 @@ if __name__ == '__main__':
     # ord_data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
     news = NateNews()
     df = news.load_data()
-    df = df.reset_index(drop=True)
 
     ## load model
     # keybert = KeyBERT(model_path='./model')
