@@ -22,4 +22,30 @@ pip install requirements_gpu.txt
 
 
 ## Introduce file
-`add_mecab_userdic.py`
+`add_mecab_userdic.py`  
+mecab의 사용자 사전에 고유명사 추가  
+
+`finetune.py`  
+ko-sbert-nli 모델을 natenews 데이터셋으로 finetuning  
+
+`keybert.py`  
+핵심 키워드 추출
+
+`kobertopic.py`  
+토픽모델링
+
+`load_dataset.py`  
+네이트 뉴스 데이터셋 불러오기  
+
+`main.py`  
+네이트 뉴스 데이터셋에서 키워드와 핵심문장 예측 실행문
+
+`preprocess.py`  
+keybert.py 사용하기 전에 키워드 후보군 추출  
+
+`run_colab.py`  
+colab gpu를 활용하여 model finetuning  
+
+`summarize.py`  
+핵심 문장 추출
+
