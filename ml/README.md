@@ -5,7 +5,9 @@
 - python=3.8
 
 **install mecab** => 한국어 형태소 분석기  
-https://mire-gardenia-e1b.notion.site/5874cfe2a72e4214b82dfecac9ea46e4
+https://mire-gardenia-e1b.notion.site/5874cfe2a72e4214b82dfecac9ea46e4  
+**mecab 파일이 C:/mecab 경로일경우 site-packages/konlpy/tag/_mecab.py 에서   
+Mecab()의 __init__(dicpath='C:/mecab/mecab-ko-dic')로 바꿔줘야 함**
 
 
 ### cpu version  
@@ -49,3 +51,18 @@ colab gpu를 활용하여 model finetuning
 `summarize.py`  
 핵심 문장 추출
 
+`newspred.py`  
+최종 키워드 예측과 핵심 문장 예측 모델
+
+## Getting Started
+```
+# load dataset
+news = NateNews()
+df = news.load_data()
+
+# load model
+model = NewsModel(model_path="sinjy1203/ko-sbert-natenews")
+
+# pred keyword & main sentence 
+keywords, sentence = model.predict(df.loc[i, 'contents'], word_top_n=5)
+```
