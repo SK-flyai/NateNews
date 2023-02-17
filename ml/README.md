@@ -57,6 +57,10 @@ colab gpu를 활용하여 model finetuning
 
 ## Getting Started
 ```
+# mecab의 사용자 사전 추가 (처음 실행할때만 하면 됨)
+python add_mecab_userdic.py 
+```
+```
 # load dataset
 news = NateNews()
 df = news.load_data()
