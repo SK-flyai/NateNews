@@ -8,15 +8,18 @@
 https://mire-gardenia-e1b.notion.site/5874cfe2a72e4214b82dfecac9ea46e4
 
 
-###cpu version  
+### cpu version  
 ```
 pip install requirements_cpu.txt
 ```
 
-###gpu version  
+### gpu version  
 - CUDA toolkit 11.6
 - cuDNN 8.6.0
 ```
 pip install requirements_gpu.txt
 ```
 
+
+## Introduce file
+'''add_mecab_userdic.py'''
