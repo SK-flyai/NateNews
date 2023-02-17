@@ -2,7 +2,7 @@
 ---
 
 ## Installation
--cpu version
+-cpu version\
 python=3.8
 
 ```
