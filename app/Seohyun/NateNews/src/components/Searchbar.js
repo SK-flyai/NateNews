@@ -9,8 +9,8 @@ const SearchBarWrapper = styled.View`
   border: #fa5858;
   border-radius: 4px;
   padding: 10px 14px 10px 12px;
-  margin-top: 0px;
-  margin-bottom: 30px;
+  margin: 0px;
+
   display: flex;
 `;
 

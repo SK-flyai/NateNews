@@ -14,12 +14,14 @@ import { Button } from "react-native-elements";
 import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
+import { Dimensions } from "react-native";
+const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
   // 기사 제목 style
   container: {
     flex: 1,
-    width: "100%",
+    width: width,
   },
   item: {
     padding: 18,
@@ -116,7 +118,7 @@ const SportContent = ({ navigation }) => {
       >
         <TouchableOpacity onPress={imagePress}>
           <Image
-            style={{ width: 420, height: 210, marginTop: 15 }}
+            style={{ width: width, height: 210, marginTop: 15 }}
             source={require(Pic1path)}
           />
         </TouchableOpacity>
