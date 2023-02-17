@@ -22,4 +22,4 @@ pip install requirements_gpu.txt
 
 
 ## Introduce file
-''add_mecab_userdic.py''
+`add_mecab_userdic.py`
