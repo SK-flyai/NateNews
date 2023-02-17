@@ -7,16 +7,7 @@ from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
-# TODO: rename SportsNews to NateNews
 # TODO: modulize
-"""
-/
-L crawl
-    L utils
-        L funcs
-    L nate
-        L NateNews
-"""
 
 
 class NateNews:
@@ -39,9 +30,49 @@ class NateNews:
             self.url,
         ]
     
+    def get_dict(self):
+        return{
+            "title": self._get_title(),
+            "category": self._get_category(),
+            "press": self._get_press(),
+            "date": self._get_date(),
+            "content": self._get_content(),
+            "image": self.image,
+        }
+    
     @property
     def press(self):
         return self._get_press()
+    
+    @property
+    def image(self):
+        return self._image
+
+    @image.setter
+    def image(self, img:dict):
+        self._image = img
+
+    def _get_content(self):
+        _article = self.content.find('div',{'id': 'articleContetns'})
+        article = text_cleaning(_article)
+        
+        pattern_link = re.compile('\[(http://[^\]]*)\]')
+        result_img = pattern_link.finditer(article)
+        article = re.sub(pattern_link, '', article)
+
+        pattern_cap = re.compile('\[([^\]]*)\]')
+        result_cap = pattern_cap.finditer(article)
+        article = re.sub(pattern_cap, '', article)
+        
+        image_dict = dict()
+        for r in result_img:
+            image_dict[r.group(1)] = ''
+            try:
+                image_dict[r.group(1)] = next(result_cap).group(1)
+            except:
+                pass
+        self.image = image_dict
+        return article
     
     def _get_press(self):
         _press = self.content.find('a', {'class': 'medium'})
@@ -55,19 +86,6 @@ class NateNews:
         nav = self.content.find('div', {'class': 'snbArea'})
         category = nav.find('li', {'class': 'on'})
         return category.text if category else 'X'
-
-    def _get_content(self):
-        article = self.content.find('div',{'id': 'articleContetns'})
-        
-        # FIXME: 밑에 코드는 backup용, 혹시 위에 코드 에러나면 아래거 돌려보기
-        # article = self.content.find('div', {'id': 'realArtcContents'})
-        # if not article:
-        #     article = self.content.find(
-        #         'div',
-        #         {'id': 'RealArtcContents'}
-        #     )
-        # if not article: return None
-        return text_cleaning(article)
     
     def _get_title(self):
         title = self.content.find('h3', {'class': 'viewTite'})

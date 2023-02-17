@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs
 from concurrent.futures import ThreadPoolExecutor
 from news_crawl import NateNews
+from preprocessing import text_cleaning
 from typing import List
 from typing import List, Union
 
@@ -8,6 +9,7 @@ import datetime as dt
 import pandas as pd
 import requests
 import time
+import re
 
 
 LINK = 'https://news.nate.com/view/'
@@ -55,9 +57,15 @@ def get_news(
     url_list = url_list if isinstance(url_list, list) else [url_list]
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
-            _news_list = list(mult.map(NateNews.create, url_list))
+            _news_list = list(mult.map(_create, url_list))
     else:
-        _news_list = [NateNews.create(url) for url in url_list]
+        # _news_list = [_create(url) for url in url_list]
+        _news_list = list()
+        for url in url_list:
+            try:
+                _news_list.append(_create(url))
+            except:
+                print(url)
     
     news_list = [news for news in _news_list if news]
     return news_list
@@ -182,7 +190,7 @@ def _get_recent(date: int):
     return latest # return latest article number
 
 
-def create(url:str):
+def _create(url:str):
     """create `NateNews` if it satisfy some conditions
 
     Args:
@@ -222,4 +230,14 @@ def create(url:str):
         print(f"There's no article in {url}")
         return None
     else:
-        return new_class
+        # 기사가 있다 -> 길이 확인하기
+        content_len = len(_remove_bracket(text_cleaning(article)))
+        if content_len < 300:
+            return None
+        else:
+            return new_class
+
+
+def _remove_bracket(text):
+    pattern = '\[[^\]]*\]'
+    return re.sub(pattern, '', text)

@@ -5,7 +5,6 @@ from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
 from konlpy.tag import Mecab
 from pathlib import Path
-from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 import itertools
 from sklearn.metrics.pairwise import cosine_similarity
@@ -152,14 +151,14 @@ class KeyBERT:
 
         return keyword
 
-    def pred_df(self, top_n: int = 5, title_n: int = 10, path: str = './newsData'):
+    def pred_df(self, df: pd.DataFrame, top_n: int = 5, title_n: int = 10, output_path: str = "natenews_data"):
         """
         뉴스 데이터 프레임에 대해 예측한 키워드를 데이터 프레임으로 저장
 
         Args:
+            df: 뉴스기사 데이터셋
             top_n: 뉴스기사에서 예측할 키워드 개수
             title_n: 각 키워드에 해당하는 뉴스기사 타이틀의 개수
-            path: 뉴스기사 데이터와 예측후 저장할 데이터 경로
 
         Save:
             news_keyword.df: 뉴스기사들과 각각의 예측 키워드
@@ -169,12 +168,11 @@ class KeyBERT:
                         index => keyword
 
         """
-        path = Path(path)
-        data_path = str(path / 'Naver.csv')
-        news_keywords_path = str(path / 'Naver_keyword.csv')
+        path = Path(output_path)
+        news_keywords_path = str(path / 'keyword.csv')
         keywords_titles_path = str(path / 'keywords_title.csv')
 
-        data_df = pd.read_csv(data_path, index_col=0)
+        data_df = df
 
         total_keywords = []
         news_keywords_df = data_df.copy()
@@ -206,18 +204,16 @@ class KeyBERT:
         keywords_titles_df.to_csv(keywords_titles_path)
 
 
-
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
-    # # news = NateNews(data_dir='./natenews_data/20220301.csv')
-    # news = NaverSports()
-    #
     # docs, topics = news.load_data()
-    ord_data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
+    # ord_data_df = pd.read_csv('./newsData/Naver.csv', index_col=0)
+    news = NateNews()
+    df = news.load_data()
 
     ## load model
     # keybert = KeyBERT(model_path='./model')
-    keybert = KeyBERT(model_path='sinjy1203/ko-sbert-navernews')
+    keybert = KeyBERT(model_path='./ko-sbert-natenews')
     # keybert = KeyBERT()
 
     # ## data check
@@ -242,6 +238,6 @@ if __name__ == '__main__':
     #     f.write('\n' + ', '.join(keywords))
 
     ## pred_keyword & titles about keyword to save
-    keybert.pred_df(path='./newsData')
+    keybert.pred_df(df)
 
 
