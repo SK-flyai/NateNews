@@ -17,10 +17,11 @@ from load_dataset import *
 
 class TextRank:
     """
+    ***************** 일단 성능 별로라 사용안함 *****************************
     bert 기반 추출적 요약 텍스트 랭크 알고리즘
     문장들 간에 유사도를 구하고 그 기반으로 중요한 문장 추출
     """
-    def __init__(self, model_path="jhgan/ko-sbert-nli"):
+    def __init__(self, model_path="sinjy1203/ko-sbert-natenews"):
         """
         self.embedding_model: kobert으로 학습시킨 sentencebert
         """
@@ -83,25 +84,34 @@ class TextRank:
 
 class KeySentence:
     """
-    keybert 알고리즘을 기반으로 신문기사 내용에서 주요 문장 추출
+    뉴스 제목과 뉴스 본문 문장들의 유사도를 통해
+    신문본문에서 주요 문장 추출
+
+    ex)
+        model_path = "sinjy1203/ko-sbert-natenews"
+        keysent = KeySentence(model_path=model_path)
+        key_sent = keysent.predict(본문내용)
+
     """
-    def __init__(self, model_path='jhgan/ko-sbert-nli'):
+    def __init__(self, model_path='sinjy1203/ko-sbert-natenews'):
         """
-        self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
+        Args:
+            model_path: huggingface hub에 있는 finetuning한 sbert model
+
         """
         self.model = SentenceTransformer(model_path)
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             sents: np.ndarray, top_n: int, nr_candidates: int) -> List[str]:
+             candidates: List[str], top_n: int, nr_candidates: int) -> List[str]:
         """
         Max Sum Similarity
-        후보간 유사성은 최소화, 문서와의 유사성은 최대화
+        후보간 유사성은 최소화, 문서와의 유사성은 최대화 를 목적으로 주요문장 추출 알고리즘
         Args:
-            doc_embedding: 신문 기사의 임베딩값
+            doc_embedding: 뉴스본문의 임베딩값
             candidate_embeddings: 문장 후보군들의 임베딩값들
-            sents: 문장 후보군
-            top_n: top n개의 문장들을 주요문장으로 리턴
-            nr_candidates: 처음에 추출할 문서와의 유사도가 높은 문장 개수
+            candidates: 문장 후보군
+            top_n: top_n개의 문장들을 주요문장으로 리턴
+            nr_candidates: 처음에 추출할 뉴스본문과 유사도가 높은 문장 개수
 
         Returns:
             top_n개의 주요문장 리스트
@@ -115,7 +125,7 @@ class KeySentence:
 
         # 코사인 유사도에 기반하여 문장들 중 상위 nr_candidates개의 문장을 pick.
         sents_idx = list(distances.argsort()[0][-nr_candidates:])
-        sents_vals = [sents[index] for index in sents_idx]
+        sents_vals = [candidates[index] for index in sents_idx]
         distances_candidates = distances_candidates[np.ix_(sents_idx, sents_idx)]
 
         # 각 문장들 중에서 가장 덜 유사한 문장들 top_n개를 최종 리턴
@@ -130,15 +140,15 @@ class KeySentence:
         return [sents_vals[idx] for idx in candidate]
 
     def mmr_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             sents: np.ndarray, top_n: int, diversity: float) -> List[str]:
+             candidates: List[str], top_n: int, diversity: float) -> List[str]:
         """
         Maximal Marginal Relevance
         문서와 유사도가 가장 높은 문장을 선택하고
-        이미 선택된 키워드와 유사하지 않으면서 문서와 유사한 문장을 반복적으로 선택
+        이미 선택된 문장과 유사하지 않으면서 문서와 유사한 문장을 반복적으로 선택
         Args:
             doc_embedding: 신문 기사의 임베딩값
             candidate_embeddings: 문장 후보군들의 임베딩값들
-            sents: 문장 후보군
+            candidates: 문장 후보군들의 원본(한글)
             top_n: top n개의 문장들을 주요문장으로 리턴
             diversity: top_n개의 문장들의 유사도정도 (0~1)
 
@@ -156,7 +166,7 @@ class KeySentence:
         sents_idx = [np.argmax(sent_doc_similarity)]
 
         # 가장 높은 유사도를 가진 문장의 인덱스를 제외한 문서의 인덱스들
-        candidates_idx = [i for i in range(len(sents)) if i != sents_idx[0]]
+        candidates_idx = [i for i in range(len(candidates)) if i != sents_idx[0]]
 
         # 최고의 주요문장은 이미 추출했으므로 top_n-1번만큼 아래를 반복.
         # ex) top_n = 5라면, 아래의 loop는 4번 반복됨.
@@ -170,14 +180,14 @@ class KeySentence:
             sents_idx.append(mmr_idx)
             candidates_idx.remove(mmr_idx)
 
-        return [sents[idx] for idx in sents_idx]
+        return [candidates[idx] for idx in sents_idx]
 
-    def predict(self, doc: str, mode: str = 'mmr', top_n: int = 5, nr_candidates: int = 10,
+    def predict(self, doc: str, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
                 diversity: float = 0.2) -> List[str]:
         """
-        뉴스기사에서 주요문장들을 리턴
+        뉴스본문에서 주요문장들을 리턴
         Args:
-            doc: 뉴스기사
+            doc: 뉴스본문
             mode: mss or mmr
             top_n: 추출할 문장 개수
             nr_candidates: mss의 파라미터
@@ -186,11 +196,11 @@ class KeySentence:
         Returns:
             top_n개의 주요문장 리스트
         """
-        # candidates = kss.split_sentences(doc)
-        candidates = doc.split('. ')
+        candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
+        # candidates = doc.split('. ')
 
-        doc_embedding = self.model.encode([doc])
-        candidate_embeddings = self.model.encode(candidates)
+        doc_embedding = self.model.encode([doc]) # 뉴스본문의 임베딩
+        candidate_embeddings = self.model.encode(candidates) # 각 문장들의 임베딩들
 
         main_sents = None
         if mode == 'mss':

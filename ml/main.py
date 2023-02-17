@@ -24,12 +24,13 @@ def enter(sent, length=10):
     return res
 
 def words_(doc):
-    try:
-        count = CountVectorizer(tokenizer=tokenizer, ngram_range=(1,1)).fit([doc])
-    except ValueError:
-        return []
-
-    candidates = count.get_feature_names_out()
+    # try:
+    #     count = CountVectorizer(tokenizer=tokenizer, ngram_range=(1,1)).fit([doc])
+    # except ValueError:
+    #     return []
+    #
+    # candidates = count.get_feature_names_out()
+    candidates = tokenizer(doc)
     return candidates
 
 def words(doc):
@@ -52,7 +53,7 @@ if __name__ == '__main__':
 
     tokenizer = CustomTokenizer(Mecab())
 
-    pred_range = (0, 1000)
+    pred_range = (0, 100)
 
     model_path = "./ko-sbert-natenews"
     word_model = KeyBERT(model_path=model_path)

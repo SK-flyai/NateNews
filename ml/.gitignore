@@ -7,6 +7,6 @@ model/
 runs/
 ko-sbert-navernews/
 ko-sbert-natenews/
-
-*.txt
-*.csv
+natenews_data/
+newsData/
+result/

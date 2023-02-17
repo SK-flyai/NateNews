@@ -20,14 +20,20 @@ from preprocess import CustomTokenizer
 class KeyBERT:
     """
     신문기사 내용에서 주요 키워드를 추출
+
+    ex)
+        keybert = KeyBERT(model_path='sinjy1203/ko-sbert-natenews')
+        키워드들 5개 = keybert.pred(뉴스내용한개)
     """
-    def __init__(self, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'), model_path="jhgan/ko-sbert-nli"):
+    def __init__(self, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'), model_path="sinjy1203/ko-sbert-natenews"):
         """
-        self.model: 문장 임베딩 모델 (kobert를 이용해 학습시킨 sentencebert 모델)
-        self.tokenizer: 키워드 후보군 추출에 사용되는 tokenizer
+        Args:
+            tag: preprocess.CustomTokenizer의 tag로 사용
+            model_path: huggingface hub에 있는 finetuning한 sbert model
+
         """
         self.model = SentenceTransformer(model_path)
-        self.tokenizer = CustomTokenizer(Mecab(), tag=tag)
+        self.tokenizer = CustomTokenizer(Mecab(), tag=tag) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
              words: np.ndarray, top_n: int, nr_candidates: int) -> List[str]:
@@ -35,7 +41,7 @@ class KeyBERT:
         Max Sum Similarity
         후보간 유사성은 최소화, 문서와의 유사성은 최대화
         Args:
-            doc_embedding: 신문 기사의 임베딩값
+            doc_embedding: 뉴스본문의 임베딩값
             candidate_embeddings: 키워드 후보군들의 임베딩값들
             words: 키워드 후보군 단어들
             top_n: top n개의 단어들을 키워드로 리턴
@@ -74,7 +80,7 @@ class KeyBERT:
         문서와 유사도가 가장 높은 단어를 선택하고
         이미 선택된 키워드와 유사하지 않으면서 문서와 유사한 단어르 반복적으로 선택
         Args:
-            doc_embedding: 신문 기사의 임베딩값
+            doc_embedding: 뉴스본문의 임베딩값
             candidate_embeddings: 키워드 후보군들의 임베딩값들
             words: 키워드 후보군 단어들
             top_n: top n개의 단어들을 키워드로 리턴

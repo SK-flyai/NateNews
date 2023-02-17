@@ -4,11 +4,18 @@ from typing import *
 import pandas as pd
 import pickle
 from pathlib import Path
+import re
 
 class CustomTokenizer:
     """
     mecab을 활용한 한국어 tokenizer
-    키워드 후보군 추출에 사용
+    뉴스본문에서 mecab을 이용해 명사를 추출하고 사용자사전들을 이용해
+    키워드 추출 후보군들로 사용
+
+    ex)
+        tokenizer = CustomTokenizer(Mecab())
+        명사들 = tokenizer(뉴스본문)
+
     """
     def __init__(self, tagger: Mecab, tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
         """
@@ -23,9 +30,12 @@ class CustomTokenizer:
         self.tagger = tagger
         self.tag = tag
 
-    def load_mapping(self, path='./user_words/word_mapping.txt'):
+    def load_mapping(self, path='./user_words/word_mapping.txt') -> Dict[str, str]:
         """
-        버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 저장
+        버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 불러오기
+        .txt 내용 형태:
+            key_value
+            key_value
 
         Args:
             path: '단어_단어' 형태의 txt 경로
@@ -39,33 +49,48 @@ class CustomTokenizer:
 
     def load_filtering(self, path='./user_words/word_filtering.txt'):
         """
-        불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 저장
+        불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 불러오기
 
         Args:
-            add_filter: 추가할 단어 집합
-            save_path: 집합 저장경로
+            path: filtering 단어들의 저장경로
         """
         with open(path, 'r', encoding='UTF8') as f:
             words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
         return words
 
-    def __call__(self, sent: str, user_words_path: str = './user_words') -> List[str]:
+    def preprocess_(self, data: str) -> str:
         """
-        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 mapping & filtering
+        단어 후보군들 추출하기 전에 제거해야할 일반적인 형식의 단어들 제거
+
         Args:
-            sent: 원본 문장
-
-        Returns: tokenize 된 문장
+            data: 뉴스 본문 한개
 
         """
+        data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)  # 날짜 형식
+        data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # 뉴스 제거
+        return data
+
+    def __call__(self, doc: str, user_words_path: str = './user_words') -> List[str]:
+        """
+        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 사용자 mapping & filtering
+        Args:
+            doc: 뉴스본문 한개
+            user_words_path: 사용자 사전들의 경로
+
+        Returns: 키워드 후보군들
+
+        """
+        doc = self.preprocess_(doc)
         if self.tag == 'nouns': # 명사만
-            word_tokens = self.tagger.nouns(sent)
+            word_tokens = self.tagger.nouns(doc)
         elif self.tag == 'morphs': # 전체 다
-            word_tokens = self.tagger.morphs(sent)
+            word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
-            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(sent))))
+            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(doc))))
         else:
             raise Exception('keyerror')
+
         # result = [word for word in word_tokens if len(word) > 1]
         result = word_tokens
         user_words_path = Path(user_words_path)
