@@ -81,8 +81,9 @@ colab gpu를 활용하여 model finetuning
 => 이 파일을 C:/mecab/tools 경로에 넣어주기
 
 ```
-# mecab의 사용자 사전 추가 (처음 실행할때만 하면 됨)
+# mecab의 사용자 사전 추가 (처음 실행할때 한번만 하면 됨)
 python initial_mecab_userdic.py
+# add_mecab_userdic.py 실행 전에 ./user_words/mecab_words.txt 에 모든 단어 앞에 /표시 
 python add_mecab_userdic.py 
 ```
 ```
