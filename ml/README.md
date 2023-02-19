@@ -83,7 +83,8 @@ colab gpu를 활용하여 model finetuning
 ```
 # mecab의 사용자 사전 추가 (처음 실행할때 한번만 하면 됨)
 python initial_mecab_userdic.py
-# add_mecab_userdic.py 실행 전에 ./user_words/mecab_words.txt 에 모든 단어 앞에 /표시 
+# add_mecab_userdic.py 실행 전에 ./user_words/mecab_words.txt 에 모든 단어 앞에 /표시 없애기
+# 단어 앞에 /표시는 그 단어를 추가 안하겟다는 의미이기 때문
 python add_mecab_userdic.py 
 ```
 ```
