@@ -31,6 +31,7 @@ def text_cleaning(article):
     tmp = _remove_newline(tmp)
 
     text = tmp.replace('기사내용 요약', '[기사내용 요약]\n')
+    text = re.sub("\\'", "", text)
 
     return text
 
