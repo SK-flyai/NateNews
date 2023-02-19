@@ -57,8 +57,8 @@ colab gpu를 활용하여 model finetuning
 
 ## Getting Started
 ### sample dataset 
-[20230212_100.xlsx] https://docs.google.com/spreadsheets/d/1C1MQlYbLmh3gVJq-F6CWXzmQ30kurG6J/edit?usp=share_link&ouid=104879418112776533120&rtpof=true&sd=true  
-[20230212_100.csv] https://drive.google.com/file/d/1De0uG-F9L916WAXN9yRfknhvwTjbeGUf/view?usp=share_link
+[20230212_100.xlsx] (https://docs.google.com/spreadsheets/d/1C1MQlYbLmh3gVJq-F6CWXzmQ30kurG6J/edit?usp=share_link&ouid=104879418112776533120&rtpof=true&sd=true)  
+[20230212_100.csv] (https://drive.google.com/file/d/1De0uG-F9L916WAXN9yRfknhvwTjbeGUf/view?usp=share_link)
 
 ```
 # mecab의 사용자 사전 추가 (처음 실행할때만 하면 됨)
