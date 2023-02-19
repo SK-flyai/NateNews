@@ -151,6 +151,7 @@ const EntertainmentMain = ({ navigation }) => {
       >
         {/*기사 목록 FlatList로 띄움*/}
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={DATA}
           keyExtractor={(item) => item.id}
           renderItem={({ item, index }) => (

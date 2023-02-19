@@ -4,11 +4,18 @@ from typing import *
 import pandas as pd
 import pickle
 from pathlib import Path
+import re
 
 class CustomTokenizer:
     """
     mecab을 활용한 한국어 tokenizer
-    키워드 후보군 추출에 사용
+    뉴스본문에서 mecab을 이용해 명사를 추출하고 사용자사전들을 이용해
+    키워드 추출 후보군들로 사용
+
+    ex)
+        tokenizer = CustomTokenizer(Mecab())
+        명사들 = tokenizer(뉴스본문)
+
     """
     def __init__(self, tagger: Mecab, tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
         """
@@ -23,79 +30,85 @@ class CustomTokenizer:
         self.tagger = tagger
         self.tag = tag
 
-    def add_mapping(self, add_dict: Dict[str, str], save_path='./user_words/word_mapping.pkl'):
+    def load_mapping(self, path='./user_words/word_mapping.txt') -> Dict[str, str]:
         """
-        버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 저장
+        버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 불러오기
+        .txt 내용 형태:
+            key_value
+            key_value
 
         Args:
-            add_dict: 추가할 단어 매핑 딕셔너리
-            save_path: 딕셔너리 저장 경로
+            path: '단어_단어' 형태의 txt 경로
+        Returns:
+            words_dict: 매핑할 단어들 딕셔너리
         """
-        if os.path.isfile(save_path):
-            with open(save_path, 'rb') as f:
-                user_dict = pickle.load(f)
-                user_dict.update(add_dict)
-        else:
-            user_dict = add_dict
-        with open(save_path, 'wb') as f:
-            pickle.dump(user_dict, f)
+        with open(path, 'r', encoding='UTF8') as f:
+            words_dict = list(map(lambda y: y.split('_'), list(set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''})))
+            words_dict = {words_[0]: words_[1] for words_ in words_dict}
+        return words_dict
 
-    def add_filtering(self, add_filter: Set[str], save_path='./user_words/word_filtering.pkl'):
+    def load_filtering(self, path='./user_words/word_filtering.txt'):
         """
-        불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 저장
+        불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 불러오기
 
         Args:
-            add_filter: 추가할 단어 집합
-            save_path: 집합 저장경로
+            path: filtering 단어들의 저장경로
         """
-        if os.path.isfile(save_path):
-            with open(save_path, 'rb') as f:
-                user_filter = pickle.load(f)
-                user_filter = user_filter.union(add_filter)
-        else:
-            user_filter = add_filter
-        with open(save_path, 'wb') as f:
-            pickle.dump(user_filter, f)
+        with open(path, 'r', encoding='UTF8') as f:
+            words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
+        return words
 
-    def __call__(self, sent: str, user_words_path: str = './user_words') -> List[str]:
+    def preprocess_(self, data: str) -> str:
         """
-        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 mapping & filtering
+        단어 후보군들 추출하기 전에 제거해야할 일반적인 형식의 단어들 제거
+
         Args:
-            sent: 원본 문장
-
-        Returns: tokenize 된 문장
+            data: 뉴스 본문 한개
 
         """
+        data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)  # 날짜 형식
+        data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
+        data = re.sub('[가-힣]{2,3}뉴스', '', data)  # 뉴스 제거
+        return data
+
+    def __call__(self, doc: str, user_words_path: str = './user_words') -> List[str]:
+        """
+        mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 사용자 mapping & filtering
+        Args:
+            doc: 뉴스본문 한개
+            user_words_path: 사용자 사전들의 경로
+
+        Returns: 키워드 후보군들
+
+        """
+        doc = self.preprocess_(doc)
         if self.tag == 'nouns': # 명사만
-            word_tokens = self.tagger.nouns(sent)
+            word_tokens = self.tagger.nouns(doc)
         elif self.tag == 'morphs': # 전체 다
-            word_tokens = self.tagger.morphs(sent)
+            word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
-            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(sent))))
+            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(doc))))
         else:
             raise Exception('keyerror')
+
         # result = [word for word in word_tokens if len(word) > 1]
         result = word_tokens
         user_words_path = Path(user_words_path)
-        f_filtering, f_mapping = open(str(user_words_path / 'word_filtering.pkl'), 'rb') \
-                                , open(str(user_words_path / 'word_mapping.pkl'), 'rb')
-        self.filtering = pickle.load(f_filtering)
-        self.mapping = pickle.load(f_mapping)
-        f_filtering.close()
-        f_mapping.close()
+        filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
+        mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
 
         def func(x):
-            if x in self.mapping:
-                return self.mapping[x]
+            if x in mapping:
+                return mapping[x]
             return x
 
         result = list(map(func, result))
-        result = list(filter(lambda x: x not in self.filtering, result))
+        result = list(filter(lambda x: x not in filtering, result))
         return result
 
 if __name__ == '__main__':
     tokenizer = CustomTokenizer(Mecab())
-    print(tokenizer('신정열은 양의동과 김서현과 안치호와 같이 프로젝트를 진행하였다.'))
+    print(tokenizer('야구, 농구, 축구, 배구를 했다.'))
 
     ##
     tokenizer.add_mapping(
