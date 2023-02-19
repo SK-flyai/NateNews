@@ -76,8 +76,13 @@ colab gpu를 활용하여 model finetuning
 [20230212_100.xlsx](https://docs.google.com/spreadsheets/d/1SbKPI4Y0O6xgrYXHFIu8u-l9ucr5O45Q/edit?usp=share_link&ouid=104879418112776533120&rtpof=true&sd=true)  
 [20230212_100.csv](https://drive.google.com/file/d/1De0uG-F9L916WAXN9yRfknhvwTjbeGUf/view?usp=share_link)
 
+### mecab compile 파일 다운
+[compile-win.ps1](https://drive.google.com/file/d/1HH6D5Y89OOO_R2WSblDGXUdCkJNJt85f/view?usp=share_link)  
+=> 이 파일을 C:/mecab/tools 경로에 넣어주기
+
 ```
 # mecab의 사용자 사전 추가 (처음 실행할때만 하면 됨)
+python initial_mecab_userdic.py
 python add_mecab_userdic.py 
 ```
 ```
