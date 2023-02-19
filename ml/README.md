@@ -13,7 +13,10 @@ Mecab()의 __init__(dicpath='C:/mecab/mecab-ko-dic')로 바꿔줘야 함**
 
 ### cpu version  
 ```
-pip install requirements_cpu.txt
+# pip install requirements_cpu.txt => 이거 에러떠서 아래 실행 고우
+pip install sentence-transformers
+pip install kss
+pip install matplotlib
 ```
 
 ### gpu version  
