@@ -23,7 +23,11 @@ pip install matplotlib
 - CUDA toolkit 11.6
 - cuDNN 8.6.0
 ```
-pip install requirements_gpu.txt
+# pip install requirements_gpu.txt => 아래거 실행 고우
+pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+pip install sentence-transformers
+pip install kss
+pip install matplotlib
 ```
 
 
