@@ -7,6 +7,7 @@ from glob import glob
 import re
 import pandas as pd
 import kss
+import os
 
 import torch
 
@@ -81,8 +82,13 @@ class NateNews:
                         'contents'(본문), 'url'(링크)
 
         """
-
-        df = pd.read_csv(self.data_dir, index_col=0) # 원본 데이터셋 불러오기
+        ext_name = os.path.splitext(self.data_dir)[1]
+        if ext_name == '.csv':
+            df = pd.read_csv(self.data_dir, index_col=0) # 원본 데이터셋 불러오기
+        elif ext_name == '.xlsx':
+            df = pd.read_excel(self.data_dir, index_col=0)
+        else:
+            raise Exception("data format error")
         df['contents'] = df['contents'].apply(self.preprocess_) # 각 뉴스 본문 전처리
         df['titles'] = df['titles'].apply(self.preprocess_) # 각 뉴스 제목 전처리
         df.drop(df[df['contents'].apply(len) < 300].index, inplace=True) # 뉴스내용이 작은 거 없애기
@@ -94,7 +100,7 @@ class NateNews:
 
 ##
 if __name__ == '__main__':
-    news = NateNews()
+    news = NateNews(data_dir='20230212_100.xlsx')
     df = news.load_data()
 
     # ord_df = pd.read_csv('./natenews_data/20230212_100.csv', index_col=0)
@@ -104,10 +110,7 @@ if __name__ == '__main__':
     # ord_df.to_csv('./natenews_data/20230212_100.csv')
 
     ##
-    # doc = df.loc[112, 'contents']
-    # print([doc])
-    # sents = kss.split_sentences(df.loc[112, 'contents'])
-    # print(sents)
+    df = pd.read_excel('20230212_100.xlsx')
 
     ##
     news = NateNews()
