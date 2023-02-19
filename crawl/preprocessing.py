@@ -94,13 +94,11 @@ def _remove_newline(text):
     text = re.sub('\n ', '\n\n', text)
     text = re.sub('-\n', '\n\n', text)
     text = re.sub('\n{2,}', '\n\n', text)
+    text = re.sub('- \n', '\n\n', text)
     if len(text) < 2:
         return ''
-    
-    while text[0] == ' ' or text[0] == '\n':
-        text = text[1:]
+
+    text = text.strip()
     if text[0] == ']': text = text[1:]
-    while text[-1] == ' ' or text[-1] == '\n':
-        text = text[:-1]
 
     return text
