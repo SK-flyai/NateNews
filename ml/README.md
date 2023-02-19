@@ -10,6 +10,15 @@ https://mire-gardenia-e1b.notion.site/5874cfe2a72e4214b82dfecac9ea46e4
 => **mecab 파일이 C:/mecab 경로일경우 site-packages/konlpy/tag/_mecab.py 에서   
 Mecab()의 __init__(dicpath='C:/mecab/mecab-ko-dic')로 바꿔줘야 함**
 
+=> 관리자권한으로 powershell 실행후에  
+```
+ExecutionPolicy
+```
+이 것의 결과가 Restricted 일경우 아래 실행
+```
+Set-ExecutionPolicy RemoteSigned
+```
+
 
 ### cpu version  
 ```
