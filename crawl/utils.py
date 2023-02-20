@@ -55,6 +55,7 @@ def get_news(
             2. None: Abnormal Request(won't get that page)
     """
     url_list = url_list if isinstance(url_list, list) else [url_list]
+    url_list = list(map(_convert_url, url_list))
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(_create, url_list))
@@ -70,6 +71,9 @@ def get_news(
     news_list = [news for news in _news_list if news]
     return news_list
 
+def _convert_url(url:str):
+    url = url.split('?')[0].split('//')[-1]
+    return f"https://{url}"
 
 def get_urls(
     date1: Union[int, None]=None,
@@ -230,9 +234,14 @@ def _create(url:str):
         print(f"There's no article in {url}")
         return None
     else:
+        # 특수 기사들은 제외
+        title = new_class.title
+        if '[속보]' in title or '[포토]' in title or '[부고]' in title:
+            return None
         # 기사가 있다 -> 길이 확인하기
-        content_len = len(_remove_bracket(text_cleaning(article)))
+        content_len = len(_remove_bracket(text_cleaning(article)[0]))
         if content_len < 300:
+            print(f'{url} has too short article!')
             return None
         else:
             return new_class
