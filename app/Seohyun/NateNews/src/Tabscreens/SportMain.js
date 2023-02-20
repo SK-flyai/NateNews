@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import SearchBar from "../components/Searchbar";
-import { Button } from "react-native-elements";
+
+import { Pressable } from "react-native";
 
 const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
-function SportMain(navigation) {
+function SportMain({ navigation }) {
   const Armypath = "../../assets/army.jpg";
+
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View
@@ -23,36 +25,42 @@ function SportMain(navigation) {
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             병역비리 적발
           </Text>
-          <View
-            style={{
-              marginVertical: "2%",
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "pink",
-              flexDirection: "row",
-            }}
+          <Pressable
+            onPress={() => navigation.navigate("SportContent")}
+            android_ripple={{ color: "e0e0e0" }}
           >
-            <Image
+            <View
               style={{
-                width: Imagewidth,
-                height: Imagewidth * 0.7,
-                backgroundColor: "black",
-                resizeMode: "stretch",
+                marginVertical: "2%",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "pink",
+                flexDirection: "row",
               }}
-              source={require(Armypath)}
-            />
+            >
+              <Image
+                style={{
+                  width: Imagewidth,
+                  height: Imagewidth * 0.7,
+                  backgroundColor: "black",
+                  resizeMode: "stretch",
+                }}
+                source={require(Armypath)}
+              />
 
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                [단독] "통화했다, 5급" 녹취 입수…병무청 직원과 유착 정황
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                저희 JTBC가 병역 비리 브로커의 통화 녹취록을 입수했습니다.
-                브로커는 신체검사 직후 "병무청 직원과 통화를 했고, 5급이
-                나왔다"고
-              </Text>
+              <View style={styles.textcontainer}>
+                <Text style={{ fontWeight: "bold" }}>
+                  [단독] "통화했다, 5급" 녹취 입수…병무청 직원과 유착 정황
+                </Text>
+
+                <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                  저희 JTBC가 병역 비리 브로커의 통화 녹취록을 입수했습니다.
+                  브로커는 신체검사 직후 "병무청 직원과 통화를 했고, 5급이
+                  나왔다"고
+                </Text>
+              </View>
             </View>
-          </View>
+          </Pressable>
         </View>
 
         <View>
@@ -63,7 +71,12 @@ function SportMain(navigation) {
               { marginBottom: "2%" },
             ]}
           />
-          <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
+          <Pressable
+            onPress={() => navigation.navigate("SportContent")}
+            android_ripple={{ color: "gray" }}
+          >
+            <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
+          </Pressable>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
           <Text>
             "아들이 정신 잃고 몸을 떤다"... 군대 안보내려 뇌전등 허위신고한

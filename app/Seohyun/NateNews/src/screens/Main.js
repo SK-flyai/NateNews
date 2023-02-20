@@ -146,7 +146,7 @@ const Main = ({ navigation }) => {
                   color: "blue",
                   fontWeight: "bold",
                   fontSize: 17,
-                  marginLeft: "25%",
+                  marginLeft: "23%",
                   marginVertical: "3%",
                 }}
               >
