@@ -55,14 +55,14 @@ if __name__ == '__main__':
 
     tokenizer = CustomTokenizer(Mecab())
 
-    pred_range = (0, 100)
+    pred_range = (200, 300)
 
     # model_path = "./ko-sbert-natenews"
     # word_model = KeyBERT(model_path=model_path)
     # textrank_model = TextRank(model_path=model_path)
     # keysent_model = KeySentence(model_path=model_path)
-    model = NewsModel(model_path="./ko-sbert-natenews")
-
+    # model = NewsModel(model_path="./ko-sbert-natenews")
+    model = NewsModel(model_path='bongsoo/kpf-sbert-v1.1')
     news = NateNews()
     df = news.load_data()
     df = df.loc[pred_range[0]:pred_range[1]]
@@ -81,6 +81,6 @@ if __name__ == '__main__':
         df.loc[i, 'contents'] = '\n'.join(kss.split_sentences(df.loc[i, 'contents']))
         df.loc[i, 'words'] = words(df.loc[i, 'contents'])
 
-    df[['titles', 'keywords', 'keysentence', 'contents']].to_csv('./natenews_data/keyword_sent.csv')
+    df[['titles', 'keywords', 'keysentence', 'contents']].to_csv('./natenews_data/keyword_words_kpf.csv')
 
 
