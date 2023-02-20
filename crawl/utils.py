@@ -218,10 +218,12 @@ def _create(url:str):
     
     # 연예 기사는 제외
     if which_news == '연예':
+        print(f"{url} is Entertainment News!")
         return None
 
     # 연합 뉴스들 제외
     if new_class.press == 'AP연합뉴스' or new_class.press == 'EPA연합뉴스':
+        print(f"{url} is English News!")
         return None
 
     article = new_class.content.find(
@@ -231,12 +233,13 @@ def _create(url:str):
     
     # 기사가 없는 경우
     if not article:
-        print(f"There's no article in {url}")
+        print(f"{url} has no article!")
         return None
     else:
         # 특수 기사들은 제외
         title = new_class.title
         if '[속보]' in title or '[포토]' in title or '[부고]' in title:
+            print(f"{url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
         content_len = len(_remove_bracket(text_cleaning(article)[0]))
