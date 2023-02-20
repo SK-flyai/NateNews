@@ -54,24 +54,8 @@ class NateNews:
 
     def _get_content(self):
         _article = self.content.find('div',{'id': 'articleContetns'})
-        article = text_cleaning(_article)
-        
-        pattern_link = re.compile('\[(http://[^\]]*)\]')
-        result_img = pattern_link.finditer(article)
-        article = re.sub(pattern_link, '', article)
+        article, self.image = text_cleaning(_article)
 
-        pattern_cap = re.compile('\[([^\]]*)\]')
-        result_cap = pattern_cap.finditer(article)
-        article = re.sub(pattern_cap, '', article)
-        
-        image_dict = dict()
-        for r in result_img:
-            image_dict[r.group(1)] = ''
-            try:
-                image_dict[r.group(1)] = next(result_cap).group(1)
-            except:
-                pass
-        self.image = image_dict
         return article
     
     def _get_press(self):
@@ -86,6 +70,10 @@ class NateNews:
         nav = self.content.find('div', {'class': 'snbArea'})
         category = nav.find('li', {'class': 'on'})
         return category.text if category else 'X'
+    
+    @property
+    def title(self):
+        return self._get_title()
     
     def _get_title(self):
         title = self.content.find('h3', {'class': 'viewTite'})
