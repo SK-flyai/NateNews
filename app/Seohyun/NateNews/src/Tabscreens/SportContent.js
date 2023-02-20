@@ -83,7 +83,7 @@ var caption = "";
 var img = "";
 
 axios
-  .get("http://192.168.11.240:5000/get_text")
+  .get("http://192.168.1.10:5000/get_text")
   .then((response) => {
     title = response.data.title;
     category = response.data.category;
@@ -107,11 +107,23 @@ const Container = styled.View`
 `;
 
 const SportContent = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
-
-  const Pic1path = "../../assets/Images/ArticlePic1.png";
 
   const [isModalVisible, setModalVisible] = useState(false);
+  const [aspectRatio, setAspectRatio] = useState(null);
+
+  useEffect(() => {
+    Image.getSize(
+      img,
+      (width, height) => {
+        setAspectRatio(width / height);
+      },
+      error => {
+        console.error(error);
+      }
+    );
+  }, []);
+
+
   useEffect(() => {
     const handleBackButton = () => {
       if (isModalVisible) {
@@ -135,7 +147,7 @@ const SportContent = ({ navigation }) => {
     console.log("Image Clicked!");
     setModalVisible(true);
   };
-
+  
   return (
     <SafeAreaView
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
@@ -181,10 +193,12 @@ const SportContent = ({ navigation }) => {
           <Divider style={{ height: 5 }} />
 
           <TouchableOpacity onPress={imagePress}>
-            <Image
-              style={{ width: width, height: 210, marginTop: 15 }}
-              source={require(Pic1path)}
-            />
+          <Image
+            style={{ width: width, aspectRatio, marginTop: 15 }}
+            source={{
+              uri: img,
+            }}
+          />
           </TouchableOpacity>
           <Divider style={{ height: 5 }} />
 
