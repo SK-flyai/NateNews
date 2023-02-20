@@ -9,7 +9,7 @@ PRESS = [
     'CBS노컷뉴스는 여러분의 제보로 함께 세상을 바꿉니다. 각종 비리와 부당대우, 사건사고와 미담 등 모든 얘깃거리를 알려주세요.이메일 : 카카오톡 : @노컷뉴스사이트 : https://url.kr/b71afn',
     # 뉴스1
     'news1.kr',
-    'All rights reserved.',
+    'reserved.',
     '무단 전재 및 재배포 금지.',
     '뉴스1.',
     # 뉴시스
@@ -19,10 +19,32 @@ PRESS = [
     '데일리임팩트.',
     # 조선비즈
     'ChosunBiz.com',
-    # 헤럴드경제
-    'All Rights Reserved.',
+    # 헤럴드경제, 헤럴드 POP
+    'Reserved.',
     # 더팩트
     '여러분의 제보를 기다립니다.',
+    # 블로터
+    'bloter.net',
+    # 케이스타뉴스
+    '케이스타뉴스.',
+    # JTBC
+    'JTBC의 모든 콘텐트는 저작권법의 보호를 받은바, 무단 전재, 복사, 배포 등을 금합니다.',
+    # SBS
+    'SBS & SBS Digital News Lab.',
+    # 에이빙뉴스
+    '에이빙.',
+    # 뉴스엔
+    '뉴스엔.',
+    # 마이데일리
+    '마이데일리.',
+    # 스포츠한국
+    '스포츠한국. 무단전재 및 재배포 금지',
+    # 스포탈코리아
+    '스포탈코리아. 무단전재 및 재배포 금지',
+    # 인터풋볼
+    '인터풋볼. 무단전재 및 재배포 금지',
+    # 일간스포츠
+    '일간스포츠. All rights reserved',
 ]
 
 def text_cleaning(article):
@@ -41,10 +63,10 @@ def text_cleaning(article):
     
     content = bs(tmp, 'html.parser') # 다시 parsing
     tmp = re.sub(' {2,}', ' ', content.text)
-    
+
     tmp = _remove_bracket(tmp)
     
-    tmp = ('').join([word for word in tmp if word.isalpha() or ord(word) < 128])
+    tmp = ('').join([word for word in tmp if word.isalpha() or ord(word) < 128 or word == '…'])
     tmp = tmp.replace(MESSAGE, '')
     
     tmp = _remove_email(tmp)
