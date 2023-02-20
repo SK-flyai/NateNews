@@ -1,13 +1,10 @@
 import requests
-import re
-import time
 
 from bs4 import BeautifulSoup as bs
 from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
-# TODO: modulize
 
 
 class NateNews:
@@ -17,8 +14,7 @@ class NateNews:
         assert res.status_code == 200
         
         self.url = url
-        html = res.text
-        self.content = bs(html, 'html.parser')
+        self.content = bs(res.text, 'html.parser')
     
     def get_info(self):
         return[
@@ -83,5 +79,4 @@ class NateNews:
     
     def _get_date(self):
         date = self.content.find('em').text
-        # date: dt.datetime = dt.datetime.strptime(_date, "%Y-%m-%d %H:%M")
         return date

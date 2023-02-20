@@ -2,13 +2,11 @@ from bs4 import BeautifulSoup as bs
 from concurrent.futures import ThreadPoolExecutor
 from news_crawl import NateNews
 from preprocessing import text_cleaning
-from typing import List
 from typing import List, Union
 
 import datetime as dt
 import pandas as pd
 import requests
-import time
 import re
 
 
@@ -37,7 +35,6 @@ def get_news_df(
         except:
             print('Error occurs')
             print(news.url)
-    # info_list = [news.get_info() for news in news_list]
     return pd.DataFrame(info_list, columns=COLUMNS)
 
 
@@ -60,7 +57,6 @@ def get_news(
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(_create, url_list))
     else:
-        # _news_list = [_create(url) for url in url_list]
         _news_list = list()
         for url in url_list:
             try:
@@ -209,7 +205,7 @@ def _create(url:str):
         Union[NateNews, None]: 
     """        
     # time.sleep(0.5)
-    # TODO: handling sleep stuff...
+    # TODO: handling sleep stuff... => Only when collect huge amount of dataset
     new_class = NateNews(url)
     which_news = new_class.content.find(
         'a',
