@@ -1,3 +1,4 @@
+import bs4
 import re
 
 from bs4 import BeautifulSoup as bs
@@ -47,7 +48,17 @@ PRESS = [
     '일간스포츠. All rights reserved',
 ]
 
-def text_cleaning(article):
+def text_cleaning(article: bs4.element.Tag):
+    """Cleaning news content and divide images & texts
+
+    Args:
+        article (bs4.element.Tag): content of article found with `bs`
+
+    Returns:
+        Tuple[str, Dict[str, str]]:
+            str: Content of news article after cleaning noise
+            Dict[str, str]: pair of image-caption
+    """    
     article_text = str(article)
     i = 0
     # [] 내부 모두 제거
@@ -88,6 +99,8 @@ def text_cleaning(article):
     return (text.strip() + '.', images)
 
 def _seperate_text(text):
+    """Seperate text with images(and captions)
+    """
     pattern_link = re.compile('\[(http://[^\]]*)\]')
     result_img = pattern_link.finditer(text)
     text = re.sub(pattern_link, '', text)
@@ -107,16 +120,21 @@ def _seperate_text(text):
     return text, image_dict
 
 def _remove_press(text):
+    """Remove noise in each article in press
+    """
     text = re.sub(('|').join(PRESS), '', text)
     return text
 
 def _remove_link(text):
+    """Remove links
+    """
     pattern = re.compile('^[^\[\n]*https?://[^ \n]+', re.MULTILINE)
     text = re.sub(pattern, '', text)
     return text
 
 def _remove_caption(text):
-    # 캡션 표시
+    """Specify which line is caption of certain image
+    """
     pattern = re.compile('(<p style="[^>]*>)([^<]*)(</p>)')
     result = pattern.finditer(text)
     for r in result:
@@ -131,6 +149,8 @@ def _remove_caption(text):
     return text
 
 def _remove_html_tag(text):
+    """Replace html tags with newline or empty string
+    """
     pattern = "</?p[^>]*>" # <p> or </p> -> 개행으로 변경
     text = re.sub(pattern, '\n', text)
     
@@ -153,6 +173,8 @@ def _remove_html_tag(text):
     return text
 
 def _remove_bracket(text):
+    """Remove <> and [] stuffs
+    """
     pattern = "<[^>]*>" # <> 내부 모두 제거
     text = re.sub(pattern, '', text)
     
@@ -162,6 +184,8 @@ def _remove_bracket(text):
     return text
 
 def _remove_email(text):
+    """Remove texts with email form
+    """
     pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.com'
     text = re.sub(pattern, '', text)
     pattern = '[a-zA-Z0-9+-_.]+@[a-zA-Z0-9+-_]+.co.kr'
@@ -172,6 +196,8 @@ def _remove_email(text):
     return text
 
 def _remove_newline(text):
+    """Remove newline and similar things
+    """
     text = re.sub('\n ', '\n\n', text)
     text = re.sub('-\n', '\n\n', text)
     text = re.sub('\n{2,}', '\n\n', text)
