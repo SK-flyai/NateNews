@@ -5,6 +5,7 @@ import pandas as pd
 import pickle
 from pathlib import Path
 import re
+from bareunpy import Tagger
 
 class CustomTokenizer:
     """
@@ -17,10 +18,10 @@ class CustomTokenizer:
         명사들 = tokenizer(뉴스본문)
 
     """
-    def __init__(self, tagger: Mecab, tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
+    def __init__(self, tagger: Union[Mecab, Tagger] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
         """
         Args:
-            tagger: mecab 클래스
+            tagger: 형태소 분석기
             tag: 태그 방법
                 nouns: 명사만 추출
                 morphs: 모든 품사의 형태소 추출
