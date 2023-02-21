@@ -18,6 +18,8 @@ import Icon3 from "react-native-vector-icons/Foundation";
 const { width } = Dimensions.get("window");
 
 const SportContent = ({ navigation }) => {
+  // 모달 쓰기위한 함수 구현부 이미지 함수 삭제
+
   const [isModalVisible1, setModalVisible1] = useState(false);
   const [isModalVisible2, setModalVisible2] = useState(false);
 
@@ -177,8 +179,6 @@ const SportContent = ({ navigation }) => {
                 <View
                   style={{
                     width: width * 0.95,
-                    flexDirection: "row",
-                    flexWrap: "wrap",
                   }}
                 >
                   <Text
@@ -195,6 +195,9 @@ const SportContent = ({ navigation }) => {
               </Pressable>
             </Text>
           </View>
+
+          {/* 첫번째 모달 */}
+
           <Modal
             visible={isModalVisible1}
             style={styles.bottomModal}
@@ -211,6 +214,9 @@ const SportContent = ({ navigation }) => {
               </ScrollView>
             </View>
           </Modal>
+
+          {/*두번째 모달 */}
+
           <Modal
             visible={isModalVisible2}
             style={styles.bottomModal}
