@@ -7,8 +7,9 @@ import {
 import MainPage from "./MainPage";
 import { Button } from "../components";
 import Tab from "./Tab";
-
 const Drawer = createDrawerNavigator();
+
+import Header from "./Header";
 
 const styles = StyleSheet.create({
   drawerLabel: {
@@ -24,8 +25,9 @@ const Sidebar = () => {
     <Drawer.Navigator
       initialRouteName="Main" // 초기 화면 -> Main.js (Page1)
       screenOptions={{
+        headerTitle: (props) => <Header {...props} />,
         headerStyle: {
-          backgroundColor: "#FA5858",
+          backgroundColor: "white",
         },
         drawerStyle: {
           backgroundColor: "#F2F2F2",
