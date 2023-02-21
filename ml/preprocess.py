@@ -5,6 +5,7 @@ import pandas as pd
 import pickle
 from pathlib import Path
 import re
+from bareunpy import Tagger
 
 class CustomTokenizer:
     """
@@ -17,10 +18,10 @@ class CustomTokenizer:
         명사들 = tokenizer(뉴스본문)
 
     """
-    def __init__(self, tagger: Mecab, tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
+    def __init__(self, tagger: Union[Mecab, Tagger] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
         """
         Args:
-            tagger: mecab 클래스
+            tagger: 형태소 분석기
             tag: 태그 방법
                 nouns: 명사만 추출
                 morphs: 모든 품사의 형태소 추출
@@ -69,6 +70,7 @@ class CustomTokenizer:
         data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)  # 날짜 형식
         data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # 뉴스 제거
+        data = re.sub('무단복제 및 재배포 금지', '', data) # 너무 많이 나와서 제거
         return data
 
     def __call__(self, doc: str, user_words_path: str = './user_words') -> List[str]:
@@ -91,8 +93,7 @@ class CustomTokenizer:
         else:
             raise Exception('keyerror')
 
-        # result = [word for word in word_tokens if len(word) > 1]
-        result = word_tokens
+        result = [word for word in word_tokens if len(word) > 1]
         user_words_path = Path(user_words_path)
         filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
         mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
