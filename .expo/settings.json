@@ -4,5 +4,9 @@
   "dev": true,
   "minify": false,
   "urlRandomness": null,
-  "https": false
+  "https": false,
+
+  "colorize.languages": [
+    "javascript"
+  ]
 }

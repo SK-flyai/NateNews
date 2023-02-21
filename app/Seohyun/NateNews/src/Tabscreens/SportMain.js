@@ -1,16 +1,65 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
-import SearchBar from "../components/Searchbar";
-
-import { Pressable } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
-const Imagewidth = width * 0.25;
+const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
 function SportMain({ navigation }) {
-  const Armypath = "../../assets/youngsan.webp";
+  const Armypath = "../../assets/army.jpg";
+  const links = [];
+  const titles = [];
+  const categories = [];
+  const presses = [];
+  const dates = [];
+  const contents = [];
+  const images = [];
+  for (var key in data.spo) {
+    links.push(key);
+    titles.push(data.spo[key].title);
+    categories.push(data.spo[key].category);
+    presses.push(data.spo[key].press);
+    dates.push(data.spo[key].date);
+    contents.push(data.spo[key].content);
+    for (var key2 in data.spo[key].image) {
+      // console.log(data.spo[key].image[key2]);
+      images.push(key2);
+      break;
+    }
+  }
+  const views = [];
+  for (let i = 0; i < 20; i++) {
+    views.push(
+      <View key={i}>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SportContent", links[i])}
+        >
+          <View>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
+
+            <View>
+              <Text style={{ fontWeight: "bold" }}>{titles[i]}</Text>
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
@@ -23,7 +72,7 @@ function SportMain({ navigation }) {
       >
         <View style={{ flex: 1, marginTop: "5%", backgroundColor: "white" }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            역술인 '천공' 관저 개입 논란
+            병역비리 적발
           </Text>
           <Pressable
             onPress={() => navigation.navigate("SportContent")}
@@ -34,7 +83,7 @@ function SportMain({ navigation }) {
                 marginVertical: "2%",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "white",
+                backgroundColor: "pink",
                 flexDirection: "row",
               }}
             >
@@ -50,17 +99,13 @@ function SportMain({ navigation }) {
 
               <View style={styles.textcontainer}>
                 <Text style={{ fontWeight: "bold" }}>
-                  경찰, '천공 의혹' 제기 김종대 前의원 조사…CCTV 확보 주력
+                  [단독] "통화했다, 5급" 녹취 입수…병무청 직원과 유착 정황
                 </Text>
 
-                <Text
-                  style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                  numberOfLines={2}
-                >
-                  "영상 삭제 여부도 확인 중"…120억대 사기 '인천 건축왕' 구속
-                  (서울=연합뉴스) 임순현 기자 = 역술인 '천공'이 대통령 관저 이전
-                  결정에 관여했다는 의혹을 수사 중인 경찰이 지난달 명예훼손 혐의
-                  피고발인인 김종대 전 정의당 의원을 불러 조사했다.
+                <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                  저희 JTBC가 병역 비리 브로커의 통화 녹취록을 입수했습니다.
+                  브로커는 신체검사 직후 "병무청 직원과 통화를 했고, 5급이
+                  나왔다"고
                 </Text>
               </View>
             </View>
@@ -79,14 +124,15 @@ function SportMain({ navigation }) {
             onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "gray" }}
           >
-            <Text>
-              김종대 "천공 관저 답사 의혹, 육군본부 비서실 빅뉴스였다"
-            </Text>
+            <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
           </Pressable>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text>경찰, '천공 의혹' 공관 CCTV 확보 나서…"수사 협조 요청"</Text>
+          <Text>
+            "아들이 정신 잃고 몸을 떤다"... 군대 안보내려 뇌전등 허위신고한
+            어머니
+          </Text>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text>'천공 의혹' 부승찬 전 대변인 "아직 제 기록이 맞다고 생각"</Text>
+          <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
         </View>
 
         <View
@@ -116,328 +162,15 @@ function SportMain({ navigation }) {
 
         <View>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            정치 주요뉴스
+            스포츠 주요뉴스
           </Text>
           <View style={styles.divider} />
-
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: Imagewidth,
-                height: Imagewidth * 0.6,
-                backgroundColor: "black",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                박영선 "이재명 공천권 포기 선언? 신의 한 수 될 것"
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                sbs
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: Imagewidth,
-                height: Imagewidth * 0.6,
-                backgroundColor: "black",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                sbs
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.mainnews}>
-          <Image
-            style={{
-              width: Imagewidth,
-              height: Imagewidth * 0.6,
-              backgroundColor: "black",
-            }}
-            source={require(Armypath)}
-          />
-
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }}>
-              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
+          <View>
+            <Text>{views}</Text>
           </View>
         </View>
+
         <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <Image
-            style={{
-              width: Imagewidth,
-              height: Imagewidth * 0.6,
-              backgroundColor: "black",
-            }}
-            source={require(Armypath)}
-          />
-
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }}>
-              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <Image
-            style={{
-              width: Imagewidth,
-              height: Imagewidth * 0.6,
-              backgroundColor: "black",
-            }}
-            source={require(Armypath)}
-          />
-
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }}>
-              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            정치 최신뉴스
-          </Text>
-          <View style={styles.divider} />
-
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            {/* <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            /> */}
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-        </View>
       </View>
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>

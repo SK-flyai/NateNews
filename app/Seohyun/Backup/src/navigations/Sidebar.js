@@ -9,11 +9,8 @@ import { Button } from "../components";
 import Tab from "./Tab";
 import axios from "axios";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import Header from "./Header";
 
 const Drawer = createDrawerNavigator();
-
-import Header from "./Header";
 
 const styles = StyleSheet.create({
   drawerLabel: {
@@ -27,7 +24,7 @@ const styles = StyleSheet.create({
 const Sidebar = () => {
   const flaskButtonClick = async () => {
     try {
-      const response = await axios.get("http://192.168.1.10:5000/crawl");
+      const response = await axios.get('http://192.168.1.10:5000/crawl');
       console.log(response.data.output);
     } catch (error) {
       console.error(error);
@@ -38,9 +35,8 @@ const Sidebar = () => {
     <Drawer.Navigator
       initialRouteName="Main" // 초기 화면 -> Main.js (Page1)
       screenOptions={{
-        headerTitle: (props) => <Header {...props} />,
         headerStyle: {
-          backgroundColor: "white",
+          backgroundColor: "#FA5858",
         },
         drawerStyle: {
           backgroundColor: "#F2F2F2",
@@ -122,9 +118,9 @@ const Sidebar = () => {
               },
             }),
           },
-          onPress: () => {
-            console.log("News drawer item clicked!");
-          },
+            onPress: () => {
+            console.log('News drawer item clicked!');
+          }
         }}
       />
 
@@ -134,23 +130,16 @@ const Sidebar = () => {
         options={{
           drawerLabel: () => (
             <TouchableOpacity onPress={flaskButtonClick}>
-              <Text
-                style={{
-                  fontSize: 17,
-                  ...Platform.select({
-                    ios: {
-                      fontFamily: "Futura",
-                    },
-                    android: {
-                      fontFamily: "monospace",
-                    },
-                  }),
-                }}
-              >
-                뉴스
-              </Text>
+              <Text style ={{fontSize: 17,...Platform.select({
+              ios: {
+                fontFamily: "Futura",
+              },
+              android: {
+                fontFamily: "monospace",
+              },
+            }),}}>뉴스</Text>
             </TouchableOpacity>
-          ),
+          )
         }}
       />
 
