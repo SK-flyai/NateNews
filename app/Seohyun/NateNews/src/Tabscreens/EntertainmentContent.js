@@ -12,12 +12,12 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Divider } from "react-native-elements";
-import { Button } from "react-native-elements";
+
 import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
-import { color } from "react-native-reanimated";
+
 const { width } = Dimensions.get("window");
 
 const styles = StyleSheet.create({
