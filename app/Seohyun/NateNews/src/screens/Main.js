@@ -8,7 +8,7 @@ import SearchBar from "../components/Searchbar";
 import { Image, View, Text, ScrollView } from "react-native";
 import { Divider } from "react-native-elements";
 import { StyleSheet } from "react-native";
-import { Dimensions } from "react-native";
+import { Dimensions, Animated, Easing } from "react-native";
 
 // 광고 및 기사 이미지들
 const AD1path = "../../assets/ad1.png";
@@ -16,7 +16,8 @@ const AD2path = "../../assets/ad2.png";
 const Artipic1 = "../../assets/artipic1.png";
 const Artipic2 = "../../assets/artipic2.png";
 const Artipic3 = "../../assets/artipic3.png";
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
+
 const imageWidth = width * 0.32;
 
 const Main = ({ navigation }) => {
@@ -59,8 +60,6 @@ const Main = ({ navigation }) => {
         style={{
           flex: 1,
           backgroundColor: "white",
-          // justifyContent: "center",
-          // alignItems: "center",
         }}
       >
         <View
@@ -135,7 +134,6 @@ const Main = ({ navigation }) => {
             <View
               style={{
                 width: "100%",
-
                 backgroundColor: "#F2F2F2",
                 flexDirection: "row",
                 alignItems: "center",
@@ -150,12 +148,12 @@ const Main = ({ navigation }) => {
                   marginVertical: "3%",
                 }}
               >
-                인기 검색어  :
+                인기 검색어 :{" "}
               </Text>
               <Text
                 style={{ color: "black", fontWeight: "bold", fontSize: 18 }}
               >
-                  {hotkeywords[keywordIndex]}
+                {hotkeywords[keywordIndex]}
               </Text>
             </View>
           </View>
@@ -172,10 +170,6 @@ const Main = ({ navigation }) => {
                 flex: 1,
                 flexDirection: "row",
                 justifyContent: "space-between",
-                // flexDirection: "row",
-                // flex: 1,
-                // justifyContent: "space-around",
-                // marginVertical: 20,
               }}
             >
               <Image
@@ -195,12 +189,58 @@ const Main = ({ navigation }) => {
               flex: 1,
               justifyContent: "space-around",
               marginHorizontal: "1%",
-              backgroundColor: "pink",
+              backgroundColor: "white",
             }}
           >
             <View
               style={{
-                backgroundColor: "yellow",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                style={{
+                  width: width * 0.45,
+                  height: imageWidth,
+                  resizeMode: "stretch",
+                }}
+                source={{
+                  uri: "https://m2.nateimg.co.kr/news/artc/1676962255_330.png",
+                }}
+              />
+              <Text style={{ width: width * 0.45 }}>
+                대전 휩쓴 붉은 물결... 여與 합동연설회 '구름인파'
+              </Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Image
+                style={{
+                  width: width * 0.45,
+                  height: imageWidth,
+                  resizeMode: "stretch",
+
+                  resizeMode: "contain",
+                }}
+                source={{
+                  uri: "https://m2.nateimg.co.kr/news/artc/1676962487_391.jpg",
+                }}
+              />
+              <Text style={{ width: width * 0.45 }}>
+                미혼부 고딩아빠, 고딩 딸에 딸 닮은 어린아이까지?
+              </Text>
+            </View>
+          </View>
+
+          <View
+            style={{
+              flexDirection: "row",
+              flex: 1,
+              justifyContent: "space-around",
+              marginTop: "3%",
+              marginHorizontal: "1%",
+            }}
+          >
+            <View
+              style={{
                 alignItems: "center",
               }}
             >
@@ -244,23 +284,23 @@ const Main = ({ navigation }) => {
               </Text>
             </View>
           </View>
-        </ScrollView>
-        <View
-          style={{
-            backgroundColor: "#FA5858",
-            // height: 50,
-            // width: "110%",
-            flex: 0.08,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Text
-            style={{ color: "lightgrey", fontWeight: "bold", fontSize: 13 }}
+          <View
+            style={{
+              backgroundColor: "#FA5858",
+              height: height * 0.06,
+              // width: "110%",
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            개인정보처리방침 | 서비스 이용약관 | 광고문의
-          </Text>
-        </View>
+            <Text
+              style={{ color: "lightgrey", fontWeight: "bold", fontSize: 13 }}
+            >
+              개인정보처리방침 | 서비스 이용약관 | 광고문의
+            </Text>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -284,9 +324,17 @@ const styles = StyleSheet.create({
     borderBottomColor: "#F0EEED",
     padding: 10,
   },
+  wrapper: {
+    height: 50,
+    overflow: "hidden",
+  },
+  keywordWrapper: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  keyword: {
+    fontSize: 17,
+
+    marginVertical: "3%",
+  },
 });
-
-//   padding-top: ${({ insets: { top } }) => top}px;
-
-//   padding-bottom: ${({ insets: { bottom } }) => bottom}px;
-// `;
