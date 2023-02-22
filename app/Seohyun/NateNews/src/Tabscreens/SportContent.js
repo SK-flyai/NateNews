@@ -105,7 +105,7 @@ const SportContent = ({ route }) => {
             >
               {/* 편의점 직원 살해 후 달아난 30대男…16살부터 상습 강도질
               {"\n"} */}
-              {title}
+              {title.replace(/ /g, "\u00A0")}
             </Text>
             <Text style={{ color: "grey" }}>{date}</Text>
             <Text style={{ color: "grey" }}>{press}</Text>
