@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import styled from "styled-components/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Image,
   View,
@@ -20,60 +18,6 @@ import { Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 
-const styles = StyleSheet.create({
-  // 기사 제목 style
-  container: {
-    flex: 1,
-    width: width,
-    paddingHorizontal: "1%",
-    backgroundColor: "white",
-  },
-  item: {
-    padding: 18,
-    marginHorizontal: 0,
-  },
-  separator: {
-    backgroundColor: "#e0e0e0",
-    height: 1,
-  },
-  title: {
-    fontSize: 16,
-    ...Platform.select({
-      ios: {
-        fontFamily: "Futura",
-      },
-      android: {
-        fontFamily: "monospace",
-      },
-    }),
-  },
-  bottomModal: {
-    justifyContent: "flex-end",
-    margin: 0,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    padding: 30,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 4,
-    height: "80%",
-  },
-  closeButton: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "red",
-    borderRadius: 20,
-    padding: 5,
-  },
-  closeButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-  },
-});
-
 var title = "";
 var category = "";
 var press = "";
@@ -81,14 +25,6 @@ var date = "";
 var content = "";
 var caption = "";
 var img = "";
-
-const Container = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.background};
-  padding: 0 5px;
-`;
 
 const SportContent = ({ route }) => {
   const link = route.params;
@@ -104,7 +40,8 @@ const SportContent = ({ route }) => {
     break;
   }
 
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const [isModalVisible2, setModalVisible2] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
 
   useEffect(() => {
@@ -121,8 +58,9 @@ const SportContent = ({ route }) => {
 
   useEffect(() => {
     const handleBackButton = () => {
-      if (isModalVisible) {
-        setModalVisible(false);
+      if (isModalVisible1 || isModalVisible2) {
+        setModalVisible1(false);
+        setModalVisible2(false);
         return true; // indicate that the back key was handled
       }
       return false; // default behavior of back key
@@ -130,18 +68,19 @@ const SportContent = ({ route }) => {
 
     BackHandler.addEventListener("hardwareBackPress", handleBackButton);
 
-    return () =>
+    return () => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
-  }, [isModalVisible]);
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+    };
+  }, [isModalVisible1, isModalVisible2]);
+
+  const toggleModal1 = () => {
+    setModalVisible1(!isModalVisible1);
   };
 
-  // 이미지 버튼 함수 (Modal에서 사용)
-  const imagePress = () => {
-    console.log("Image Clicked!");
-    setModalVisible(true);
+  const toggleModal2 = () => {
+    setModalVisible2(!isModalVisible2);
   };
+  const newContect = content.replace(/ /g, "\u00A0");
 
   return (
     <SafeAreaView
@@ -187,9 +126,15 @@ const SportContent = ({ route }) => {
           </View>
           <Divider style={{ height: 5 }} />
 
-          <TouchableOpacity onPress={imagePress}>
+          <TouchableOpacity onPress={toggleModal1}>
             <Image
-              style={{ width: width, aspectRatio, marginTop: 15 }}
+              style={{
+                width: width,
+                aspectRatio,
+                marginTop: 15,
+                // resizeMode: "contain",
+                // height: width * aspectRatio,
+              }}
               source={{
                 uri: img,
               }}
@@ -197,31 +142,18 @@ const SportContent = ({ route }) => {
           </TouchableOpacity>
           <Divider style={{ height: 5 }} />
 
-          {/*Modal (팝업 바)*/}
-          <Modal
-            isVisible={isModalVisible}
-            style={styles.bottomModal}
-            onRequestClose={() => {
-              setModalVisible(false);
-            }}
-          >
-            <View style={styles.modalContent}>
-              <Pressable style={styles.closeButton} onPress={toggleModal}>
-                <Text style={styles.closeButtonText}>X</Text>
-              </Pressable>
-              <ScrollView>
-                <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-                  {content}
-                </Text>
-              </ScrollView>
-            </View>
-          </Modal>
           <View style={{ flex: 1 }}>
-            <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-              {content}
+            <Text
+              style={{
+                padding: 5,
+                marginTop: 10,
+                fontSize: 15,
+              }}
+            >
+              {newContect}
             </Text>
             <Pressable
-              onPress={imagePress}
+              onPress={toggleModal2}
               android_ripple={{ color: "purple" }}
               style={{
                 justifyContent: "center",
@@ -244,6 +176,48 @@ const SportContent = ({ route }) => {
               </View>
             </Pressable>
           </View>
+
+          {/*Modal (팝업 바)*/}
+          <Modal
+            visible={isModalVisible1}
+            style={styles.bottomModal}
+            onRequestClose={toggleModal1}
+          >
+            <View style={styles.modalContent}>
+              <Pressable style={styles.closeButton} onPress={toggleModal1}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </Pressable>
+              <ScrollView>
+                <Text
+                  style={{
+                    padding: 5,
+                    marginTop: 10,
+                    fontSize: 15,
+                  }}
+                >
+                  {newContect}
+                </Text>
+              </ScrollView>
+            </View>
+          </Modal>
+
+          {/* 모달 2 */}
+          <Modal
+            visible={isModalVisible2}
+            style={styles.bottomModal}
+            onRequestClose={toggleModal2}
+          >
+            <View style={styles.modalContent}>
+              <Pressable style={styles.closeButton} onPress={toggleModal2}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </Pressable>
+              <ScrollView>
+                <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
+                  mdoal2
+                </Text>
+              </ScrollView>
+            </View>
+          </Modal>
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -251,3 +225,58 @@ const SportContent = ({ route }) => {
 };
 
 export default SportContent;
+
+const styles = StyleSheet.create({
+  // 기사 제목 style
+  container: {
+    flex: 1,
+    width: width,
+    paddingHorizontal: "1%",
+    backgroundColor: "white",
+  },
+  item: {
+    padding: 18,
+    marginHorizontal: 0,
+  },
+  separator: {
+    backgroundColor: "#e0e0e0",
+    height: 1,
+  },
+  title: {
+    fontSize: 16,
+    ...Platform.select({
+      ios: {
+        fontFamily: "Futura",
+      },
+      android: {
+        fontFamily: "monospace",
+      },
+    }),
+  },
+  bottomModal: {
+    justifyContent: "flex-end",
+    margin: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: "6%",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 4,
+    height: "80%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 8,
+    right: 10,
+    backgroundColor: "red",
+    borderRadius: 20,
+    padding: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+});

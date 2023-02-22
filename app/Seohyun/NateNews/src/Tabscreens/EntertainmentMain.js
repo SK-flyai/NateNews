@@ -1,16 +1,73 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
-import SearchBar from "../components/Searchbar";
-
-import { Pressable } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
-const Imagewidth = width * 0.25;
+const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
 function EntertainmentMain({ navigation }) {
-  const Armypath = "../../assets/youngsan.webp";
+  const Armypath = "../../assets/army.jpg";
+  const links = [];
+  const titles = [];
+  const categories = [];
+  const presses = [];
+  const dates = [];
+  const contents = [];
+  const images = [];
+  for (var key in data.spo) {
+    links.push(key);
+    titles.push(data.spo[key].title);
+    categories.push(data.spo[key].category);
+    presses.push(data.spo[key].press);
+    dates.push(data.spo[key].date);
+    contents.push(data.spo[key].content);
+    for (var key2 in data.spo[key].image) {
+      // console.log(data.spo[key].image[key2]);
+      images.push(key2);
+      break;
+    }
+  }
+  const views = [];
+  for (let i = 0; i < 20; i++) {
+    views.push(
+      <View key={i}>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("EntertainmentContent", links[i])}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
+
+            <View
+              style={{
+                marginLeft: "1%",
+                width: width - (SmallImageWidth + 20),
+              }}
+            >
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+                {titles[i]}
+              </Text>
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
@@ -23,10 +80,10 @@ function EntertainmentMain({ navigation }) {
       >
         <View style={{ flex: 1, marginTop: "5%", backgroundColor: "white" }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            '베를린 영화제' 빛낸 스타들
+            병역비리 적발
           </Text>
           <Pressable
-            onPress={() => navigation.navigate("EntertainmentContent")}
+            onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "e0e0e0" }}
           >
             <View
@@ -45,26 +102,18 @@ function EntertainmentMain({ navigation }) {
                   backgroundColor: "black",
                   resizeMode: "stretch",
                 }}
-                source={{
-                  uri: "https://thumbnews.nateimg.co.kr/mnews107x80///news.nateimg.co.kr/etc/cms/2023/02/20/1676870109_561.jpg",
-                }}
+                source={require(Armypath)}
               />
 
               <View style={styles.textcontainer}>
                 <Text style={{ fontWeight: "bold" }}>
-                  "전도연, 실망시키는 법 없다" 베를린서 공개된 '길복순' 극찬
-                  세례
+                  [단독] "통화했다, 5급" 녹취 입수…병무청 직원과 유착 정황
                 </Text>
 
-                <Text
-                  style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                  numberOfLines={2}
-                >
-                  전도연 주연 '길복순'이 베를린 국제영화제를 통해 공개된 가운데,
-                  뜨거운 반응이 전해지고 있다. 넷플릭스 영화 '길복순'(감독
-                  변성현)은 청부살인업계의 전설적인 킬러 길복순이 회사와 재계약
-                  직전, 죽거나 또는 죽이거나, 피할 수 없는 대결에 휘말리게 되는
-                  이야기를 그린 액션 영화.
+                <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                  저희 JTBC가 병역 비리 브로커의 통화 녹취록을 입수했습니다.
+                  브로커는 신체검사 직후 "병무청 직원과 통화를 했고, 5급이
+                  나왔다"고
                 </Text>
               </View>
             </View>
@@ -83,20 +132,15 @@ function EntertainmentMain({ navigation }) {
             onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "gray" }}
           >
-            <Text numberOfLines={1}>
-              "밀양과 달라"…'길복순' 전도연, 젠더리스 턱시도→연기 찬사…베를린
-              매료 [종합]
-            </Text>
+            <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
           </Pressable>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            [SC이슈] "다정 투샷부터 모자 장난까지"…홍상수♥김민희, 신작보다 더
-            뜨거운 해외發 불륜 로맨스
+          <Text>
+            "아들이 정신 잃고 몸을 떤다"... 군대 안보내려 뇌전등 허위신고한
+            어머니
           </Text>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            '전생' 유태오, 베를린영화제서 환대…"영광스럽다"
-          </Text>
+          <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
         </View>
 
         <View
@@ -125,281 +169,16 @@ function EntertainmentMain({ navigation }) {
         </View>
 
         <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>연예랭킹</Text>
-          <View style={styles.divider} />
-
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: Imagewidth,
-                height: Imagewidth * 0.6,
-                backgroundColor: "black",
-              }}
-              source={{
-                uri: "https://thumbnews.nateimg.co.kr/mnews70/http://news.nateimg.co.kr/orgImg/tt/2023/02/20/news-p.v1.20230220.4272e9227283419da6d09c71c21b0642_P1.jpg",
-              }}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                '이제훈 성희롱 발언' 이경실, 결국 대학생에 고발당했다
-              </Text>
-              <Text
-                style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                numberOfLines={2}
-              >
-                개그우먼 이경실이 배우 이제훈을 향한 성희롱성 발언으로 고발
-                당했다. 20일 매일경제 단독 보도에 따르면 이경실은 지난 19일
-                연세대학교 재학생 A씨로부터 통신매체이용음란 혐의로 경찰에 고발
-                당했다. A씨는 행정안전부 ‘문서24’를 통해 고발했다.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                BTS 슈가가 밝힌 빠른 출·입국 이유, 블랙핑크 리사 때 일어난
-                불상사 [한혁승의 포톡]
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                sbs
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              "노출 거절하면 캐스팅 교체"…'판타G스팟' 여배우 고백 파문
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              문가영, 데뷔 첫 팬미팅서 눈물 펑펑…유연석도 오고 '그남자'도 왔다
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              김하영, 코 성형 전 사진 공개 "하길 잘했다 싶어"(철파엠)
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            정치 최신뉴스
+            스포츠 주요뉴스
           </Text>
-          <View style={styles.divider} />
 
-          <View style={styles.mainnews}>
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            {/* <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={require(Armypath)}
-            /> */}
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }}>
-                "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                중앙일보 | 5분전
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
+          <View style={{ flex: 1 }}>{views}</View>
         </View>
+
+        <View style={styles.divider} />
       </View>
+
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
   );
