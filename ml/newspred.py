@@ -31,19 +31,25 @@ class NewsModel:
         self.word_model = KeyBERT(tagger=tagger, model_path=model_path)
         self.keysent_model = KeySentence(model_path=model_path)
 
-    def predict(self, doc: str, title: str, word_top_n: int = 5) -> Tuple[List[str], str]:
+    def predict(self, doc: str, title: str, word_top_n: int = 5, sent_top_n: int = 1,
+                title_w: float = 0.5, diversity: float = 0.2) -> Tuple[List[str], List[str]]:
         """
         Args:
             doc: 뉴스본문 한개
             title: 뉴스제목 한개
             word_top_n: 핵심키워드 개수
+            sent_top_n: 핵심문장 개수
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
+            diversity: 핵심문장이나 키워드들 간에 다양성
 
         Return:
             keywords: 예측한 word_top_n개 키워드들
             keysent: 예측한 핵심문장
         """
-        keywords = self.word_model.predict(doc=doc, title=title, top_n=word_top_n)
-        keysent = self.keysent_model.predict(doc=doc, top_n=1)[0]
+        keywords = self.word_model.predict(doc=doc, title=title, top_n=word_top_n, title_w=title_w,
+                                           diversity=diversity)
+        keysent = self.keysent_model.predict(doc=doc, title=title, top_n=sent_top_n, title_w=title_w,
+                                             diversity=diversity)
 
         return keywords, keysent
 
@@ -51,7 +57,19 @@ class NewsModel:
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
+    news = NateNews()
+    df = news.load_data()
 
+    ##
+    tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
+    model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
+    keywords, keysent = model.predict(df.loc[202, 'contents'], df.loc[202, 'titles'], word_top_n=20,
+                                      sent_top_n=3, title_w=0.5, diversity=0)
+    print(keywords)
+
+    ##
+    tokenizer = CustomTokenizer(tagger=tagger)
+    a = set(tokenizer(df.loc[202, 'contents']))
 
 
 
