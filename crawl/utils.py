@@ -31,7 +31,7 @@ def get_news_df(
     info_list = list()
     for news in news_list:
         try:
-            info_list.append(news.get_info())
+            info_list.append(news.get_list())
         except:
             print('Error occurs')
             print(news.url)

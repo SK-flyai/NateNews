@@ -23,7 +23,7 @@ class NateNews:
         self.text = self._get_text()
     
     # for making dataset or .ipynb    
-    def get_info(self):
+    def get_list(self):
         return[
             self.title,
             self.category,
