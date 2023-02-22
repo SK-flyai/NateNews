@@ -4,6 +4,7 @@
 ## Installation
 - python=3.8
 
+### Mecab 설치 & 환경세팅 (일단 mecab 부분 사용안함)
 **install mecab** => 한국어 형태소 분석기  
 https://mire-gardenia-e1b.notion.site/5874cfe2a72e4214b82dfecac9ea46e4  
 
@@ -19,6 +20,12 @@ ExecutionPolicy
 Set-ExecutionPolicy RemoteSigned
 ```
 
+### bareun 설치 & 환경세팅
+```commandline
+pip3 install bareunpy
+```
+- Go to https://bareun.ai/.  
+With registration, for the first time, you can get a API-KEY to use it freely.
 
 ### cpu version  
 ```
@@ -83,6 +90,7 @@ colab gpu를 활용하여 model finetuning
 ```
 # mecab의 사용자 사전 추가 (처음 실행할때 한번만 하면 됨)
 python initial_mecab_userdic.py
+
 # add_mecab_userdic.py 실행 전에 ./user_words/mecab_words.txt 에 모든 단어 앞에 /표시 없애기
 # 단어 앞에 /표시는 그 단어를 추가 안하겟다는 의미이기 때문
 python add_mecab_userdic.py 
@@ -92,8 +100,9 @@ python add_mecab_userdic.py
 news = NateNews()
 df = news.load_data()
 
-# load model
-model = NewsModel(model_path="sinjy1203/ko-sbert-natenews")
+# load model & tagger
+tagger = Tagger(API-KEY)
+model = NewsModel(tagger=tagger, model_path="sinjy1203/ko-sbert-natenews")
 
 # pred keyword & main sentence 
 keywords, sentence = model.predict(df.loc[i, 'contents'], word_top_n=5)
