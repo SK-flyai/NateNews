@@ -215,26 +215,26 @@ def _create(url:str):
         "포토/TV",
         "아이돌24시"
     ]:
-        print(f"{url} is Entertainment News!")
+        print(f"{news.url} is Entertainment News!")
         return None
 
     # 연합 뉴스들 제외
     if news.press == 'AP연합뉴스' or news.press == 'EPA연합뉴스':
-        print(f"{url} is English News!")
+        print(f"{news.url} is English News!")
         return None
     
     # 기사가 없는 경우
     if not news.text:
-        print(f"{url} has no article!")
+        print(f"{news.url} has no article!")
         return None
     else:
         # 특수 기사들은 제외
         if '[속보]' in news.title or '[포토]' in news.title or '[부고]' in news.title:
-            print(f"{url} is not Normal News!")
+            print(f"{news.url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
         if len(news.text) < 300:
-            print(f'{url} has too short article!')
+            print(f'{news.url} has too short article!')
             return None
         else:
             return news
