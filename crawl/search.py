@@ -3,7 +3,7 @@ import requests
 
 URL = "https://news.nate.com/search?q="
 
-def get_search(keyword: str):
+def search_news(keyword: str):
     url = f"{URL}{keyword.replace(' ', '+')}"
     headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
     req = requests.get(url, headers=headers)
@@ -16,4 +16,4 @@ def get_search(keyword: str):
 
 
 if __name__ == "__main__":
-    print(get_search('키워드'))
+    print(search_news('키워드'))
