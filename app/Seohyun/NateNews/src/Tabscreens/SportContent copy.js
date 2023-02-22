@@ -19,11 +19,6 @@ const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
 
-const recSentences = [];
-const recKeywords = [];
-const recLinks = [];
-let keywordnum = 0;
-
 var title = "";
 var category = "";
 var press = "";
@@ -32,9 +27,15 @@ var content = "";
 var caption = "";
 var img = "";
 
-for (var key1 in data2.keyword) {
-  recKeywords.push(key1 + "  ");
-  recLinks.push(data2.keyword[key1]);
+const recSentences = [];
+const recKeywords = [];
+const recLinks = [];
+
+let keywordnum = 0;
+
+for (var key in data2.keyword) {
+  recKeywords.push(key + "  ");
+  recLinks.push(data2.keyword[key]);
 }
 
 for (var key2 in data2.sentence) {
@@ -101,11 +102,10 @@ const SportContent = ({ route }) => {
   const newContect = content.replace(/ /g, "\u00A0");
 
   for (let i = 0; i < keywordcnt; i++) {
-    keywordnum = i + 1;
     keywordlist.push(
       <View key={i}>
         <Pressable
-          onPress={toggleModal1}
+          onPress={imagePress}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
@@ -117,7 +117,7 @@ const SportContent = ({ route }) => {
             <Text
               style={{
                 fontSize: 15,
-                backgroundColor: "lightgrey",
+                backgroundColor: "yellow",
               }}
             >
               {recKeywords[i]}
@@ -199,28 +199,31 @@ const SportContent = ({ route }) => {
             >
               {newContect}
             </Text>
-
-            <View
+            <Pressable
+              onPress={toggleModal2}
+              android_ripple={{ color: "purple" }}
               style={{
+                justifyContent: "center",
+                alignItems: "center",
                 flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightblue",
+                backgroundColor: "yellow",
               }}
             >
-              <Text
-                style={{
-                  fontSize: 15,
-                }}
-              >
-                {recSentences}
-              </Text>
-            </View>
+              <View style={{ flex: 1, width: width * 0.95 }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                  Modal Modal
+                </Text>
+              </View>
+            </Pressable>
           </View>
 
-          <View>
-            <Text>{"\n"}</Text>
-            {keywordlist}
-          </View>
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}
@@ -239,7 +242,7 @@ const SportContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {keywordnum}
+                  {newContect}
                 </Text>
               </ScrollView>
             </View>
@@ -262,6 +265,30 @@ const SportContent = ({ route }) => {
               </ScrollView>
             </View>
           </Modal>
+          <View style={{ flex: 1 }}>
+            <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
+              {content}
+            </Text>
+            <Text>{"\n"}</Text>
+
+            <View
+              style={{
+                flex: 1,
+                width: width * 0.95,
+                backgroundColor: "lightgrey",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                {recSentences}
+              </Text>
+            </View>
+            <View>{keywordlist}</View>
+          </View>
         </ScrollView>
       </View>
     </SafeAreaView>
