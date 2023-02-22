@@ -40,7 +40,7 @@ class NateNews:
             "category": self.category,
             "press": self.press,
             "date": self.date,
-            "content": self.content,
+            "content": self.text,
             "image": self.image,
         }
 
