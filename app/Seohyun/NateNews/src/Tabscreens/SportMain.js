@@ -1,3 +1,8 @@
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
@@ -62,7 +67,7 @@ function SportMain({ navigation }) {
           backgroundColor: "black",
           resizeMode: "stretch",
         };
-    const news = isFirstView ? contents[0] : null;
+
     const fview = isFirstView ? (
       <Image style={Istyle} source={{ uri: images[i] }} />
     ) : null;
