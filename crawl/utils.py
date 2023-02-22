@@ -52,7 +52,7 @@ def get_news(
             2. None: Abnormal Request(won't get that page)
     """
     url_list = url_list if isinstance(url_list, list) else [url_list]
-    url_list = list(map(_convert_url, url_list))
+
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(_create, url_list))
@@ -66,10 +66,6 @@ def get_news(
     
     news_list = [news for news in _news_list if news]
     return news_list
-
-def _convert_url(url:str):
-    url = url.split('?')[0].split('//')[-1]
-    return f"https://{url}"
 
 def get_urls(
     date1: Union[int, None]=None,

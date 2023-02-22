@@ -5,12 +5,12 @@ from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
+HEADERS = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
 
 
 class NateNews:
     def __init__(self, url:str):
-        headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
-        res = requests.get(url, headers=headers) # to prevent block crawling
+        res = requests.get(_convert_url(url), headers=HEADERS) # to prevent block crawling
         assert res.status_code == 200 # to check valid request
         
         self.url = url
@@ -171,3 +171,8 @@ class NateNews:
     @url.setter
     def url(self, url: str):
         self._url = url
+
+
+def _convert_url(url:str):
+    url = url.split('?')[0].split('//')[-1]
+    return f"https://{url}"
