@@ -10,10 +10,10 @@ HEADERS = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/53
 
 class NateNews:
     def __init__(self, url:str):
-        res = requests.get(_convert_url(url), headers=HEADERS) # to prevent block crawling
+        self.url = _convert_url(url)
+        res = requests.get(self.url, headers=HEADERS) # to prevent block crawling
         assert res.status_code == 200 # to check valid request
         
-        self.url = url
         self.content = bs(res.text, 'html.parser')
         
         self.title = self._get_title()
