@@ -1,22 +1,46 @@
 {
-    "title": "TITLE",
-    "category": "CATEGORY",
-    "press": "PRESS",
-    "date": "DATE",
-    "content": "CONTENT",
-    "image": [
-        {"IMG LINK" : "IMG CAPTION"}
-    ],
-    "keyword": {
-        "KEYWORD1" : ["LINK1", "LINK2", "..etc"],
-        "KEYWORD2" : ["LINK1", "LINK2", "..etc"],
-        "KEYWORD3" : ["LINK1", "LINK2", "..etc"],
-        "KEYWORD4" : ["LINK1", "LINK2", "..etc"],
-        "KEYWORD5" : ["LINK1", "LINK2", "..etc"]
+    "URL1": {
+        "title": "TITLE",
+        "category": "CATEGORY",
+        "press": "PRESS",
+        "date": "DATE",
+        "content": "CONTENT",
+        "image": [
+            {"IMG LINK" : "IMG CAPTION"}
+        ],
+        "keyword": {
+            "KEYWORD1" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD2" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD3" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD4" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD5" : ["LINK1", "LINK2", "..etc"]
+        },
+        "sentence": [
+            "SENTENCE1",
+            "SENTENCE2",
+            "SENTENCE3"
+        ]
     },
-    "sentence": [
-        "SENTENCE1",
-        "SENTENCE2",
-        "SENTENCE3"
-    ]
+    "URL2": {
+        "title": "TITLE",
+        "category": "CATEGORY",
+        "press": "PRESS",
+        "date": "DATE",
+        "content": "CONTENT",
+        "image": [
+            {"IMG LINK" : "IMG CAPTION"}
+        ],
+        "keyword": {
+            "KEYWORD1" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD2" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD3" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD4" : ["LINK1", "LINK2", "..etc"],
+            "KEYWORD5" : ["LINK1", "LINK2", "..etc"]
+        },
+        "sentence": [
+            "SENTENCE1",
+            "SENTENCE2",
+            "SENTENCE3"
+        ]
+    }
 }
