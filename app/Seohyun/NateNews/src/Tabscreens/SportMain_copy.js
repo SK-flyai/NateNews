@@ -9,7 +9,7 @@ const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.25;
 const SmallImageWidth = width * 0.15;
 
-function EntertainmentMain({ navigation }) {
+function SportMain({ navigation }) {
   const Armypath = "../../assets/youngsan.webp";
 
   return (
@@ -23,10 +23,10 @@ function EntertainmentMain({ navigation }) {
       >
         <View style={{ flex: 1, marginTop: "5%", backgroundColor: "white" }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            '베를린 영화제' 빛낸 스타들
+            역술인 '천공' 관저 개입 논란
           </Text>
           <Pressable
-            onPress={() => navigation.navigate("EntertainmentContent")}
+            onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "e0e0e0" }}
           >
             <View
@@ -45,26 +45,22 @@ function EntertainmentMain({ navigation }) {
                   backgroundColor: "black",
                   resizeMode: "stretch",
                 }}
-                source={{
-                  uri: "https://thumbnews.nateimg.co.kr/mnews107x80///news.nateimg.co.kr/etc/cms/2023/02/20/1676870109_561.jpg",
-                }}
+                source={require(Armypath)}
               />
 
               <View style={styles.textcontainer}>
                 <Text style={{ fontWeight: "bold" }}>
-                  "전도연, 실망시키는 법 없다" 베를린서 공개된 '길복순' 극찬
-                  세례
+                  경찰, '천공 의혹' 제기 김종대 前의원 조사…CCTV 확보 주력
                 </Text>
 
                 <Text
                   style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
                   numberOfLines={2}
                 >
-                  전도연 주연 '길복순'이 베를린 국제영화제를 통해 공개된 가운데,
-                  뜨거운 반응이 전해지고 있다. 넷플릭스 영화 '길복순'(감독
-                  변성현)은 청부살인업계의 전설적인 킬러 길복순이 회사와 재계약
-                  직전, 죽거나 또는 죽이거나, 피할 수 없는 대결에 휘말리게 되는
-                  이야기를 그린 액션 영화.
+                  "영상 삭제 여부도 확인 중"…120억대 사기 '인천 건축왕' 구속
+                  (서울=연합뉴스) 임순현 기자 = 역술인 '천공'이 대통령 관저 이전
+                  결정에 관여했다는 의혹을 수사 중인 경찰이 지난달 명예훼손 혐의
+                  피고발인인 김종대 전 정의당 의원을 불러 조사했다.
                 </Text>
               </View>
             </View>
@@ -83,20 +79,14 @@ function EntertainmentMain({ navigation }) {
             onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "gray" }}
           >
-            <Text numberOfLines={1}>
-              "밀양과 달라"…'길복순' 전도연, 젠더리스 턱시도→연기 찬사…베를린
-              매료 [종합]
+            <Text>
+              김종대 "천공 관저 답사 의혹, 육군본부 비서실 빅뉴스였다"
             </Text>
           </Pressable>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            [SC이슈] "다정 투샷부터 모자 장난까지"…홍상수♥김민희, 신작보다 더
-            뜨거운 해외發 불륜 로맨스
-          </Text>
+          <Text>경찰, '천공 의혹' 공관 CCTV 확보 나서…"수사 협조 요청"</Text>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            '전생' 유태오, 베를린영화제서 환대…"영광스럽다"
-          </Text>
+          <Text>'천공 의혹' 부승찬 전 대변인 "아직 제 기록이 맞다고 생각"</Text>
         </View>
 
         <View
@@ -125,7 +115,9 @@ function EntertainmentMain({ navigation }) {
         </View>
 
         <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>연예랭킹</Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            정치 주요뉴스
+          </Text>
           <View style={styles.divider} />
 
           <View style={styles.mainnews}>
@@ -135,32 +127,32 @@ function EntertainmentMain({ navigation }) {
                 height: Imagewidth * 0.6,
                 backgroundColor: "black",
               }}
-              source={{
-                uri: "https://thumbnews.nateimg.co.kr/mnews70/http://news.nateimg.co.kr/orgImg/tt/2023/02/20/news-p.v1.20230220.4272e9227283419da6d09c71c21b0642_P1.jpg",
-              }}
+              source={require(Armypath)}
             />
 
             <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                '이제훈 성희롱 발언' 이경실, 결국 대학생에 고발당했다
+              <Text style={{ fontWeight: "bold" }}>
+                박영선 "이재명 공천권 포기 선언? 신의 한 수 될 것"
               </Text>
-              <Text
-                style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                numberOfLines={2}
-              >
-                개그우먼 이경실이 배우 이제훈을 향한 성희롱성 발언으로 고발
-                당했다. 20일 매일경제 단독 보도에 따르면 이경실은 지난 19일
-                연세대학교 재학생 A씨로부터 통신매체이용음란 혐의로 경찰에 고발
-                당했다. A씨는 행정안전부 ‘문서24’를 통해 고발했다.
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                sbs
               </Text>
             </View>
           </View>
           <View style={styles.divider} />
           <View style={styles.mainnews}>
+            <Image
+              style={{
+                width: Imagewidth,
+                height: Imagewidth * 0.6,
+                backgroundColor: "black",
+              }}
+              source={require(Armypath)}
+            />
+
             <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                BTS 슈가가 밝힌 빠른 출·입국 이유, 블랙핑크 리사 때 일어난
-                불상사 [한혁승의 포톡]
+              <Text style={{ fontWeight: "bold" }}>
+                다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
               </Text>
               <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
                 sbs
@@ -170,9 +162,18 @@ function EntertainmentMain({ navigation }) {
           <View style={styles.divider} />
         </View>
         <View style={styles.mainnews}>
+          <Image
+            style={{
+              width: Imagewidth,
+              height: Imagewidth * 0.6,
+              backgroundColor: "black",
+            }}
+            source={require(Armypath)}
+          />
+
           <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              "노출 거절하면 캐스팅 교체"…'판타G스팟' 여배우 고백 파문
+            <Text style={{ fontWeight: "bold" }}>
+              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
             </Text>
             <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
               sbs
@@ -181,9 +182,18 @@ function EntertainmentMain({ navigation }) {
         </View>
         <View style={styles.divider} />
         <View style={styles.mainnews}>
+          <Image
+            style={{
+              width: Imagewidth,
+              height: Imagewidth * 0.6,
+              backgroundColor: "black",
+            }}
+            source={require(Armypath)}
+          />
+
           <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              문가영, 데뷔 첫 팬미팅서 눈물 펑펑…유연석도 오고 '그남자'도 왔다
+            <Text style={{ fontWeight: "bold" }}>
+              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
             </Text>
             <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
               sbs
@@ -192,9 +202,18 @@ function EntertainmentMain({ navigation }) {
         </View>
         <View style={styles.divider} />
         <View style={styles.mainnews}>
+          <Image
+            style={{
+              width: Imagewidth,
+              height: Imagewidth * 0.6,
+              backgroundColor: "black",
+            }}
+            source={require(Armypath)}
+          />
+
           <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              김하영, 코 성형 전 사진 공개 "하길 잘했다 싶어"(철파엠)
+            <Text style={{ fontWeight: "bold" }}>
+              다시 부활한 '북한=적'...북풀루토눔 핵폭탄만 15개
             </Text>
             <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
               sbs
@@ -209,6 +228,16 @@ function EntertainmentMain({ navigation }) {
           <View style={styles.divider} />
 
           <View style={styles.mainnews}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={require(Armypath)}
+            />
+
             <View style={styles.textcontainer}>
               <Text style={{ fontWeight: "bold" }}>
                 "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
@@ -220,6 +249,16 @@ function EntertainmentMain({ navigation }) {
           </View>
           <View style={styles.divider} />
           <View style={styles.mainnews}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={require(Armypath)}
+            />
+
             <View style={styles.textcontainer}>
               <Text style={{ fontWeight: "bold" }}>
                 "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
@@ -405,7 +444,7 @@ function EntertainmentMain({ navigation }) {
   );
 }
 
-export default EntertainmentMain;
+export default SportMain;
 
 const styles = StyleSheet.create({
   divider: {
