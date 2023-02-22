@@ -13,8 +13,6 @@ import Header from "./Header";
 
 const Drawer = createDrawerNavigator();
 
-import Header from "./Header";
-
 const styles = StyleSheet.create({
   drawerLabel: {
     fontSize: 17,
@@ -27,7 +25,7 @@ const styles = StyleSheet.create({
 const Sidebar = () => {
   const flaskButtonClick = async () => {
     try {
-      const response = await axios.get("http://192.168.1.10:5000/crawl");
+      const response = await axios.get("http://192.168.11.162:5000/crawl");
       console.log(response.data.output);
     } catch (error) {
       console.error(error);

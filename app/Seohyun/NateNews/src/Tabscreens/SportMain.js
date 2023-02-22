@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import { Pressable, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
@@ -38,7 +39,7 @@ function SportMain({ navigation }) {
         <TouchableOpacity
           onPress={() => navigation.navigate("SportContent", links[i])}
         >
-          <View>
+          <View style={{ flexDirection: "row" }}>
             <Image
               style={{
                 width: SmallImageWidth,
@@ -49,8 +50,15 @@ function SportMain({ navigation }) {
               source={{ uri: images[i] }}
             />
 
-            <View>
-              <Text style={{ fontWeight: "bold" }}>{titles[i]}</Text>
+            <View
+              style={{
+                marginLeft: "1%",
+                width: width - (SmallImageWidth + 20),
+              }}
+            >
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+                {titles[i]}
+              </Text>
               <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
                 {presses[i]}
               </Text>
@@ -83,7 +91,7 @@ function SportMain({ navigation }) {
                 marginVertical: "2%",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "pink",
+                backgroundColor: "white",
                 flexDirection: "row",
               }}
             >
@@ -164,14 +172,13 @@ function SportMain({ navigation }) {
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             스포츠 주요뉴스
           </Text>
-          <View style={styles.divider} />
-          <View>
-            <Text>{views}</Text>
-          </View>
+
+          <View style={{ flex: 1 }}>{views}</View>
         </View>
 
         <View style={styles.divider} />
       </View>
+
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
   );
