@@ -1,5 +1,9 @@
 # 네이트 뉴스기사에 대한 핵심 키워드, 핵심 문장 추출
+
 ---
+
+## huggfacehub
+**https://huggingface.co/sinjy1203/ko-sbert-natenews**
 
 ## Installation
 - python=3.8
@@ -47,7 +51,7 @@ pip install matplotlib
 ```
 
 
-## Introduce file
+## file
 `add_mecab_userdic.py`  
 mecab의 사용자 사전에 고유명사 추가  
 

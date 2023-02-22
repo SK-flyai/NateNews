@@ -42,19 +42,19 @@ def dataset(df: pd.DataFrame) -> Tuple[List[InputExample], Tuple[List]]:
         train_dataset += [InputExample(texts=[content, title], label=1.0)]
         eval_sents1 += [content]
         eval_sents2 += [title]
-        eval_scores += [1.0]
+        eval_scores += [0.7]
 
         new_idxs = list(df[df['categories'] != category].index)
 
         train_dataset += [InputExample(texts=[content, df.loc[random.choice(new_idxs), 'titles']], label=0.0)]
         eval_sents1 += [content]
         eval_sents2 += [df.loc[random.choice(new_idxs), 'titles']]
-        eval_scores += [0.0]
+        eval_scores += [0.3]
 
         train_dataset += [InputExample(texts=[df.loc[random.choice(new_idxs), 'contents'], title], label=0.0)]
         eval_sents1 += [df.loc[random.choice(new_idxs), 'contents']]
         eval_sents2 += [title]
-        eval_scores += [0.0]
+        eval_scores += [0.3]
     eval_dataset = (eval_sents1, eval_sents2, eval_scores)
 
     return train_dataset, eval_dataset
@@ -85,74 +85,25 @@ def finetuning(train_dataset: List[InputExample], eval_dataset: Tuple[List],
     #   callback=transformers.integrations.TensorBoardCallback(SummaryWriter()))
     
 if __name__ == '__main__':
-    news = NateNews()
-    df = news.load_data()
-    train_dataset, eval_dataset = dataset(df)
-    finetuning(train_dataset, eval_dataset, output_path='ko-sbert-natenews')
+    # news = NateNews()
+    # df = news.load_data()
+    # train_dataset, eval_dataset = dataset(df)
+    # finetuning(train_dataset, eval_dataset, output_path='ko-sbert-natenews')
 
+    model = SentenceTransformer('sinjy1203/ko-sbert-natenews')
+    train_examples = [InputExample(texts=['"난 천하람의 빠니보틀" 이준석 발언에 찐 빠니보틀이 답했다', '빠니보틀'], label=1.0)]
+    train_dataloader = DataLoader(train_examples, shuffle=True, batch_size=1)
 
+    train_loss = losses.CosineSimilarityLoss(model)
 
-## dataset
-# news = NaverSports()
-# docs, topics = news.load_data()
+    # Tune the model
+    model.fit(train_objectives=[(train_dataloader, train_loss)], epochs=10, optimizer_params={'lr': 0.1})
 
-# ## load dataframe
-# df = pd.read_csv('./newsData/Naver.csv', index_col=0)
-#
-# ## make dataset
-# eval_sents1 = []
-# eval_sents2 = []
-# eval_scores = []
-#
-# train_dataset = []
-# idxs = list(range(len(df)))
-# for i in idxs:
-#     content, title, category = df.loc[i, 'contents'], df.loc[i, 'titles'], df.loc[i, 'categories']
-#     train_dataset += [InputExample(texts=[content, title], label=1.0)]
-#
-#     eval_sents1 += [content]
-#     eval_sents2 += [title]
-#     eval_scores += [1.0]
-#
-#     new_idxs = list(df[df['categories'] != category].index)
-#     train_dataset += [InputExample(texts=[content, df.loc[random.choice(new_idxs), 'titles']], label=0.0)]
-#     eval_sents1 += [content]
-#     eval_sents2 += [df.loc[random.choice(new_idxs), 'titles']]
-#     eval_scores += [0.0]
-#
-#     train_dataset += [InputExample(texts=[df.loc[random.choice(new_idxs), 'contents'], title], label=0.0)]
-#     eval_sents1 += [df.loc[random.choice(new_idxs), 'contents']]
-#     eval_sents2 += [title]
-#     eval_scores += [0.0]
+    ##
+    doc = model_.encode(['"난 천하람의 빠니보틀" 이준석 발언에 찐 빠니보틀이 답했다'])
+    word = model_.encode(['곽튜브'])
+    sim = cosine_similarity(doc, word)
 
-
-
-##
-# ##
-# eval_sents1 = []
-# eval_sents2 = []
-# eval_scores = []
-
-# train_dataset = []
-# idxs = list(range(len(docs)))
-# for i in idxs:
-#     doc, topic = docs[i], topics[i]
-#     train_dataset += [InputExample(texts=[doc, topic], label=1.0)]
-
-#     eval_sents1 += [doc]
-#     eval_sents2 += [topic]
-#     eval_scores += [1.0]
-
-#     new_idxs = idxs[:i] + idxs[i+1:]
-#     train_dataset += [InputExample(texts=[doc, topics[random.choice(new_idxs)]], label=0.0)]
-#     eval_sents1 += [doc]
-#     eval_sents2 += [topics[random.choice(new_idxs)]]
-#     eval_scores += [0.0]
-
-
-#     train_dataset += [InputExample(texts=[doc[random.choice(new_idxs)], topics], label=0.0)]
-#     eval_sents1 += [doc[random.choice(new_idxs)]]
-#     eval_sents2 += [topic]
-#     eval_scores += [0.0]
-
-
+    ##
+    model_ = SentenceTransformer('bongsoo/kpf-sbert-v1.1')
+    # model_ = SentenceTransformer('sinjy1203/ko-sbert-natenews')
