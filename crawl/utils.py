@@ -206,46 +206,39 @@ def _create(url:str):
     """        
     # time.sleep(0.5)
     # TODO: handling sleep stuff... => Only when collect huge amount of dataset
-    new_class = NateNews(url)
-    which_news = new_class.content.find(
-        'a',
-        {'class': 'svcname'}
-    ).text
+    news = NateNews(url)
     
     # 연예 기사는 제외
-    if which_news == '연예':
+    
+    if news.category in [
+        "연예가화제",
+        "방송/가요",
+        "영화",
+        "해외연예",
+        "POLL",
+        "포토/TV",
+        "아이돌24시"
+    ]:
         print(f"{url} is Entertainment News!")
         return None
 
     # 연합 뉴스들 제외
-    if new_class.press == 'AP연합뉴스' or new_class.press == 'EPA연합뉴스':
+    if news.press == 'AP연합뉴스' or news.press == 'EPA연합뉴스':
         print(f"{url} is English News!")
         return None
-
-    article = new_class.content.find(
-        'div',
-        {'id': 'articleContetns'}
-    )
     
     # 기사가 없는 경우
-    if not article:
+    if not news.text:
         print(f"{url} has no article!")
         return None
     else:
         # 특수 기사들은 제외
-        title = new_class.title
-        if '[속보]' in title or '[포토]' in title or '[부고]' in title:
+        if '[속보]' in news.title or '[포토]' in news.title or '[부고]' in news.title:
             print(f"{url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
-        content_len = len(_remove_bracket(text_cleaning(article)[0]))
-        if content_len < 300:
+        if len(news.text) < 300:
             print(f'{url} has too short article!')
             return None
         else:
-            return new_class
-
-
-def _remove_bracket(text):
-    pattern = '\[[^\]]*\]'
-    return re.sub(pattern, '', text)
+            return news
