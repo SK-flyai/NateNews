@@ -14,8 +14,6 @@ const MainPage = () => {
         options={{
           headerShown: false,
           headerStyle: {
-            justifyContent: "center",
-            alignItems: "center",
             backgroundColor: "#FA5858",
           },
           headerTitleStyle: {

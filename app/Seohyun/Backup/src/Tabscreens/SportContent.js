@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   Image,
   View,
@@ -79,6 +81,14 @@ var date = "";
 var content = "";
 var caption = "";
 var img = "";
+
+const Container = styled.View`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.background};
+  padding: 0 5px;
+`;
 
 const SportContent = ({ route }) => {
   const link = route.params;

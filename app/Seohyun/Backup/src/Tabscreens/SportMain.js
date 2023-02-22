@@ -2,15 +2,65 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import SearchBar from "../components/Searchbar";
-
-import { Pressable } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
-const Imagewidth = width * 0.25;
+const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
-function EntertainmentMain({ navigation }) {
-  const Armypath = "../../assets/youngsan.webp";
+function SportMain({ navigation }) {
+  const Armypath = "../../assets/army.jpg";
+  const links = [];
+  const titles = [];
+  const categories = [];
+  const presses = [];
+  const dates = [];
+  const contents = [];
+  const images = [];
+  for (var key in data.spo) {
+    links.push(key);
+    titles.push(data.spo[key].title);
+    categories.push(data.spo[key].category);
+    presses.push(data.spo[key].press);
+    dates.push(data.spo[key].date);
+    contents.push(data.spo[key].content);
+    for (var key2 in data.spo[key].image) {
+      // console.log(data.spo[key].image[key2]);
+      images.push(key2);
+      break;
+    }
+  }
+  const views = [];
+  for (let i = 0; i < 20; i++) {
+    views.push(
+      <View key={i}>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SportContent", links[i])}
+        >
+          <View>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
+
+            <View>
+              <Text style={{ fontWeight: "bold" }}>{titles[i]}</Text>
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
@@ -23,10 +73,10 @@ function EntertainmentMain({ navigation }) {
       >
         <View style={{ flex: 1, marginTop: "5%", backgroundColor: "white" }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-            '베를린 영화제' 빛낸 스타들
+            병역비리 적발
           </Text>
           <Pressable
-            onPress={() => navigation.navigate("EntertainmentContent")}
+            onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "e0e0e0" }}
           >
             <View
@@ -34,7 +84,7 @@ function EntertainmentMain({ navigation }) {
                 marginVertical: "2%",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "white",
+                backgroundColor: "pink",
                 flexDirection: "row",
               }}
             >
@@ -45,26 +95,18 @@ function EntertainmentMain({ navigation }) {
                   backgroundColor: "black",
                   resizeMode: "stretch",
                 }}
-                source={{
-                  uri: "https://thumbnews.nateimg.co.kr/mnews107x80///news.nateimg.co.kr/etc/cms/2023/02/20/1676870109_561.jpg",
-                }}
+                source={require(Armypath)}
               />
 
               <View style={styles.textcontainer}>
                 <Text style={{ fontWeight: "bold" }}>
-                  "전도연, 실망시키는 법 없다" 베를린서 공개된 '길복순' 극찬
-                  세례
+                  [단독] "통화했다, 5급" 녹취 입수…병무청 직원과 유착 정황
                 </Text>
 
-                <Text
-                  style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                  numberOfLines={2}
-                >
-                  전도연 주연 '길복순'이 베를린 국제영화제를 통해 공개된 가운데,
-                  뜨거운 반응이 전해지고 있다. 넷플릭스 영화 '길복순'(감독
-                  변성현)은 청부살인업계의 전설적인 킬러 길복순이 회사와 재계약
-                  직전, 죽거나 또는 죽이거나, 피할 수 없는 대결에 휘말리게 되는
-                  이야기를 그린 액션 영화.
+                <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                  저희 JTBC가 병역 비리 브로커의 통화 녹취록을 입수했습니다.
+                  브로커는 신체검사 직후 "병무청 직원과 통화를 했고, 5급이
+                  나왔다"고
                 </Text>
               </View>
             </View>
@@ -83,20 +125,15 @@ function EntertainmentMain({ navigation }) {
             onPress={() => navigation.navigate("SportContent")}
             android_ripple={{ color: "gray" }}
           >
-            <Text numberOfLines={1}>
-              "밀양과 달라"…'길복순' 전도연, 젠더리스 턱시도→연기 찬사…베를린
-              매료 [종합]
-            </Text>
+            <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
           </Pressable>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            [SC이슈] "다정 투샷부터 모자 장난까지"…홍상수♥김민희, 신작보다 더
-            뜨거운 해외發 불륜 로맨스
+          <Text>
+            "아들이 정신 잃고 몸을 떤다"... 군대 안보내려 뇌전등 허위신고한
+            어머니
           </Text>
           <View style={[styles.divider, { marginVertical: "2%" }]} />
-          <Text numberOfLines={1}>
-            '전생' 유태오, 베를린영화제서 환대…"영광스럽다"
-          </Text>
+          <Text>"병역면제? 진짜 뇌전증 환자는 입대 원해"</Text>
         </View>
 
         <View
@@ -125,90 +162,32 @@ function EntertainmentMain({ navigation }) {
         </View>
 
         <View>
-          <Text style={{ fontSize: 20, fontWeight: "bold" }}>연예랭킹</Text>
+          <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+            스포츠 주요뉴스
+          </Text>
           <View style={styles.divider} />
+          <View>
+            <Text>{views}</Text>
+          </View>
+        </View>
 
-          <View style={styles.mainnews}>
-            <Image
-              style={{
-                width: Imagewidth,
-                height: Imagewidth * 0.6,
-                backgroundColor: "black",
-              }}
-              source={{
-                uri: "https://thumbnews.nateimg.co.kr/mnews70/http://news.nateimg.co.kr/orgImg/tt/2023/02/20/news-p.v1.20230220.4272e9227283419da6d09c71c21b0642_P1.jpg",
-              }}
-            />
-
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                '이제훈 성희롱 발언' 이경실, 결국 대학생에 고발당했다
-              </Text>
-              <Text
-                style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}
-                numberOfLines={2}
-              >
-                개그우먼 이경실이 배우 이제훈을 향한 성희롱성 발언으로 고발
-                당했다. 20일 매일경제 단독 보도에 따르면 이경실은 지난 19일
-                연세대학교 재학생 A씨로부터 통신매체이용음란 혐의로 경찰에 고발
-                당했다. A씨는 행정안전부 ‘문서24’를 통해 고발했다.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-          <View style={styles.mainnews}>
-            <View style={styles.textcontainer}>
-              <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-                BTS 슈가가 밝힌 빠른 출·입국 이유, 블랙핑크 리사 때 일어난
-                불상사 [한혁승의 포톡]
-              </Text>
-              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                sbs
-              </Text>
-            </View>
-          </View>
-          <View style={styles.divider} />
-        </View>
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              "노출 거절하면 캐스팅 교체"…'판타G스팟' 여배우 고백 파문
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              문가영, 데뷔 첫 팬미팅서 눈물 펑펑…유연석도 오고 '그남자'도 왔다
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
-        <View style={styles.divider} />
-        <View style={styles.mainnews}>
-          <View style={styles.textcontainer}>
-            <Text style={{ fontWeight: "bold" }} numberOfLines={1}>
-              김하영, 코 성형 전 사진 공개 "하길 잘했다 싶어"(철파엠)
-            </Text>
-            <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-              sbs
-            </Text>
-          </View>
-        </View>
         <View style={styles.divider} />
         <View>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             정치 최신뉴스
           </Text>
           <View style={styles.divider} />
-
           <View style={styles.mainnews}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={require(Armypath)}
+            />
+
             <View style={styles.textcontainer}>
               <Text style={{ fontWeight: "bold" }}>
                 "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
@@ -220,6 +199,16 @@ function EntertainmentMain({ navigation }) {
           </View>
           <View style={styles.divider} />
           <View style={styles.mainnews}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: Imagewidth * 0.4,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={require(Armypath)}
+            />
+
             <View style={styles.textcontainer}>
               <Text style={{ fontWeight: "bold" }}>
                 "총리님이 희망""내 마음 1등"...황교안 치켜세운 이준석, 왜
@@ -405,7 +394,7 @@ function EntertainmentMain({ navigation }) {
   );
 }
 
-export default EntertainmentMain;
+export default SportMain;
 
 const styles = StyleSheet.create({
   divider: {
@@ -438,3 +427,205 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
 });
+
+// import React from "react";
+// import styled from "styled-components/native";
+// import { useSafeAreaInsets } from "react-native-safe-area-context";
+// import { View, Text, FlatList, StyleSheet, SafeAreaView } from "react-native";
+// import SearchBar from "../components/Searchbar";
+// import { Button } from "react-native-elements";
+// import { Dimensions } from "react-native";
+
+// const { width } = Dimensions.get("window");
+
+// const DATA = [
+//   {
+//     id: "1",
+//     title: "1. 곽상도가 돈 달래, 아들 통해서 녹음파일...",
+//   },
+//   {
+//     id: "2",
+//     title: "2. 탄핵안 설명 중에…'필리핀 날씨' 검색한...",
+//   },
+//   {
+//     id: "3",
+//     title: "3. 편의점 직원 살해 후 달아난 30대…",
+//   },
+//   {
+//     id: "4",
+//     title: "4. 대기업 다니던 딸, 출산 중 지적장애 얻어…",
+//   },
+//   {
+//     id: "5",
+//     title: "5. 빅뱅 승리 오늘(9일) 오전 출소",
+//   },
+//   {
+//     id: "6",
+//     title: "6. 신정환, 라방 중 도박·뎅기열 언급하는...",
+//   },
+//   {
+//     id: "7",
+//     title: "7. '기부 요정' 한지민, 튀르키예·시리아...",
+//   },
+//   {
+//     id: "8",
+//     title: "8. 송민호 맞아? 몰라보게 달라진 충격 근황...",
+//   },
+//   {
+//     id: "9",
+//     title: "9. 유재석, 갈비뼈 실금 간 전소민에...",
+//   },
+//   {
+//     id: "10",
+//     title: "10. 조국 딸 600만 원 '유죄', 곽상도 아들 50억...",
+//   },
+//   {
+//     id: "11",
+//     title: "11. 곽상도가 돈 달래, 아들 통해서 녹음파일...",
+//   },
+//   {
+//     id: "12",
+//     title: "12. 탄핵안 설명 중에…'필리핀 날씨' 검색한...",
+//   },
+//   {
+//     id: "13",
+//     title: "13. 편의점 직원 살해 후 달아난 30대…",
+//   },
+//   {
+//     id: "14",
+//     title: "14. 대기업 다니던 딸, 출산 중 지적장애 얻어…",
+//   },
+//   {
+//     id: "15",
+//     title: "15. 빅뱅 승리 오늘(9일) 오전 출소",
+//   },
+//   {
+//     id: "16",
+//     title: "16. 신정환, 라방 중 도박·뎅기열 언급하는...",
+//   },
+//   {
+//     id: "17",
+//     title: "17. '기부 요정' 한지민, 튀르키예·시리아...",
+//   },
+//   {
+//     id: "18",
+//     title: "18. 송민호 맞아? 몰라보게 달라진 충격 근황...",
+//   },
+//   {
+//     id: "19",
+//     title: "19. 유재석, 갈비뼈 실금 간 전소민에...",
+//   },
+//   {
+//     id: "20",
+//     title: "20. 조국 딸 600만 원 '유죄', 곽상도 아들 50억...",
+//   },
+// ];
+
+// const styles = StyleSheet.create({
+//   // 기사 제목 style
+//   container: {
+//     flex: 1,
+//     width: width,
+//   },
+//   item: {
+//     padding: 18,
+//     marginHorizontal: 0,
+//   },
+//   separator: {
+//     backgroundColor: "#e0e0e0",
+//     height: 1,
+//   },
+//   title: {
+//     fontSize: 16,
+//     ...Platform.select({
+//       ios: {
+//         fontFamily: "Futura",
+//       },
+//       android: {
+//         fontFamily: "monospace",
+//       },
+//     }),
+//   },
+// });
+
+// const Container = styled.View`
+//   flex: 1;
+//   justify-content: center;
+//   align-items: center;
+//   background-color: ${({ theme }) => theme.background};
+//   padding: 0 5px;
+// `;
+
+// const SportMain = ({ navigation }) => {
+//   const insets = useSafeAreaInsets();
+
+//   const date = new Date();
+//   const year = date.getFullYear();
+//   const month = date.getMonth() + 1;
+//   const todaydate = date.getDate();
+
+//   return (
+//     <Container insets={insets}>
+//       <View>
+//         <Text
+//           style={{
+//             fontWeight: "bold",
+//             fontSize: 20,
+//             marginBottom: 10,
+//             marginTop: 10,
+//           }}
+//         >
+//           {year}.{month}.{todaydate}
+//         </Text>
+//       </View>
+//       <SearchBar />
+//       <SafeAreaView
+//         style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
+//       >
+//         {/*기사 목록 FlatList로 띄움*/}
+//         <FlatList
+//           data={DATA}
+//           keyExtractor={(item) => item.id}
+//           renderItem={({ item, index }) => (
+//             <View>
+//               <Button
+//                 title={item.title}
+//                 titleStyle={{
+//                   color: "black",
+//                   ...Platform.select({
+//                     ios: {
+//                       fontFamily: "Futura",
+//                     },
+//                     android: {
+//                       fontFamily: "monospace",
+//                     },
+//                   }),
+//                 }}
+//                 onPress={() => navigation.navigate("SportContent")}
+//                 buttonStyle={{
+
+//                   backgroundColor: "white",
+
+//                   //   margin: 10,
+//                   alignSelf: "flex-start",
+//                 }}
+//               >
+//                 <Text >{item.title}</Text>
+//               </Button>
+//               {index !== DATA.length - 1 && (
+//                 <View
+//                   style={{
+//                     borderBottomColor: "#e0e0e0",
+//                     borderBottomWidth: 1,
+//                   }}
+//                 />
+//               )}
+//             </View>
+//           )}
+//         />
+//       </SafeAreaView>
+//     </Container>
+//   );
+// };
+
+// export default SportMain;
