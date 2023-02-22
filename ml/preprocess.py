@@ -31,7 +31,7 @@ class CustomTokenizer:
         self.tagger = tagger
         self.tag = tag
 
-    def load_mapping(self, path='./user_words/word_mapping.txt') -> Dict[str, str]:
+    def load_mapping(self, path: str = './user_words/word_mapping.txt') -> Dict[str, str]:
         """
         버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 불러오기
         .txt 내용 형태:
@@ -48,7 +48,7 @@ class CustomTokenizer:
             words_dict = {words_[0]: words_[1] for words_ in words_dict}
         return words_dict
 
-    def load_filtering(self, path='./user_words/word_filtering.txt'):
+    def load_filtering(self, path: str = './user_words/word_filtering.txt') -> Set[str]:
         """
         불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 불러오기
 
@@ -58,6 +58,19 @@ class CustomTokenizer:
         with open(path, 'r', encoding='UTF8') as f:
             words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
         return words
+
+    def load_comp(self, path: str = './user_words/word_comp.txt') -> Dict[str, str]:
+        with open(path, 'r', encoding='UTF8') as f:
+            words_dict = list(
+                map(lambda y: y.split('='), list(set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''})))
+            words_dict = {words_[0]: words_[1] for words_ in words_dict}
+        return words_dict
+
+    def compound(self, words: List[str], comps: Dict[str, str]) -> List[str]:
+        words = '_'.join(words)
+        for comp in comps:
+            words = re.sub(comp, comps[comp], words)
+        return words.split('_')
 
     def preprocess_(self, data: str) -> str:
         """
@@ -93,8 +106,12 @@ class CustomTokenizer:
         else:
             raise Exception('keyerror')
 
-        result = [word for word in word_tokens if len(word) > 1]
         user_words_path = Path(user_words_path)
+        comp_words = self.load_comp(str(user_words_path / 'word_comp.txt'))
+        word_tokens = self.compound(word_tokens, comp_words)
+
+        result = [word for word in word_tokens if len(word) > 1]
+        # result = word_tokens
         filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
         mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
 
@@ -108,34 +125,20 @@ class CustomTokenizer:
         return result
 
 if __name__ == '__main__':
-    tokenizer = CustomTokenizer(Mecab())
-    print(tokenizer('야구, 농구, 축구, 배구를 했다.'))
+    tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
+
+    # tagger = Tagger()
+
+    tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
-    tokenizer.add_mapping(
-        {
-            '안치호': '치호',
-            '양의동': '동'
-        }
-    )
+    tokenizer('중고나라')
 
-    ##
-    with open('./user_words/word_mapping.pkl', 'rb') as f:
-        my_dict = pickle.load(f)
-    print(my_dict)
+##
+    cust_dic.update()
 
-    ##
-    tokenizer.add_filtering(
-        {
-            '양의동', '김서현'
-        }
-    )
+##
+    tagger.set_domain('comp')
 
-    ##
-    with open('./user_words/word_filtering.pkl', 'rb') as f:
-        my_dict = pickle.load(f)
-    print(my_dict)
-
-    ##
-    df = pd.read_csv('./newsData/Naver.csv', index_col=0)
-    print(tokenizer(df.loc[23, 'contents']))
+##
+    tagger.morphs('국제친선대사')
