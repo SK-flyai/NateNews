@@ -10,12 +10,21 @@ CATEGORY=['all', 'sisa', 'spo', 'pol', 'eco', 'soc', 'int', 'its']
 
 
 def get_ranking(num: int=20):
+    """Get yesterday news's ranking
+
+    Args:
+        num (int, optional): # of news in ranking. Defaults to 20.
+
+    Returns:
+        _type_: _description_
+    """
     ranking_dict = defaultdict(dict)
     date = dt.date.today() - dt.timedelta(days=1)
     date = (date.strftime('%Y%m%d'))
     
     for category in CATEGORY:
         url_list = _get_ranking(category, date)
+        print(f"\n{category}")
         news_list = get_news(url_list)[:num]
         ranking_dict[category] = {news.url: news.get_dict() for news in news_list}
     
@@ -30,7 +39,7 @@ def _get_ranking(
     main = soup.find('div', {'class': 'postRankNews'})
     
     links = main.find_all('a')
-    ranking = ['https:' + link['href'].split('?')[0] for link in links if 'nate.com/view' in link['href']]
+    ranking = [link['href'] for link in links if 'nate.com/view' in link['href']]
     
     return ranking
 
