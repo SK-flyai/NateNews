@@ -19,6 +19,53 @@ import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
+import data2 from "../flask/recommend.json";
+
+const recSentences = [];
+const recKeywords = [];
+const recLinks = [];
+
+let keywordnum = 0;
+
+for (var key in data2.keyword) {
+  recKeywords.push(key + "  ");
+  recLinks.push(data2.keyword[key]);
+}
+
+for (var key2 in data2.sentence) {
+  recSentences.push(data2.sentence[key2] + "\n\n");
+}
+
+let keywordcnt = recKeywords.length;
+const keywordlist = [];
+
+for (let i = 0; i < keywordcnt; i++) {
+  keywordlist.push(
+    <View key={i}>
+      <Pressable
+        //onPress={imagePress}
+        android_ripple={{ color: "purple" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          flex: 1,
+        }}
+      >
+        <View style={{ flex: 1, width: width * 0.95 }}>
+          <Text
+            style={{
+              fontSize: 15,
+              backgroundColor: "yellow",
+            }}
+          >
+            {recKeywords[i]}
+          </Text>
+          <Text>{"\n"}</Text>
+        </View>
+      </Pressable>
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   // 기사 제목 style
@@ -99,13 +146,19 @@ const SportContent = ({ route }) => {
   date = data.spo[link].date;
   content = data.spo[link].content;
   caption = data.spo[link].caption;
-  for (var key in data.spo[link].image) {
-    img = key;
+  for (var key3 in data.spo[link].image) {
+    img = key3;
     break;
   }
 
-  const [isModalVisible, setModalVisible] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
+
+  // 이미지 버튼 함수 (Modal에서 사용)
+  const [isModalVisible, setModalVisible] = useState(false);
+  const imagePress = () => {
+    console.log("Image Clicked!");
+    setModalVisible(true);
+  };
 
   useEffect(() => {
     Image.getSize(
@@ -137,19 +190,12 @@ const SportContent = ({ route }) => {
     setModalVisible(!isModalVisible);
   };
 
-  // 이미지 버튼 함수 (Modal에서 사용)
-  const imagePress = () => {
-    console.log("Image Clicked!");
-    setModalVisible(true);
-  };
-
   return (
     <SafeAreaView
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
     >
       <View style={{ flex: 1, backgroundColor: "white" }}>
         <ScrollView style={{ flex: 1, borderWidth: 1, borderColor: "#e0e0e0" }}>
-          {/* <Divider style={{ height: 30 }} /> */}
           <View style={{ flex: 1, backgroundColor: "white" }}>
             <Text
               style={{
@@ -164,8 +210,6 @@ const SportContent = ({ route }) => {
                 }),
               }}
             >
-              {/* 편의점 직원 살해 후 달아난 30대男…16살부터 상습 강도질
-              {"\n"} */}
               {title}
             </Text>
             <Text style={{ color: "grey" }}>{date}</Text>
@@ -220,29 +264,25 @@ const SportContent = ({ route }) => {
             <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
               {content}
             </Text>
-            <Pressable
-              onPress={imagePress}
-              android_ripple={{ color: "purple" }}
+            <Text>{"\n"}</Text>
+
+            <View
               style={{
-                justifyContent: "center",
-                alignItems: "center",
                 flex: 1,
-                backgroundColor: "yellow",
+                width: width * 0.95,
+                backgroundColor: "lightgrey",
               }}
             >
-              <View style={{ flex: 1, width: width * 0.95 }}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                  }}
-                >
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal
-                </Text>
-              </View>
-            </Pressable>
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontWeight: "bold",
+                }}
+              >
+                {recSentences}
+              </Text>
+            </View>
+            <View>{keywordlist}</View>
           </View>
         </ScrollView>
       </View>
