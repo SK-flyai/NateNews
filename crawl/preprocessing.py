@@ -77,6 +77,7 @@ def text_cleaning(article: bs4.element.Tag):
 
     tmp = _remove_bracket(tmp)
     
+    tmp = tmp.replace('·', ', ')
     tmp = ('').join([word for word in tmp if word.isalpha() or ord(word) < 128 or word == '…'])
     tmp = tmp.replace(MESSAGE, '')
     

@@ -3,3 +3,7 @@ pandas
 requests
 XlsxWriter
 openpyxl
+bareunpy
+sentence-transformers
+kss
+matplotlib
