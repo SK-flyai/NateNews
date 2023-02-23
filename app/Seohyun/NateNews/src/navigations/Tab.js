@@ -2,7 +2,7 @@ import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 import {
-  SportNav,
+  TotalNav,
   EntertainmentNav,
   PoliticNav,
   EconomicNav,
@@ -11,7 +11,6 @@ import {
 } from "./TabNavs/index";
 import { Dimensions } from "react-native";
 
-const { width } = Dimensions.get("window");
 const TopTab = createMaterialTopTabNavigator();
 
 const TopTabNavigation = () => {
@@ -26,7 +25,7 @@ const TopTabNavigation = () => {
         tabBarPosition: "top",
       }}
     >
-      <TopTab.Screen name="종합" component={SportNav} />
+      <TopTab.Screen name="종합" component={TotalNav} />
       {/*Page2 - 스포츠 Tab*/}
 
       <TopTab.Screen name="시사" component={EntertainmentNav} />

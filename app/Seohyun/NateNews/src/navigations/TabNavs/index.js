@@ -1,4 +1,4 @@
-import SportNav from "./SportNav";
+import TotalNav from "./TotalNav";
 import EntertainmentNav from "./EntertainmentNav";
 import PoliticNav from "./PoliticNav";
 import EconomicNav from "./EconomicNav";
@@ -6,7 +6,7 @@ import SocialNav from "./SocialNav";
 import WorldNav from "./WorldNav";
 
 export {
-  SportNav,
+  TotalNav,
   EntertainmentNav,
   PoliticNav,
   EconomicNav,
