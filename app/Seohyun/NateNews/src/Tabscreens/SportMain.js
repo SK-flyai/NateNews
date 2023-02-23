@@ -1,13 +1,15 @@
+<<<<<<< HEAD
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 
+=======
+>>>>>>> 30a0c09 (230222 16:71)
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import { Pressable, TouchableOpacity } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
@@ -16,9 +18,12 @@ const SmallImageWidth = width * 0.15;
 
 function SportMain({ navigation }) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
   const Armypath = "../../assets/army.jpg";
 >>>>>>> 929584e (02/22 09:41)
+=======
+>>>>>>> 30a0c09 (230222 16:71)
   const links = [];
   const titles = [];
   const categories = [];
@@ -205,22 +210,45 @@ function SportMain({ navigation }) {
 =======
   const views = [];
   for (let i = 0; i < 20; i++) {
+    const [aspectRatio, setAspectRatio] = useState(null);
+
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
+
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
+
     views.push(
-      <View key={i}>
+      <View styles={{ flex: 1 }} key={i}>
         <View style={styles.divider} />
         <TouchableOpacity
           onPress={() => navigation.navigate("SportContent", links[i])}
         >
-          <View style={{ flexDirection: "row" }}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: Imagewidth * 0.4,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={{ uri: images[i] }}
-            />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Image style={Istyle} source={{ uri: images[i] }} />
 
 <<<<<<< HEAD
             <View>
@@ -230,11 +258,12 @@ function SportMain({ navigation }) {
             <View
               style={{
                 marginLeft: "1%",
-                width: width - (SmallImageWidth + 20),
+                width: width - (imageWidth + 20),
+                justifyContent: "center",
               }}
             >
-              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
-                {titles[i]}
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
               </Text>
 >>>>>>> 93555d0 (230222 11:58)
               <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
@@ -250,6 +279,7 @@ function SportMain({ navigation }) {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View
+<<<<<<< HEAD
         style={{
           flex: 1,
           backgroundColor: "white",
@@ -366,6 +396,15 @@ function SportMain({ navigation }) {
 
         <View style={styles.divider} />
 >>>>>>> 929584e (02/22 09:41)
+=======
+        style={{ flex: 1, backgroundColor: "white", marginHorizontal: "3%" }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          스포츠 주요뉴스
+        </Text>
+
+        <View style={{ flex: 1 }}>{views}</View>
+>>>>>>> 30a0c09 (230222 16:71)
       </View>
 <<<<<<< HEAD
       <View
@@ -383,6 +422,8 @@ function SportMain({ navigation }) {
       </View>
 =======
 >>>>>>> 93555d0 (230222 11:58)
+
+      <View style={styles.divider} />
 
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
