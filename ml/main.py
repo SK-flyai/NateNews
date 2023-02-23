@@ -62,6 +62,7 @@ if __name__ == '__main__':
     # model = NewsModel(model_path="./ko-sbert-natenews")
     # model = NewsModel(tagger=tagger, model_path='sinjy1203/ko-sbert-natenews')
     model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
+    # model = NewsModel(tagger=tagger, model_path='./ko-sbert-natenews')
     news = NateNews()
     df = news.load_data()
     df = df.loc[pred_range[0]:pred_range[1]]
@@ -79,8 +80,12 @@ if __name__ == '__main__':
         df.loc[i, 'keysent'] = keysent
         df.loc[i, 'titles'] = title
         df.loc[i, 'contents'] = '\n'.join(kss.split_sentences(df.loc[i, 'contents']))
+        df.loc[i, 'contents'] = '\n'.join(re.split('\. |\? ', df.loc[i, 'contents']))
         df.loc[i, 'words'] = words(df.loc[i, 'contents'])
 
     df[['titles', 'keywords', 'words', 'contents']].to_csv('./natenews_data/' + output_fname)
 
+
+
+##
 

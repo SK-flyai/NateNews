@@ -18,7 +18,8 @@ class CustomTokenizer:
         명사들 = tokenizer(뉴스본문)
 
     """
-    def __init__(self, tagger: Union[Mecab, Tagger] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
+    def __init__(self, tagger: Union[Mecab, Tagger] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+                 user_words_path: str = './user_words'):
         """
         Args:
             tagger: 형태소 분석기
@@ -27,9 +28,14 @@ class CustomTokenizer:
                 morphs: 모든 품사의 형태소 추출
                 NNP: 고유명사만 추출
                 NNG: 일반명사만 추출
+            user_words_path: 사용자사전 경로
         """
         self.tagger = tagger
         self.tag = tag
+        user_words_path = Path(user_words_path)
+        self.comp_words = self.load_comp(str(user_words_path / 'word_comp.txt'))
+        self.filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
+        self.mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
 
     def load_mapping(self, path: str = './user_words/word_mapping.txt') -> Dict[str, str]:
         """
@@ -86,7 +92,7 @@ class CustomTokenizer:
         data = re.sub('무단복제 및 재배포 금지', '', data) # 너무 많이 나와서 제거
         return data
 
-    def __call__(self, doc: str, user_words_path: str = './user_words') -> List[str]:
+    def __call__(self, doc: str) -> List[str]:
         """
         mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 사용자 mapping & filtering
         Args:
@@ -106,22 +112,18 @@ class CustomTokenizer:
         else:
             raise Exception('keyerror')
 
-        user_words_path = Path(user_words_path)
-        comp_words = self.load_comp(str(user_words_path / 'word_comp.txt'))
-        word_tokens = self.compound(word_tokens, comp_words)
+        word_tokens = self.compound(word_tokens, self.comp_words)
 
         result = [word for word in word_tokens if len(word) > 1]
         # result = word_tokens
-        filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
-        mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
 
         def func(x):
-            if x in mapping:
-                return mapping[x]
+            if x in self.mapping:
+                return self.mapping[x]
             return x
 
         result = list(map(func, result))
-        result = list(filter(lambda x: x not in filtering, result))
+        result = list(filter(lambda x: x not in self.filtering, result))
         return result
 
 if __name__ == '__main__':

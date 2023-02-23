@@ -207,8 +207,9 @@ class KeySentence:
         Returns:
             top_n개의 주요문장 리스트
         """
-        candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
+        # candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
         # candidates = doc.split('. ')
+        candidates = re.split('\. |\? ', doc)
 
         doc_embedding = self.model.encode([doc, title]) # 뉴스본문의 임베딩
         candidate_embeddings = self.model.encode(candidates) # 각 문장들의 임베딩들

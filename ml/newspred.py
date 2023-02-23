@@ -22,13 +22,16 @@ class NewsModel:
     keysent_model = KeySentence(model_path=model_path)
 
     """
-    def __init__(self, tagger: Union[Tagger, Mecab] = Mecab(), model_path: str = 'sinjy1203/ko-sbert-natenews'):
+    def __init__(self, tagger: Union[Tagger, Mecab] = Mecab(), model_path: str = 'sinjy1203/ko-sbert-natenews',
+                 user_words_path: str = './user_words'):
         """
         Args:
             tagger: 키워드 추출에 사용할 형태소분석기
             model_path: huggingface hub에 있는 finetuning한 sbert model
+            user_words_path: 사용자 사전 위치
         """
-        self.word_model = KeyBERT(tagger=tagger, model_path=model_path)
+        self.word_model = KeyBERT(tagger=tagger, model_path=model_path,
+                                  user_words_path=user_words_path)
         self.keysent_model = KeySentence(model_path=model_path)
 
     def predict(self, doc: str, title: str, word_top_n: int = 5, sent_top_n: int = 1,
