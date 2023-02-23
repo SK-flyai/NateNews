@@ -7,19 +7,10 @@ import {
 import MainPage from "./MainPage";
 import { Button } from "../components";
 import Tab from "./Tab";
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 929584e (02/22 09:41)
 import axios from "axios";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "./Header";
 
-<<<<<<< HEAD
-=======
->>>>>>> bce5f48 (FIX: Header)
-=======
->>>>>>> 929584e (02/22 09:41)
 const Drawer = createDrawerNavigator();
 
 const styles = StyleSheet.create({
@@ -34,15 +25,7 @@ const styles = StyleSheet.create({
 const Sidebar = () => {
   const flaskButtonClick = async () => {
     try {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      const response = await axios.get("http://192.168.11.162:5000/crawl");
-=======
       const response = await axios.get("http://192.168.1.10:5000/crawl");
->>>>>>> 929584e (02/22 09:41)
-=======
-      const response = await axios.get("http://192.168.11.162:5000/crawl");
->>>>>>> 93555d0 (230222 11:58)
       console.log(response.data.output);
     } catch (error) {
       console.error(error);

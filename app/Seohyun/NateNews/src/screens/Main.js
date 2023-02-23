@@ -153,7 +153,7 @@ const Main = ({ navigation }) => {
               <Text
                 style={{ color: "black", fontWeight: "bold", fontSize: 18 }}
               >
-                  {hotkeywords[keywordIndex]}
+                {hotkeywords[keywordIndex]}
               </Text>
             </View>
           </View>
@@ -338,8 +338,3 @@ const styles = StyleSheet.create({
     marginVertical: "3%",
   },
 });
-
-//   padding-top: ${({ insets: { top } }) => top}px;
-
-//   padding-bottom: ${({ insets: { bottom } }) => bottom}px;
-// `;
