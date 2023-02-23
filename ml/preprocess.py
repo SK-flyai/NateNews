@@ -6,6 +6,7 @@ import pickle
 from pathlib import Path
 import re
 from bareunpy import Tagger
+from load_dataset import NateNews
 
 class CustomTokenizer:
     """
@@ -144,6 +145,7 @@ class CustomTokenizer:
 
         # result = list(map(func, result))
         result = list(filter(lambda x: x not in self.filtering, result))
+        result = list(filter(lambda x: not x.isdigit(), result))
         return result
 
 if __name__ == '__main__':
@@ -154,7 +156,13 @@ if __name__ == '__main__':
     tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
-    tagger.pos('인생샷')
+    news = NateNews()
+    df = news.load_data()
+
+    ##
+    sents = re.split('\. |\? ', df.loc[398, 'contents'])
+    for sent in sents:
+        print(tagger.pos(sent))
 
 ##
     cust_dic.update()
