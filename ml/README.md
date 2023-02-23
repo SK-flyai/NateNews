@@ -17,7 +17,7 @@ With registration, for the first time, you can get a API-KEY to use it freely.
 
 ### cpu version  
 ```
-# pip install requirements_cpu.txt => 이거 에러떠서 아래 실행 고우
+# pip install requirements_cpu.txt => 이거 실행하지 말기
 pip install sentence-transformers
 pip install kss
 pip install matplotlib
@@ -27,7 +27,7 @@ pip install matplotlib
 - CUDA toolkit 11.6
 - cuDNN 8.6.0
 ```
-# pip install requirements_gpu.txt => 아래거 실행 고우
+# pip install requirements_gpu.txt => 이거 실행하지 말기
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 pip install sentence-transformers
 pip install kss
