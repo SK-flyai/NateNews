@@ -76,7 +76,7 @@ df = news.load_data()
 
 # load model & tagger
 tagger = Tagger(API-KEY)
-model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
+model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1', user_words_path='./user_words')
 
 # pred keyword & main sentence 
 keywords, keysent = model.predict(df.loc[i, 'contents'], df.loc[i, 'titles'], word_top_n=5,
