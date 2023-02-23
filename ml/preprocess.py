@@ -36,6 +36,7 @@ class CustomTokenizer:
         self.comp_words = self.load_comp(str(user_words_path / 'word_comp.txt'))
         self.filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
         self.mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
+        self.nnp = self.load_nnp(str(user_words_path / 'word_nnp.txt'))
 
     def load_mapping(self, path: str = './user_words/word_mapping.txt') -> Dict[str, str]:
         """
@@ -78,6 +79,23 @@ class CustomTokenizer:
             words = re.sub(comp, comps[comp], words)
         return words.split('_')
 
+    def load_nnp(self, path: str = './user_words/word_nnp.txt') -> Set[str]:
+        """
+        고유명사로 인식해야 할 사용자 단어 로드
+
+        Args:
+            path: 사용자 고유명사들의 저장경로
+        """
+        with open(path, 'r', encoding='UTF8') as f:
+            words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
+        return words
+
+    def tonnp(self, pos):
+        if pos[0] in self.nnp:
+            return (pos[0], 'NNP')
+        else:
+            return pos
+
     def preprocess_(self, data: str) -> str:
         """
         단어 후보군들 추출하기 전에 제거해야할 일반적인 형식의 단어들 제거
@@ -108,7 +126,9 @@ class CustomTokenizer:
         elif self.tag == 'morphs': # 전체 다
             word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
-            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(doc))))
+            word_pos = self.tagger.pos(doc)
+            word_pos = list(map(self.tonnp, word_pos))
+            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, word_pos)))
         else:
             raise Exception('keyerror')
 
@@ -131,7 +151,7 @@ if __name__ == '__main__':
 
     # tagger = Tagger()
 
-    # tokenizer = CustomTokenizer(tagger=tagger)
+    tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
     tagger.pos('인생샷')
