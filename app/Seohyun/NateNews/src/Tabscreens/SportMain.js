@@ -127,7 +127,7 @@ function SportMain({ navigation }) {
   }
 
   const views2 = [];
-  for (let i = 5; i < 10; i++) {
+  for (let i = 5; i < 15; i++) {
     const urlsend = links[i];
 
     views2.push(

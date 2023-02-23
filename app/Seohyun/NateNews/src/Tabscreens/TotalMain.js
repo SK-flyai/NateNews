@@ -52,13 +52,13 @@ function TotalMain({ navigation }) {
   }
 
   const views = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     const urlsend = links[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
       Image.getSize(
-        images[0],
+        images[1],
         (width, height) => {
           setAspectRatio(width / height);
         },
@@ -68,7 +68,7 @@ function TotalMain({ navigation }) {
       );
     }, []);
 
-    const isFirstView = i === 0; // check if it's the first view
+    const isFirstView = i === 1; // check if it's the first view
     const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
     const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
     const num = isFirstView ? 2 : 1;
@@ -132,7 +132,7 @@ function TotalMain({ navigation }) {
   }
 
   const views2 = [];
-  for (let i = 5; i < 10; i++) {
+  for (let i = 6; i < 16; i++) {
     const urlsend = links[i];
 
     views2.push(

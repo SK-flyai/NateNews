@@ -132,38 +132,8 @@ function ScienceMain({ navigation }) {
   }
 
   const views2 = [];
-  for (let i = 5; i < 10; i++) {
+  for (let i = 5; i < 15; i++) {
     const urlsend = links[i];
-    const [aspectRatio, setAspectRatio] = useState(null);
-
-    useEffect(() => {
-      Image.getSize(
-        images[0],
-        (width, height) => {
-          setAspectRatio(width / height);
-        },
-        (error) => {
-          console.error(error);
-        }
-      );
-    }, []);
-
-    const isFirstView = i === 0; // check if it's the first view
-    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
-    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
-    const num = isFirstView ? 2 : 1;
-    const Istyle = isFirstView
-      ? {
-          width: imageWidth,
-          aspectRatio,
-          backgroundColor: "white",
-        }
-      : {
-          width: imageWidth,
-          height: imageHeight,
-          backgroundColor: "black",
-          resizeMode: "stretch",
-        };
 
     views2.push(
       <View styles={{ flex: 1 }} key={i}>
@@ -176,7 +146,15 @@ function ScienceMain({ navigation }) {
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
-            <Image style={Istyle} source={{ uri: images[i] }} />
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: width * 0.12,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
 
             <View
               style={{
@@ -185,7 +163,7 @@ function ScienceMain({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
                 {titles[i].replace(/ /g, "\u00A0")}
               </Text>
 

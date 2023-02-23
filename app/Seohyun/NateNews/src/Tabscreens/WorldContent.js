@@ -22,6 +22,7 @@ import data2 from "../flask/recommend.json";
 const recSentences = [];
 const recKeywords = [];
 const recLinks = [];
+
 let keywordnum = 0;
 
 var title = "";
@@ -42,7 +43,8 @@ for (var key2 in data2.sentence) {
 }
 
 let keywordcnt = recKeywords.length;
-const keywordlist = [];
+let keywordlist = [];
+let modallink = [];
 
 const WorldContent = ({ route }) => {
   const link = route.params;
@@ -58,9 +60,19 @@ const WorldContent = ({ route }) => {
     break;
   }
 
-  const [isModalVisible1, setModalVisible1] = useState(false);
-  const [isModalVisible2, setModalVisible2] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
+
+  const [isModalVisible2, setModalVisible2] = useState(false);
+  const toggleModal2 = () => {
+    setModalVisible2(!isModalVisible2);
+  };
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const toggleModal1 = (keywordnum) => {
+    setModalVisible1(!isModalVisible1);
+    console.log(keywordnum);
+    modallink = recLinks[keywordnum];
+  };
 
   useEffect(() => {
     Image.getSize(
@@ -90,22 +102,14 @@ const WorldContent = ({ route }) => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
   }, [isModalVisible1, isModalVisible2]);
-
-  const toggleModal1 = () => {
-    setModalVisible1(!isModalVisible1);
-  };
-
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
   const newContect = content.replace(/ /g, "\u00A0");
 
-  for (let i = 0; i < keywordcnt; i++) {
-    keywordnum = i + 1;
-    keywordlist.push(
+  keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
+    const keywordnum = i;
+    return (
       <View key={i}>
         <Pressable
-          onPress={toggleModal1}
+          onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
@@ -127,7 +131,7 @@ const WorldContent = ({ route }) => {
         </Pressable>
       </View>
     );
-  }
+  });
 
   return (
     <SafeAreaView
@@ -190,6 +194,32 @@ const WorldContent = ({ route }) => {
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>{"\n"}</Text>
+              <View
+                style={{
+                  flex: 1,
+                  width: width * 0.75,
+                  backgroundColor: "lightblue",
+                  borderRadius: 8,
+                  padding: "5%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                </Text>
+              </View>
+            </View>
             <Text
               style={{
                 padding: 5,
@@ -199,24 +229,7 @@ const WorldContent = ({ route }) => {
             >
               {newContect}
             </Text>
-
-            <View
-              style={{
-                flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightblue",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 15,
-                }}
-              >
-                {recSentences}
-              </Text>
-            </View>
           </View>
-
           <View>
             <Text>{"\n"}</Text>
             {keywordlist}
@@ -239,7 +252,7 @@ const WorldContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {keywordnum}
+                  {modallink}
                 </Text>
               </ScrollView>
             </View>
