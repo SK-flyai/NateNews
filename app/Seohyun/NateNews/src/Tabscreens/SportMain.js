@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> efb560c (230222 19:19)
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 // 상단 탭 기준 종합
 
+<<<<<<< HEAD
 =======
 >>>>>>> 30a0c09 (230222 16:71)
+=======
+>>>>>>> efb560c (230222 19:19)
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
@@ -244,7 +250,7 @@ function SportMain({ navigation }) {
           backgroundColor: "black",
           resizeMode: "stretch",
         };
-    const news = isFirstView ? contents[0] : null;
+
     const fview = isFirstView ? (
       <Image style={Istyle} source={{ uri: images[i] }} />
     ) : null;
