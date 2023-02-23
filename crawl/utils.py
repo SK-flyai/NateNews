@@ -2,13 +2,11 @@ from bs4 import BeautifulSoup as bs
 from concurrent.futures import ThreadPoolExecutor
 from news_crawl import NateNews
 from preprocessing import text_cleaning
-from typing import List
 from typing import List, Union
 
 import datetime as dt
 import pandas as pd
 import requests
-import time
 import re
 
 
@@ -22,7 +20,6 @@ COLUMNS = [
     'url',
 ]
 
-
 def get_news_df(
     news_list: List[NateNews]
 ):
@@ -34,11 +31,10 @@ def get_news_df(
     info_list = list()
     for news in news_list:
         try:
-            info_list.append(news.get_info())
+            info_list.append(news.get_list())
         except:
             print('Error occurs')
             print(news.url)
-    # info_list = [news.get_info() for news in news_list]
     return pd.DataFrame(info_list, columns=COLUMNS)
 
 
@@ -56,36 +52,29 @@ def get_news(
             2. None: Abnormal Request(won't get that page)
     """
     url_list = url_list if isinstance(url_list, list) else [url_list]
-    url_list = list(map(_convert_url, url_list))
+
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(_create, url_list))
     else:
-        # _news_list = [_create(url) for url in url_list]
         _news_list = list()
         for url in url_list:
             try:
                 _news_list.append(_create(url))
             except:
                 print(url)
-
+    
     news_list = [news for news in _news_list if news]
     return news_list
 
-
-def _convert_url(url: str):
-    url = url.split('?')[0].split('//')[-1]
-    return f"https://{url}"
-
-
 def get_urls(
-    date1: Union[int, None] = None,
-    date2: Union[int, None] = None,
-    artc1: Union[int, None] = None,
-    artc2: Union[int, None] = None,
+    date1: Union[int, None]=None,
+    date2: Union[int, None]=None,
+    artc1: Union[int, None]=None,
+    artc2: Union[int, None]=None,
 ):
     """get url list
-
+    
     Desc:
         url list
         eg:
@@ -106,7 +95,7 @@ def get_urls(
 
     Returns:
         List[str]: url list
-    """
+    """    
     date1 = date1 if date1 else int(dt.datetime.now().strftime('%Y%m%d'))
     date2 = date2 if date2 else date1
     artc1 = artc1 if artc1 and artc1 > 0 else 1
@@ -121,7 +110,7 @@ def get_urls(
 
 def _get_date_list(
     date1: int,
-    date2: int,
+    date2: int, 
 ):
     """get date list
 
@@ -132,24 +121,24 @@ def _get_date_list(
     Returns:
         List[int]: date list from `date1` to `date2`
     """
-
+    
     if not date2:
         return [date1]
-
-    date: int = date1
+    
+    date:int = date1
     date_list = list()
-
+    
     while date <= date2:
         date_list.append(date)
         date = dt.datetime.strptime(str(date), "%Y%m%d") + dt.timedelta(days=1)
         date = int(date.strftime('%Y%m%d'))
-
+    
     return date_list
 
 
 def _get_artc_list(
     artc1: int,
-    artc2: Union[int, None],
+    artc2: Union[int,None],
     date: int,
 ):
     """get article list
@@ -183,22 +172,21 @@ def _get_recent(date: int):
 
     Returns:
         int: latest article number
-    """
-    req = requests.get(
-        f'https://news.nate.com/recent?mid=n0100&type=c&date={date}')
+    """        
+    req = requests.get(f'https://news.nate.com/recent?mid=n0100&type=c&date={date}')
     content = bs(req.text, 'html.parser')
     _recent = content.find_all('div', {'class': 'mlt01'})
-
+    
     latest = None
     for news in _recent:
         # recent = //news.nate.com/view/{YYYY}{mm}{dd}n{NNNNN}?mid=n0100
         recent = int(news.find('a')['href'].split('?')[0][-5:])
         if not latest or latest < recent:
             latest = recent
-    return latest  # return latest article number
+    return latest # return latest article number
 
 
-def _create(url: str):
+def _create(url:str):
     """create `NateNews` if it satisfy some conditions
 
     Args:
@@ -208,52 +196,45 @@ def _create(url: str):
         return `NateNews` if given url satisfy some conditions
         * 1. Should have article(articleContetns)
         * 2. Exclude English news
-
+        
     Returns:
         Union[NateNews, None]: 
-    """
+    """        
     # time.sleep(0.5)
-    # TODO: handling sleep stuff...
-    new_class = NateNews(url)
-    which_news = new_class.content.find(
-        'a',
-        {'class': 'svcname'}
-    ).text
-
+    # TODO: handling sleep stuff... => Only when collect huge amount of dataset
+    news = NateNews(url)
+    
     # 연예 기사는 제외
-    if which_news == '연예':
-        print(f"{url} is Entertainment News!")
+    
+    if news.category in [
+        "연예가화제",
+        "방송/가요",
+        "영화",
+        "해외연예",
+        "POLL",
+        "포토/TV",
+        "아이돌24시"
+    ]:
+        print(f"{news.url} is Entertainment News!")
         return None
 
     # 연합 뉴스들 제외
-    if new_class.press == 'AP연합뉴스' or new_class.press == 'EPA연합뉴스':
-        print(f"{url} is English News!")
+    if news.press == 'AP연합뉴스' or news.press == 'EPA연합뉴스':
+        print(f"{news.url} is English News!")
         return None
-
-    article = new_class.content.find(
-        'div',
-        {'id': 'articleContetns'}
-    )
-
+    
     # 기사가 없는 경우
-    if not article:
-        print(f"{url} has no article!")
+    if not news.text:
+        print(f"{news.url} has no article!")
         return None
     else:
         # 특수 기사들은 제외
-        title = new_class.title
-        if '[속보]' in title or '[포토]' in title or '[부고]' in title:
-            print(f"{url} is not Normal News!")
+        if '[속보]' in news.title or '[포토]' in news.title or '[부고]' in news.title:
+            print(f"{news.url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
-        content_len = len(_remove_bracket(text_cleaning(article)[0]))
-        if content_len < 300:
-            print(f'{url} has too short article!')
+        if len(news.text) < 300:
+            print(f'{news.url} has too short article!')
             return None
         else:
-            return new_class
-
-
-def _remove_bracket(text):
-    pattern = '\[[^\]]*\]'
-    return re.sub(pattern, '', text)
+            return news

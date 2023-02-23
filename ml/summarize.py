@@ -1,7 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
-from konlpy.tag import Mecab
 from pathlib import Path
 import numpy as np
 import itertools
@@ -102,7 +101,8 @@ class KeySentence:
         self.model = SentenceTransformer(model_path)
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             candidates: List[str], top_n: int, nr_candidates: int) -> List[str]:
+             candidates: List[str], top_n: int, nr_candidates: int,
+             title_w: float = 0.5) -> List[str]:
         """
         Max Sum Similarity
         후보간 유사성은 최소화, 문서와의 유사성은 최대화 를 목적으로 주요문장 추출 알고리즘
@@ -112,12 +112,15 @@ class KeySentence:
             candidates: 문장 후보군
             top_n: top_n개의 문장들을 주요문장으로 리턴
             nr_candidates: 처음에 추출할 뉴스본문과 유사도가 높은 문장 개수
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 주요문장 리스트
         """
         # 문서와 각 문장들 간의 유사도
         distances = cosine_similarity(doc_embedding, candidate_embeddings)
+        distances = distances[0] * (1 - title_w) + distances[1] * title_w
+        distances = distances[np.newaxis]
 
         # 각 문장들 간의 유사도
         distances_candidates = cosine_similarity(candidate_embeddings,
@@ -140,7 +143,8 @@ class KeySentence:
         return [sents_vals[idx] for idx in candidate]
 
     def mmr_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             candidates: List[str], top_n: int, diversity: float) -> List[str]:
+             candidates: List[str], top_n: int, diversity: float,
+             title_w: float = 0.5) -> List[str]:
         """
         Maximal Marginal Relevance
         문서와 유사도가 가장 높은 문장을 선택하고
@@ -151,6 +155,7 @@ class KeySentence:
             candidates: 문장 후보군들의 원본(한글)
             top_n: top n개의 문장들을 주요문장으로 리턴
             diversity: top_n개의 문장들의 유사도정도 (0~1)
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 주요문장 리스트
@@ -158,6 +163,9 @@ class KeySentence:
 
         # 문서와 각 문장들 간의 유사도가 적혀있는 리스트
         sent_doc_similarity = cosine_similarity(candidate_embeddings, doc_embedding)
+        sent_doc_similarity = sent_doc_similarity[:, 0] * (1 - title_w) + \
+                              sent_doc_similarity[:, 1] * title_w
+        sent_doc_similarity = sent_doc_similarity[:, np.newaxis]
 
         # 각 문장들 간의 유사도
         sent_similarity = cosine_similarity(candidate_embeddings)
@@ -182,32 +190,36 @@ class KeySentence:
 
         return [candidates[idx] for idx in sents_idx]
 
-    def predict(self, doc: str, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
-                diversity: float = 0.2) -> List[str]:
+    def predict(self, doc: str, title: str, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
+                diversity: float = 0.2, title_w: float = 0.5) -> List[str]:
         """
         뉴스본문에서 주요문장들을 리턴
         Args:
-            doc: 뉴스본문
+            doc: 뉴스 본문
+            title: 뉴스 제목
             mode: mss or mmr
             top_n: 추출할 문장 개수
             nr_candidates: mss의 파라미터
             diversity: mmr의 파라미터
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 주요문장 리스트
         """
-        candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
+        # candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
         # candidates = doc.split('. ')
+        candidates = re.split('\. |\? ', doc)
 
-        doc_embedding = self.model.encode([doc]) # 뉴스본문의 임베딩
+        doc_embedding = self.model.encode([doc, title]) # 뉴스본문의 임베딩
         candidate_embeddings = self.model.encode(candidates) # 각 문장들의 임베딩들
 
         main_sents = None
         if mode == 'mss':
             main_sents = self.mss_(doc_embedding, candidate_embeddings, candidates, top_n=top_n,
-                                nr_candidates=nr_candidates)
+                                nr_candidates=nr_candidates, title_w=title_w)
         elif mode == 'mmr':
-            main_sents = self.mmr_(doc_embedding, candidate_embeddings, candidates, top_n=top_n, diversity=diversity)
+            main_sents = self.mmr_(doc_embedding, candidate_embeddings, candidates, top_n=top_n,
+                                   diversity=diversity, title_w=title_w)
         else:
             raise Exception('keyerror')
 

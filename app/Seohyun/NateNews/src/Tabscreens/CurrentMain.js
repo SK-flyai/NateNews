@@ -102,7 +102,7 @@ function CurrentMain({ navigation }) {
           justifyContent: "center",
         };
     const newDivider = isFirstView ? (
-      <View style={{ marginVertical: "3%" }} />
+      <View style={{ marginVertical: "2%" }} />
     ) : (
       <View style={styles.divider} />
     );
@@ -187,9 +187,7 @@ function CurrentMain({ navigation }) {
           marginTop: "3%",
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          얼음판 위엔 연아킴 비트위엔 vj 항상 기막힌
-        </Text>
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>시사 인기뉴스</Text>
         <View style={{ flex: 1 }}>{views}</View>
       </View>
       <View
@@ -223,9 +221,7 @@ function CurrentMain({ navigation }) {
           marginHorizontal: "3%",
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          스포츠 주요뉴스
-        </Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>시사 주요뉴스</Text>
 
         <View style={{ flex: 1 }}>{views2}</View>
       </View>

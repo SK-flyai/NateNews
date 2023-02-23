@@ -102,7 +102,7 @@ function ScienceMain({ navigation }) {
           justifyContent: "center",
         };
     const newDivider = isFirstView ? (
-      <View style={{ marginVertical: "3%" }} />
+      <View style={{ marginVertical: "2%" }} />
     ) : (
       <View style={styles.divider} />
     );
@@ -187,8 +187,8 @@ function ScienceMain({ navigation }) {
           marginTop: "3%",
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          얼음판 위엔 연아킴 비트위엔 vj 항상 기막힌
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+          IT/과학 인기뉴스
         </Text>
         <View style={{ flex: 1 }}>{views}</View>
       </View>
@@ -224,7 +224,7 @@ function ScienceMain({ navigation }) {
         }}
       >
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-          스포츠 주요뉴스
+          IT/과학 주요뉴스
         </Text>
 
         <View style={{ flex: 1 }}>{views2}</View>

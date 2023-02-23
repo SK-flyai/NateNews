@@ -1,3 +1,4 @@
+from typing import *
 from keybert import KeyBERT
 from summarize import TextRank, KeySentence
 from load_dataset import *
@@ -6,8 +7,9 @@ from tqdm import tqdm
 import numpy as np
 import kss
 from preprocess import CustomTokenizer
-from konlpy.tag import Mecab
 from sklearn.feature_extraction.text import CountVectorizer
+from bareunpy import Tagger
+import time
 
 class NewsModel:
     """
@@ -20,25 +22,37 @@ class NewsModel:
     keysent_model = KeySentence(model_path=model_path)
 
     """
-    def __init__(self, model_path: str = 'sinjy1203/ko-sbert-natenews'):
+    def __init__(self, tagger: Tagger, model_path: str = 'sinjy1203/ko-sbert-natenews',
+                 user_words_path: str = './user_words'):
         """
         Args:
+            tagger: 키워드 추출에 사용할 형태소분석기
             model_path: huggingface hub에 있는 finetuning한 sbert model
+            user_words_path: 사용자 사전 위치
         """
-        self.word_model = KeyBERT(model_path=model_path)
+        self.word_model = KeyBERT(tagger=tagger, model_path=model_path,
+                                  user_words_path=user_words_path)
         self.keysent_model = KeySentence(model_path=model_path)
 
-    def predict(self, doc: str, word_top_n: int = 5) -> Tuple[List[str], str]:
+    def predict(self, doc: str, title: str, word_top_n: int = 5, sent_top_n: int = 1,
+                title_w: float = 0.5, diversity: float = 0.2) -> Tuple[List[str], List[str]]:
         """
         Args:
             doc: 뉴스본문 한개
+            title: 뉴스제목 한개
+            word_top_n: 핵심키워드 개수
+            sent_top_n: 핵심문장 개수
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
+            diversity: 핵심문장이나 키워드들 간에 다양성
 
         Return:
             keywords: 예측한 word_top_n개 키워드들
             keysent: 예측한 핵심문장
         """
-        keywords = self.word_model.predict(doc=doc, top_n=word_top_n)
-        keysent = self.keysent_model.predict(doc=doc, top_n=1)[0]
+        keywords = self.word_model.predict(doc=doc, title=title, top_n=word_top_n, title_w=title_w,
+                                           diversity=diversity)
+        keysent = self.keysent_model.predict(doc=doc, title=title, top_n=sent_top_n, title_w=title_w,
+                                             diversity=diversity)
 
         return keywords, keysent
 
@@ -46,7 +60,23 @@ class NewsModel:
 
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
+    news = NateNews()
+    df = news.load_data()
 
+    ##
+    tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
+    model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
+
+    ##
+    st = time.time()
+    keywords, keysent = model.predict(df.loc[100, 'contents'], df.loc[100, 'titles'], word_top_n=20,
+                                      sent_top_n=3, title_w=0.5, diversity=0)
+    print(keywords)
+    print(time.time() - st)
+
+    ##
+    tokenizer = CustomTokenizer(tagger=tagger)
+    a = set(tokenizer(df.loc[202, 'contents']))
 
 
 

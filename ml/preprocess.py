@@ -1,10 +1,11 @@
 import os
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from typing import *
 import pandas as pd
 import pickle
 from pathlib import Path
 import re
+from bareunpy import Tagger
 
 class CustomTokenizer:
     """
@@ -17,20 +18,27 @@ class CustomTokenizer:
         명사들 = tokenizer(뉴스본문)
 
     """
-    def __init__(self, tagger: Mecab, tag: Union[str, Tuple[str]] = ('NNP', 'NNG')):
+    def __init__(self, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+                 user_words_path: str = './user_words'):
         """
         Args:
-            tagger: mecab 클래스
+            tagger: 형태소 분석기
             tag: 태그 방법
                 nouns: 명사만 추출
                 morphs: 모든 품사의 형태소 추출
                 NNP: 고유명사만 추출
                 NNG: 일반명사만 추출
+            user_words_path: 사용자사전 경로
         """
         self.tagger = tagger
         self.tag = tag
+        user_words_path = Path(user_words_path)
+        self.comp_words = self.load_comp(str(user_words_path / 'word_comp.txt'))
+        self.filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
+        self.mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
+        self.nnp = self.load_nnp(str(user_words_path / 'word_nnp.txt'))
 
-    def load_mapping(self, path='./user_words/word_mapping.txt') -> Dict[str, str]:
+    def load_mapping(self, path: str = './user_words/word_mapping.txt') -> Dict[str, str]:
         """
         버락 오바마와 오바마를 같은 단어로 인식하기 위한 단어 매핑들 불러오기
         .txt 내용 형태:
@@ -47,7 +55,7 @@ class CustomTokenizer:
             words_dict = {words_[0]: words_[1] for words_ in words_dict}
         return words_dict
 
-    def load_filtering(self, path='./user_words/word_filtering.txt'):
+    def load_filtering(self, path: str = './user_words/word_filtering.txt') -> Set[str]:
         """
         불필요한 단어나 너무 제너럴한 단어(한국) 을 제외시키기 위한 단어들 불러오기
 
@@ -57,6 +65,36 @@ class CustomTokenizer:
         with open(path, 'r', encoding='UTF8') as f:
             words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
         return words
+
+    def load_comp(self, path: str = './user_words/word_comp.txt') -> Dict[str, str]:
+        with open(path, 'r', encoding='UTF8') as f:
+            words_dict = list(
+                map(lambda y: y.split('='), list(set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''})))
+            words_dict = {words_[0]: words_[1] for words_ in words_dict}
+        return words_dict
+
+    def compound(self, words: List[str], comps: Dict[str, str]) -> List[str]:
+        words = '_'.join(words)
+        for comp in comps:
+            words = re.sub(comp, comps[comp], words)
+        return words.split('_')
+
+    def load_nnp(self, path: str = './user_words/word_nnp.txt') -> Set[str]:
+        """
+        고유명사로 인식해야 할 사용자 단어 로드
+
+        Args:
+            path: 사용자 고유명사들의 저장경로
+        """
+        with open(path, 'r', encoding='UTF8') as f:
+            words = set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''}
+        return words
+
+    def tonnp(self, pos):
+        if pos[0] in self.nnp:
+            return (pos[0], 'NNP')
+        else:
+            return pos
 
     def preprocess_(self, data: str) -> str:
         """
@@ -69,9 +107,10 @@ class CustomTokenizer:
         data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)  # 날짜 형식
         data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # 뉴스 제거
+        data = re.sub('무단복제 및 재배포 금지', '', data) # 너무 많이 나와서 제거
         return data
 
-    def __call__(self, doc: str, user_words_path: str = './user_words') -> List[str]:
+    def __call__(self, doc: str) -> List[str]:
         """
         mecab을 이용해 tag 종류에 따라 tokenize를 한 뒤에 사용자 mapping & filtering
         Args:
@@ -87,54 +126,41 @@ class CustomTokenizer:
         elif self.tag == 'morphs': # 전체 다
             word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
-            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, self.tagger.pos(doc))))
+            word_pos = self.tagger.pos(doc)
+            word_pos = list(map(self.tonnp, word_pos))
+            word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, word_pos)))
         else:
             raise Exception('keyerror')
 
-        # result = [word for word in word_tokens if len(word) > 1]
-        result = word_tokens
-        user_words_path = Path(user_words_path)
-        filtering = self.load_filtering(str(user_words_path / 'word_filtering.txt'))
-        mapping = self.load_mapping(str(user_words_path / 'word_mapping.txt'))
+        word_tokens = self.compound(word_tokens, self.comp_words)
 
-        def func(x):
-            if x in mapping:
-                return mapping[x]
-            return x
+        result = [word for word in word_tokens if len(word) > 1]
+        # result = word_tokens
 
-        result = list(map(func, result))
-        result = list(filter(lambda x: x not in filtering, result))
+        # def func(x):
+        #     if x in self.mapping:
+        #         return self.mapping[x]
+        #     return x
+
+        # result = list(map(func, result))
+        result = list(filter(lambda x: x not in self.filtering, result))
         return result
 
 if __name__ == '__main__':
-    tokenizer = CustomTokenizer(Mecab())
-    print(tokenizer('야구, 농구, 축구, 배구를 했다.'))
+    tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
+
+    # tagger = Tagger()
+
+    tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
-    tokenizer.add_mapping(
-        {
-            '안치호': '치호',
-            '양의동': '동'
-        }
-    )
+    tagger.pos('인생샷')
 
-    ##
-    with open('./user_words/word_mapping.pkl', 'rb') as f:
-        my_dict = pickle.load(f)
-    print(my_dict)
+##
+    cust_dic.update()
 
-    ##
-    tokenizer.add_filtering(
-        {
-            '양의동', '김서현'
-        }
-    )
+##
+    tagger.set_domain('comp')
 
-    ##
-    with open('./user_words/word_filtering.pkl', 'rb') as f:
-        my_dict = pickle.load(f)
-    print(my_dict)
-
-    ##
-    df = pd.read_csv('./newsData/Naver.csv', index_col=0)
-    print(tokenizer(df.loc[23, 'contents']))
+##
+    tagger.morphs('국제친선대사')

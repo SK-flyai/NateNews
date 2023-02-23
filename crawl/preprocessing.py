@@ -48,65 +48,52 @@ PRESS = [
     '일간스포츠. All rights reserved',
 ]
 
-<<<<<<< HEAD
-=======
 def text_cleaning(article: bs4.element.Tag):
     """Cleaning news content and divide images & texts
 
     Args:
         article (bs4.element.Tag): content of article found with `bs`
 
->>>>>>> d466a4b (Comment: add comments)
     Returns:
         Tuple[str, Dict[str, str]]:
             str: Content of news article after cleaning noise
             Dict[str, str]: pair of image-caption
-<<<<<<< HEAD
-    """
-=======
     """    
->>>>>>> d466a4b (Comment: add comments)
     article_text = str(article)
     i = 0
     # [] 내부 모두 제거
     pattern = '\[[^\]]*\]'
     tmp = re.sub(pattern, '', article_text)
-
+    
     tmp = tmp.replace('\n', '').replace('\t', '').replace('\r', '') # 공백 제거
     pattern = "<br/?>" # <br> 태그 -> 개행으로 변경
     tmp = re.sub(pattern, '\n', tmp)
-
+    
     tmp = _remove_caption(tmp)
     tmp = _remove_html_tag(tmp)
-
+    
     content = bs(tmp, 'html.parser') # 다시 parsing
     tmp = re.sub(' {2,}', ' ', content.text)
 
     tmp = _remove_bracket(tmp)
-<<<<<<< HEAD
-
-    tmp = ('').join([word for word in tmp if word.isalpha()
-           or ord(word) < 128 or word == '…'])
-=======
     
+    tmp = tmp.replace('·', ', ')
     tmp = ('').join([word for word in tmp if word.isalpha() or ord(word) < 128 or word == '…'])
->>>>>>> ea7d6ac (Style: add preprocessing with presses)
     tmp = tmp.replace(MESSAGE, '')
-
+    
     tmp = _remove_email(tmp)
-    tmp = _remove_newline(tmp)
 
     text = tmp.replace('기사내용 요약', '[기사내용 요약]\n')
     text = re.sub("\\'", "", text)
-
+    
     text = _remove_press(text)
-
+    
     # text -> article, images -> {IMAGE: CAPTION}
     text, images = _seperate_text(text)
-
+    
     text = _remove_link(text)
     text = _remove_newline(text)
-
+    
     text = ('.').join(text.split('.')[:-1])
     text = re.sub('\n{3,}', '\n\n', text)
 
@@ -123,7 +110,7 @@ def _seperate_text(text):
     result_cap = pattern_cap.finditer(text)
     text = re.sub(pattern_cap, '', text)
     text = re.sub('\n{3,}', '\n\n', text)
-
+    
     image_dict = dict()
     for r in result_img:
         image_dict[r.group(1)] = ''
@@ -159,7 +146,7 @@ def _remove_caption(text):
 
     for r in result:
         text = text.replace(r.group(), f"[{r.group(2)}]")
-
+    
     return text
 
 def _remove_html_tag(text):
@@ -167,7 +154,7 @@ def _remove_html_tag(text):
     """
     pattern = "</?p[^>]*>" # <p> or </p> -> 개행으로 변경
     text = re.sub(pattern, '\n', text)
-
+    
     pattern = "<caption>[^>]+>" # caption 제거
     text = re.sub(pattern, '', text)
 
@@ -178,12 +165,12 @@ def _remove_html_tag(text):
     pattern = re.compile('<img[^>]+>')
     result = pattern.finditer(text)
     images = bs(text, 'html.parser').find_all('img')
-
+    
     i = 0
     for r in result:
         text = text.replace(r.group(), f"\n[http:{images[i]['src']}]\n")
         i += 1
-
+    
     return text
 
 def _remove_bracket(text):
@@ -191,10 +178,10 @@ def _remove_bracket(text):
     """
     pattern = "<[^>]*>" # <> 내부 모두 제거
     text = re.sub(pattern, '', text)
-
+    
     pattern = "\([^\)]*\)" # () 내부 모두 제거
     text = re.sub(pattern, '', text)
-
+    
     return text
 
 def _remove_email(text):
@@ -206,7 +193,7 @@ def _remove_email(text):
     text = re.sub(pattern, '', text)
     pattern = '[a-zA-Z0-9+-_.]+@'
     text = re.sub(pattern, '', text)
-
+    
     return text
 
 def _remove_newline(text):

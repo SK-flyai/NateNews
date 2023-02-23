@@ -1,49 +1,54 @@
-from preprocess import CustomTokenizer
-from konlpy.tag import Mecab
-from sklearn.feature_extraction.text import CountVectorizer
-from load_dataset import *
-import warnings
+##
 import pandas as pd
-# -*- coding: utf-8 -*-
-warnings.filterwarnings('ignore')
-
-tokenizer = CustomTokenizer(Mecab())
-def keyword(doc):
-    try:
-        count = CountVectorizer(tokenizer=tokenizer, ngram_range=(1,1)).fit([doc])
-    except ValueError:
-        return []
-
-    candidates = count.get_feature_names_out()
-    return candidates
-
-news = NateNews()
-df = pd.read_csv('./natenews_data/keyword.csv', index_col=0)
-# print(keyword(df.loc[0, 'contents']))
-for i in range(0, 100):
-    words = keyword(df.loc[i, 'contents'])
-    total = []
-    tmp = []
-    for j, word in enumerate(words):
-        tmp += [word]
-        if j % 10 == 9:
-            total += ["_".join(tmp)]
-            tmp = []
-    if tmp:
-        total += ["_".join(tmp)]
-
-    words = '\n'.join(total)
-    df.loc[i, 'words'] = words
-    df.loc[i, 'contents'] = '\n'.join(df.loc[i, 'contents'].split('. '))
-
-cols = list(df.columns)
-cols.remove('contents')
-cols += ['contents']
-df.loc[:100, cols].to_csv('./natenews_data/keyword_words.csv')
 
 ##
-with open('./user_words/word_mapping.txt', 'r', encoding='UTF8') as f:
-    a = list(map(lambda y: y.split(), list(set(map(lambda x: x.strip('\n').strip(), f.readlines())) - {''})))
-    a = {a_[0]: a_[1] for a_ in a}
 
+df_1 = pd.read_csv('./natenews_data/keyword_kpf_titlew0.0.csv', index_col=0)
+df_2 = pd.read_csv('./natenews_data/keyword_kpf_titlew0.5.csv', index_col=0)
+df_3 = pd.read_csv('./natenews_data/keyword_kpf_titlew1.0.csv', index_col=0)
 
+##
+df = pd.DataFrame()
+df['titles'] = df_1['titles']
+df['0.0'] = df_1['keywords']
+df['0.5'] = df_2['keywords']
+df['1.0'] = df_3['keywords']
+# df['sents'] = df_1['keysentence']
+# df['sents_kpf'] = df_2['keysentence']
+df['contents'] = df_1['contents']
+
+df.to_csv('./natenews_data/kpf_titlew.csv')
+
+##
+df_1 = pd.read_csv('./natenews_data/keyword_words_0.0title.csv', index_col=0)
+df_2 = pd.read_csv('./natenews_data/keyword_words_0.25title.csv', index_col=0)
+df_3 = pd.read_csv('./natenews_data/keyword_words_0.5title.csv', index_col=0)
+df_4 = pd.read_csv('./natenews_data/keyword_words_0.75title.csv', index_col=0)
+df_5 = pd.read_csv('./natenews_data/keyword_words_1.0title.csv', index_col=0)
+
+##
+df = pd.DataFrame()
+df['titles'] = df_1['titles']
+df['0.0'] = df_1['keywords']
+df['0.25'] = df_2['keywords']
+df['0.5'] = df_3['keywords']
+df['0.75'] = df_4['keywords']
+df['1.0'] = df_5['keywords']
+df['contents'] = df_1['contents']
+
+df.to_csv('./natenews_data/keywords_titlew.csv')
+
+##
+df_1 = pd.read_csv('./natenews_data/keyword_0.0title.csv', index_col=0)
+df_2 = pd.read_csv('./natenews_data/keyword_0.5title.csv', index_col=0)
+df_3 = pd.read_csv('./natenews_data/keyword_1.0title.csv', index_col=0)
+
+##
+df = pd.DataFrame()
+df['titles'] = df_1['titles']
+df['0.0'] = df_1['keywords']
+df['0.5'] = df_2['keywords']
+df['1.0'] = df_3['keywords']
+df['contents'] = df_1['contents']
+
+df.to_csv('./natenews_data/keyword_titlew.csv')

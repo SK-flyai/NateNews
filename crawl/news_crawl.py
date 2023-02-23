@@ -1,87 +1,178 @@
 import requests
-import re
-import time
 
 from bs4 import BeautifulSoup as bs
 from preprocessing import text_cleaning
 
 
 LINK = 'https://news.nate.com/view/'
-# TODO: modulize
+HEADERS = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
 
 
 class NateNews:
     def __init__(self, url:str):
-        headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36'}
-        res = requests.get(url, headers=headers) # to prevent block crawling
-        assert res.status_code == 200
+        self.url = _convert_url(url)
+        res = requests.get(self.url, headers=HEADERS) # to prevent block crawling
+        assert res.status_code == 200 # to check valid request
         
-        self.url = url
-        html = res.text
-        self.content = bs(html, 'html.parser')
+        self.content = bs(res.text, 'html.parser')
+        
+        self.title = self._get_title()
+        self.category = self._get_category()
+        self.press = self._get_press()
+        self.date = self._get_date()
+        self.text = self._get_text()
     
-    def get_info(self):
+    # for making dataset or .ipynb    
+    def get_list(self):
         return[
-            self._get_title(),
-            self._get_category(),
-            self._get_press(),
-            self._get_date(),
-            self._get_content(),
+            self.title,
+            self.category,
+            self.press,
+            self.date,
+            self.text,
             self.url,
         ]
     
+    # for forwarding to flask
     def get_dict(self):
         return{
-            "title": self._get_title(),
-            "category": self._get_category(),
-            "press": self._get_press(),
-            "date": self._get_date(),
-            "content": self._get_content(),
+            "title": self.title,
+            "category": self.category,
+            "press": self.press,
+            "date": self.date,
+            "content": self.text,
             "image": self.image,
         }
+
+    ...
     
+    def _get_title(self):
+        _title = self.content.find('h3', {'class': 'viewTite'})
+        if not _title:
+            _title = self.content.find('h3', {'class': 'articleSubecjt'})
+        try:
+            title = _title.text
+        except:
+            title = ''
+        return title
+
+    def _get_category(self):
+        try:
+            nav = self.content.find('div', {'class': 'snbArea'})
+            _category = nav.find('li', {'class': 'on'})
+            category = _category.text
+        except:
+            category = ''
+        return category
+    
+    def _get_press(self):
+        _press = self.content.find('a', {'class': 'medium'})
+        try:
+            if _press and _press.text:
+                press = _press.text
+            else:
+                press = self.content.find('dl', {'class': 'articleInfo'}).select('img')[0]['alt']
+        except:
+            press = ''
+        return press
+    
+    def _get_date(self):
+        try:
+            date = self.content.find('em').text
+        except:
+            date = ''
+        return date
+    
+    def _get_text(self):
+        _text = self.content.find('div',{'id': 'articleContetns'})
+        try:
+            article, self.image = text_cleaning(_text)
+        except:
+            article, self.image = '', {}
+        return article
+
+    ...
+
+    # for content
+    @property
+    def content(self):
+        return self._content
+    
+    @content.setter
+    def content(self, article):
+        self._content = article
+    
+
+    # for title
+    @property
+    def title(self):
+        return self._title
+    
+    @title.setter
+    def title(self, title: str):
+        self._title = title
+    
+    
+    # for category
+    @property
+    def category(self):
+        return self._category
+    
+    @category.setter
+    def category(self, category: str):
+        self._category = category
+
+    
+    # for press
     @property
     def press(self):
-        return self._get_press()
+        return self._press
     
+    @press.setter
+    def press(self, press: str):
+        self._press = press
+        
+    
+    # date
+    @property
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, date: str):
+        self._date = date
+
+    
+    # text
+    @property
+    def text(self):
+        return self._text
+    
+    @text.setter
+    def text(self, text: str):
+        self._text = text
+
+    
+    # image
     @property
     def image(self):
         return self._image
 
     @image.setter
-    def image(self, img:dict):
-        self._image = img
+    def image(self, img: dict):
+        self._image: dict = img
 
-    def _get_content(self):
-        _article = self.content.find('div',{'id': 'articleContetns'})
-        article, self.image = text_cleaning(_article)
 
-        return article
-    
-    def _get_press(self):
-        _press = self.content.find('a', {'class': 'medium'})
-        if _press and _press.text:
-            press = _press.text
-        else:
-            press = self.content.find('dl', {'class': 'articleInfo'}).select('img')[0]['alt']
-        return press
-
-    def _get_category(self):
-        nav = self.content.find('div', {'class': 'snbArea'})
-        category = nav.find('li', {'class': 'on'})
-        return category.text if category else 'X'
-    
+    # url
     @property
-    def title(self):
-        return self._get_title()
+    def url(self):
+        return self._url
     
-    def _get_title(self):
-        title = self.content.find('h3', {'class': 'viewTite'})
-        if not title:
-            title = self.content.find('h3', {'class': 'articleSubecjt'})
-        return title.text
-    
-    def _get_date(self):
-        date = self.content.find('em').text
-        # date: dt.datetime = dt.datetime.strptime(_date, "%Y-%m-%d %H:%M")
-        return date
+    @url.setter
+    def url(self, url: str):
+        self._url = url
+
+
+def _convert_url(url:str):
+    url = url.split('?')[0].split('//')[-1]
+    return f"https://{url}"
