@@ -251,6 +251,7 @@ function SportMain({ navigation }) {
 
         <View style={{ flex: 1 }}>{views2}</View>
       </View>
+
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
   );
