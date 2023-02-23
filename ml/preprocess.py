@@ -1,5 +1,5 @@
 import os
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from typing import *
 import pandas as pd
 import pickle
@@ -18,7 +18,7 @@ class CustomTokenizer:
         명사들 = tokenizer(뉴스본문)
 
     """
-    def __init__(self, tagger: Union[Mecab, Tagger] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+    def __init__(self, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
                  user_words_path: str = './user_words'):
         """
         Args:
@@ -117,12 +117,12 @@ class CustomTokenizer:
         result = [word for word in word_tokens if len(word) > 1]
         # result = word_tokens
 
-        def func(x):
-            if x in self.mapping:
-                return self.mapping[x]
-            return x
+        # def func(x):
+        #     if x in self.mapping:
+        #         return self.mapping[x]
+        #     return x
 
-        result = list(map(func, result))
+        # result = list(map(func, result))
         result = list(filter(lambda x: x not in self.filtering, result))
         return result
 
@@ -131,10 +131,10 @@ if __name__ == '__main__':
 
     # tagger = Tagger()
 
-    tokenizer = CustomTokenizer(tagger=tagger)
+    # tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
-    tokenizer('중고나라')
+    tagger.pos('인생샷')
 
 ##
     cust_dic.update()

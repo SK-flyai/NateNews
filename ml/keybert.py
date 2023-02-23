@@ -3,7 +3,7 @@ from typing import *
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from pathlib import Path
 import numpy as np
 import itertools
@@ -26,7 +26,7 @@ class KeyBERT:
         keybert = KeyBERT(model_path='sinjy1203/ko-sbert-natenews')
         키워드들 5개 = keybert.pred(뉴스내용한개)
     """
-    def __init__(self, tagger: Union[Tagger, Mecab] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+    def __init__(self, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
                  model_path="sinjy1203/ko-sbert-natenews", user_words_path: str = './user_words'):
         """
         Args:

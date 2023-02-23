@@ -6,7 +6,7 @@ from tqdm import tqdm
 import numpy as np
 import kss
 from preprocess import CustomTokenizer
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from sklearn.feature_extraction.text import CountVectorizer
 
 from newspred import NewsModel
@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     tokenizer = CustomTokenizer(tagger=tagger)
 
-    pred_range = (250, 300)
+    pred_range = (300, 350)
 
     # model_path = "./ko-sbert-natenews"
     # word_model = KeyBERT(model_path=model_path)
