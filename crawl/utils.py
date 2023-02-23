@@ -243,6 +243,7 @@ def _create(url: str):
         # 특수 기사들은 제외
         title = new_class.title
         if '[속보]' in title or '[포토]' in title or '[부고]' in title:
+            print(f"{url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
         content_len = len(_remove_bracket(text_cleaning(article)[0]))
