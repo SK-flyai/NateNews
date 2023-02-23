@@ -7,9 +7,9 @@ from tqdm import tqdm
 import numpy as np
 import kss
 from preprocess import CustomTokenizer
-from konlpy.tag import Mecab
 from sklearn.feature_extraction.text import CountVectorizer
 from bareunpy import Tagger
+import time
 
 class NewsModel:
     """
@@ -22,7 +22,7 @@ class NewsModel:
     keysent_model = KeySentence(model_path=model_path)
 
     """
-    def __init__(self, tagger: Union[Tagger, Mecab] = Mecab(), model_path: str = 'sinjy1203/ko-sbert-natenews',
+    def __init__(self, tagger: Tagger, model_path: str = 'sinjy1203/ko-sbert-natenews',
                  user_words_path: str = './user_words'):
         """
         Args:
@@ -66,9 +66,13 @@ if __name__ == '__main__':
     ##
     tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
     model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
-    keywords, keysent = model.predict(df.loc[202, 'contents'], df.loc[202, 'titles'], word_top_n=20,
+
+    ##
+    st = time.time()
+    keywords, keysent = model.predict(df.loc[100, 'contents'], df.loc[100, 'titles'], word_top_n=20,
                                       sent_top_n=3, title_w=0.5, diversity=0)
     print(keywords)
+    print(time.time() - st)
 
     ##
     tokenizer = CustomTokenizer(tagger=tagger)

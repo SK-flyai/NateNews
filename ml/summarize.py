@@ -1,7 +1,6 @@
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
-from konlpy.tag import Mecab
 from pathlib import Path
 import numpy as np
 import itertools
