@@ -1,3 +1,8 @@
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
@@ -8,7 +13,7 @@ const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
-function EconomicMain({ navigation }) {
+function TotalMain({ navigation }) {
   const links = [];
   const titles = [];
   const categories = [];
@@ -47,13 +52,13 @@ function EconomicMain({ navigation }) {
   }
 
   const views = [];
-  for (let i = 0; i < 5; i++) {
+  for (let i = 1; i < 6; i++) {
     const urlsend = links[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
       Image.getSize(
-        images[0],
+        images[1],
         (width, height) => {
           setAspectRatio(width / height);
         },
@@ -63,7 +68,7 @@ function EconomicMain({ navigation }) {
       );
     }, []);
 
-    const isFirstView = i === 0; // check if it's the first view
+    const isFirstView = i === 1; // check if it's the first view
     const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
     const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
     const num = isFirstView ? 2 : 1;
@@ -109,7 +114,7 @@ function EconomicMain({ navigation }) {
           onPress={() => {
             urlPushClick(urlsend);
             console.log(urlsend); // call urlPushClick with the appropriate text
-            navigation.navigate("EconomicContent", links[i]);
+            navigation.navigate("TotalContent", links[i]);
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
@@ -127,7 +132,7 @@ function EconomicMain({ navigation }) {
   }
 
   const views2 = [];
-  for (let i = 5; i < 15; i++) {
+  for (let i = 6; i < 16; i++) {
     const urlsend = links[i];
 
     views2.push(
@@ -137,7 +142,7 @@ function EconomicMain({ navigation }) {
           onPress={() => {
             urlPushClick(urlsend);
             console.log(urlsend); // call urlPushClick with the appropriate text
-            navigation.navigate("EconomicContent", links[i]);
+            navigation.navigate("TotalContent", links[i]);
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
@@ -230,7 +235,7 @@ function EconomicMain({ navigation }) {
   );
 }
 
-export default EconomicMain;
+export default TotalMain;
 
 const styles = StyleSheet.create({
   divider: {

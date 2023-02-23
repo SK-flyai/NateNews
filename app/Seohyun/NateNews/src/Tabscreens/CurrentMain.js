@@ -1,3 +1,8 @@
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
@@ -8,7 +13,7 @@ const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
-function EconomicMain({ navigation }) {
+function CurrentMain({ navigation }) {
   const links = [];
   const titles = [];
   const categories = [];
@@ -109,7 +114,7 @@ function EconomicMain({ navigation }) {
           onPress={() => {
             urlPushClick(urlsend);
             console.log(urlsend); // call urlPushClick with the appropriate text
-            navigation.navigate("EconomicContent", links[i]);
+            navigation.navigate("CurrentContent", links[i]);
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
@@ -137,7 +142,7 @@ function EconomicMain({ navigation }) {
           onPress={() => {
             urlPushClick(urlsend);
             console.log(urlsend); // call urlPushClick with the appropriate text
-            navigation.navigate("EconomicContent", links[i]);
+            navigation.navigate("CurrentContent", links[i]);
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
@@ -230,7 +235,7 @@ function EconomicMain({ navigation }) {
   );
 }
 
-export default EconomicMain;
+export default CurrentMain;
 
 const styles = StyleSheet.create({
   divider: {

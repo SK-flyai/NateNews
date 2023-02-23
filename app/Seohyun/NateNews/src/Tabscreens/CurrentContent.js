@@ -19,6 +19,12 @@ const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
 
+const recSentences = [];
+const recKeywords = [];
+const recLinks = [];
+
+let keywordnum = 0;
+
 var title = "";
 var category = "";
 var press = "";
@@ -27,15 +33,9 @@ var content = "";
 var caption = "";
 var img = "";
 
-const recSentences = [];
-const recKeywords = [];
-const recLinks = [];
-
-let keywordnum = 0;
-
-for (var key in data2.keyword) {
-  recKeywords.push(key + "  ");
-  recLinks.push(data2.keyword[key]);
+for (var key1 in data2.keyword) {
+  recKeywords.push(key1 + "  ");
+  recLinks.push(data2.keyword[key1]);
 }
 
 for (var key2 in data2.sentence) {
@@ -43,9 +43,10 @@ for (var key2 in data2.sentence) {
 }
 
 let keywordcnt = recKeywords.length;
-const keywordlist = [];
+let keywordlist = [];
+let modallink = [];
 
-const SportContent = ({ route }) => {
+const CurrentContent = ({ route }) => {
   const link = route.params;
 
   title = data.spo[link].title;
@@ -59,9 +60,19 @@ const SportContent = ({ route }) => {
     break;
   }
 
-  const [isModalVisible1, setModalVisible1] = useState(false);
-  const [isModalVisible2, setModalVisible2] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
+
+  const [isModalVisible2, setModalVisible2] = useState(false);
+  const toggleModal2 = () => {
+    setModalVisible2(!isModalVisible2);
+  };
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const toggleModal1 = (keywordnum) => {
+    setModalVisible1(!isModalVisible1);
+    console.log(keywordnum);
+    modallink = recLinks[keywordnum];
+  };
 
   useEffect(() => {
     Image.getSize(
@@ -91,21 +102,14 @@ const SportContent = ({ route }) => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
   }, [isModalVisible1, isModalVisible2]);
-
-  const toggleModal1 = () => {
-    setModalVisible1(!isModalVisible1);
-  };
-
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
   const newContect = content.replace(/ /g, "\u00A0");
 
-  for (let i = 0; i < keywordcnt; i++) {
-    keywordlist.push(
+  keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
+    const keywordnum = i;
+    return (
       <View key={i}>
         <Pressable
-          onPress={imagePress}
+          onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
@@ -117,7 +121,7 @@ const SportContent = ({ route }) => {
             <Text
               style={{
                 fontSize: 15,
-                backgroundColor: "yellow",
+                backgroundColor: "lightgrey",
               }}
             >
               {recKeywords[i]}
@@ -127,7 +131,7 @@ const SportContent = ({ route }) => {
         </Pressable>
       </View>
     );
-  }
+  });
 
   return (
     <SafeAreaView
@@ -190,6 +194,32 @@ const SportContent = ({ route }) => {
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
+            <View
+              style={{
+                flex: 1,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>{"\n"}</Text>
+              <View
+                style={{
+                  flex: 1,
+                  width: width * 0.75,
+                  backgroundColor: "lightblue",
+                  borderRadius: 8,
+                  padding: "5%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                </Text>
+              </View>
+            </View>
             <Text
               style={{
                 padding: 5,
@@ -199,31 +229,11 @@ const SportContent = ({ route }) => {
             >
               {newContect}
             </Text>
-            <Pressable
-              onPress={toggleModal2}
-              android_ripple={{ color: "purple" }}
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
-                flex: 1,
-                backgroundColor: "yellow",
-              }}
-            >
-              <View style={{ flex: 1, width: width * 0.95 }}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                  }}
-                >
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal
-                </Text>
-              </View>
-            </Pressable>
           </View>
-
+          <View>
+            <Text>{"\n"}</Text>
+            {keywordlist}
+          </View>
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}
@@ -242,7 +252,7 @@ const SportContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {newContect}
+                  {modallink}
                 </Text>
               </ScrollView>
             </View>
@@ -265,37 +275,13 @@ const SportContent = ({ route }) => {
               </ScrollView>
             </View>
           </Modal>
-          <View style={{ flex: 1 }}>
-            <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-              {content}
-            </Text>
-            <Text>{"\n"}</Text>
-
-            <View
-              style={{
-                flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightgrey",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "bold",
-                }}
-              >
-                {recSentences}
-              </Text>
-            </View>
-            <View>{keywordlist}</View>
-          </View>
         </ScrollView>
       </View>
     </SafeAreaView>
   );
 };
 
-export default SportContent;
+export default CurrentContent;
 
 const styles = StyleSheet.create({
   // 기사 제목 style
