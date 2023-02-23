@@ -7,6 +7,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import { Pressable, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import data from "../flask/ranking.json";
 
 const { width } = Dimensions.get("window");
@@ -210,7 +211,7 @@ function SportMain({ navigation }) {
         <TouchableOpacity
           onPress={() => navigation.navigate("SportContent", links[i])}
         >
-          <View>
+          <View style={{ flexDirection: "row" }}>
             <Image
               style={{
                 width: SmallImageWidth,
@@ -221,9 +222,21 @@ function SportMain({ navigation }) {
               source={{ uri: images[i] }}
             />
 
+<<<<<<< HEAD
             <View>
               <Text style={{ fontWeight: "bold" }}>{titles[i]}</Text>
 >>>>>>> 929584e (02/22 09:41)
+=======
+            <View
+              style={{
+                marginLeft: "1%",
+                width: width - (SmallImageWidth + 20),
+              }}
+            >
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+                {titles[i]}
+              </Text>
+>>>>>>> 93555d0 (230222 11:58)
               <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
                 {presses[i]}
               </Text>
@@ -275,7 +288,7 @@ function SportMain({ navigation }) {
                 marginVertical: "2%",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: "pink",
+                backgroundColor: "white",
                 flexDirection: "row",
               }}
             >
@@ -347,15 +360,14 @@ function SportMain({ navigation }) {
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
             스포츠 주요뉴스
           </Text>
-          <View style={styles.divider} />
-          <View>
-            <Text>{views}</Text>
-          </View>
+
+          <View style={{ flex: 1 }}>{views}</View>
         </View>
 
         <View style={styles.divider} />
 >>>>>>> 929584e (02/22 09:41)
       </View>
+<<<<<<< HEAD
       <View
         style={{
           flex: 1,
@@ -369,6 +381,8 @@ function SportMain({ navigation }) {
 
         <View style={{ flex: 1 }}>{views2}</View>
       </View>
+=======
+>>>>>>> 93555d0 (230222 11:58)
 
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
