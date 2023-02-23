@@ -10,10 +10,16 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Divider } from "react-native-elements";
-import { Button } from "react-native-elements";
+
 import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
+<<<<<<< HEAD
+=======
+import { Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
+>>>>>>> a042843 (Initial commit)
 
 const styles = StyleSheet.create({
   // 기사 제목 style
