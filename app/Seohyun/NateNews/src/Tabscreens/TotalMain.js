@@ -21,6 +21,23 @@ function TotalMain({ navigation }) {
   const dates = [];
   const contents = [];
   const images = [];
+  var urlLink = "";
+  const [result, setResult] = useState(null);
+
+  const urlPushClick = (urls) => {
+    console.log(`urlPushClicked`);
+    fetch("http://192.168.11.162:5000/push_url", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ text: urls }),
+    })
+      .then((response) => response.json())
+      .then((data) => setResult(data.message))
+      .catch((error) => setResult(error.message));
+  };
+
   for (var key in data.spo) {
     links.push(key);
     titles.push(data.spo[key].title);
@@ -29,7 +46,6 @@ function TotalMain({ navigation }) {
     dates.push(data.spo[key].date);
     contents.push(data.spo[key].content);
     for (var key2 in data.spo[key].image) {
-      // console.log(data.spo[key].image[key2]);
       images.push(key2);
       break;
     }
@@ -37,85 +53,7 @@ function TotalMain({ navigation }) {
 
   const views = [];
   for (let i = 0; i < 5; i++) {
-    const [aspectRatio, setAspectRatio] = useState(null);
-
-    useEffect(() => {
-      Image.getSize(
-        images[0],
-        (width, height) => {
-          setAspectRatio(width / height);
-        },
-        (error) => {
-          console.error(error);
-        }
-      );
-    }, []);
-
-    const isFirstView = i === 0; // check if it's the first view
-    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
-    const imageHeight = isFirstView ? width : width * 0.12; // set image width based on isFirstView
-    const num = isFirstView ? 2 : 1;
-    const Istyle = isFirstView
-      ? {
-          width: imageWidth,
-          aspectRatio,
-          backgroundColor: "white",
-        }
-      : {
-          width: imageWidth,
-          height: imageHeight,
-          backgroundColor: "white",
-          resizeMode: "stretch",
-        };
-
-    const fview = isFirstView ? (
-      <Image style={Istyle} source={{ uri: images[i] }} />
-    ) : null;
-    const nameView = isFirstView
-      ? {
-          marginLeft: "1%",
-          width: width - (imageWidth + 20),
-          justifyContent: "center",
-          fontWeight: "bold",
-        }
-      : {
-          marginLeft: "1%",
-          width: width * 0.93,
-          marginVertical: "2%",
-          justifyContent: "center",
-        };
-    const newDivider = isFirstView ? (
-      <View style={{ marginVertical: "2%" }} />
-    ) : (
-      <View style={styles.divider} />
-    );
-
-    views.push(
-      <View styles={{ flex: 1 }} key={i}>
-        {newDivider}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SportContent", links[i])}
-        >
-          <View style={{ flex: 1, flexDirection: "row" }}>
-            {fview}
-
-            <View style={nameView}>
-              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
-                {titles[i].replace(/ /g, "\u00A0")}
-              </Text>
-              {/* <Text numberOfLines={2}>{news}</Text> */}
-              {/* <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
-                {presses[i]}
-              </Text> */}
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  const views2 = [];
-  for (let i = 5; i < 20; i++) {
+    const urlsend = links[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
@@ -147,14 +85,76 @@ function TotalMain({ navigation }) {
           resizeMode: "stretch",
         };
 
+    const fview = isFirstView ? (
+      <Image style={Istyle} source={{ uri: images[i] }} />
+    ) : null;
+    const nameView = isFirstView
+      ? {
+          marginLeft: "1%",
+          width: width - (imageWidth + 20),
+          justifyContent: "center",
+          fontWeight: "bold",
+        }
+      : {
+          marginLeft: "1%",
+          width: width * 0.93,
+          marginVertical: "2%",
+          justifyContent: "center",
+        };
+    const newDivider = isFirstView ? (
+      <View style={{ marginVertical: "3%" }} />
+    ) : (
+      <View style={styles.divider} />
+    );
+
+    views.push(
+      <View styles={{ flex: 1 }} key={i}>
+        {newDivider}
+        <TouchableOpacity
+          onPress={() => {
+            urlPushClick(urlsend);
+            console.log(urlsend); // call urlPushClick with the appropriate text
+            navigation.navigate("TotalContent", links[i]);
+          }}
+        >
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            {fview}
+
+            <View style={nameView}>
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const views2 = [];
+  for (let i = 5; i < 10; i++) {
+    const urlsend = links[i];
+
     views2.push(
       <View styles={{ flex: 1 }} key={i}>
         <View style={styles.divider} />
         <TouchableOpacity
-          onPress={() => navigation.navigate("SportContent", links[i])}
+          onPress={() => {
+            urlPushClick(urlsend);
+            console.log(urlsend); // call urlPushClick with the appropriate text
+            navigation.navigate("TotalContent", links[i]);
+          }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
-            <Image style={Istyle} source={{ uri: images[i] }} />
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: width * 0.12,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
 
             <View
               style={{
@@ -163,7 +163,7 @@ function TotalMain({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
                 {titles[i].replace(/ /g, "\u00A0")}
               </Text>
 
@@ -229,6 +229,7 @@ function TotalMain({ navigation }) {
 
         <View style={{ flex: 1 }}>{views2}</View>
       </View>
+
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
   );

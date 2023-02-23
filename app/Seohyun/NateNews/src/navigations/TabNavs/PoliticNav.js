@@ -9,7 +9,7 @@ const Stack = createStackNavigator();
 const PoliticNav = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen // Page2 - '정치' Tab (뉴스 기사 목록)
+      <Stack.Screen // Page2 - '스포츠' Tab (뉴스 기사 목록)
         name="PoliticMain"
         component={PoliticMain}
         options={{
@@ -33,7 +33,7 @@ const PoliticNav = () => {
         }}
       />
 
-      <Stack.Screen // Page3 - '정치' Tab (뉴스 기사 본문)
+      <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
         name="PoliticContent"
         component={PoliticContent}
         options={{

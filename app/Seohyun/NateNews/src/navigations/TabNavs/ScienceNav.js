@@ -1,17 +1,16 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform } from "react-native";
-import EntertainmentMain from "../../Tabscreens/EntertainmentMain";
-import EntertainmentContent from "../../Tabscreens/EntertainmentContent";
-
+import ScienceMain from "../../Tabscreens/ScienceMain";
+import ScienceContent from "../../Tabscreens/ScienceContent";
 const Stack = createStackNavigator();
 
-const EntertainmentNav = () => {
+const ScienceNav = () => {
   return (
     <Stack.Navigator>
-      <Stack.Screen // Page2 - '연예' Tab (뉴스 기사 목록)
-        name="EntertainmentMain"
-        component={EntertainmentMain}
+      <Stack.Screen // Page2 - '스포츠' Tab (뉴스 기사 목록)
+        name="ScienceMain"
+        component={ScienceMain}
         options={{
           headerShown: false,
           headerStyle: {
@@ -33,9 +32,9 @@ const EntertainmentNav = () => {
         }}
       />
 
-      <Stack.Screen // Page3 - '연예' Tab (뉴스 기사 본문)
-        name="EntertainmentContent"
-        component={EntertainmentContent}
+      <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
+        name="ScienceContent"
+        component={ScienceContent}
         options={{
           headerShown: false,
           headerStyle: {
@@ -60,4 +59,4 @@ const EntertainmentNav = () => {
   );
 };
 
-export default EntertainmentNav;
+export default ScienceNav;

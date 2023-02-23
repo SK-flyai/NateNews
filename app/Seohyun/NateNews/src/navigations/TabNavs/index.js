@@ -1,15 +1,19 @@
+import TotalNav from "./TotalNav";
+import CurrentNav from "./CurrentNav";
 import SportNav from "./SportNav";
-import EntertainmentNav from "./EntertainmentNav";
+
 import PoliticNav from "./PoliticNav";
 import EconomicNav from "./EconomicNav";
 import SocialNav from "./SocialNav";
 import WorldNav from "./WorldNav";
-
+import ScienceNav from "./ScienceNav";
 export {
+  TotalNav,
+  CurrentNav,
   SportNav,
-  EntertainmentNav,
   PoliticNav,
   EconomicNav,
   SocialNav,
   WorldNav,
+  ScienceNav,
 };

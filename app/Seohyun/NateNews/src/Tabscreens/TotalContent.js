@@ -17,6 +17,12 @@ import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
+import data2 from "../flask/recommend.json";
+
+const recSentences = [];
+const recKeywords = [];
+const recLinks = [];
+let keywordnum = 0;
 
 var title = "";
 var category = "";
@@ -25,6 +31,18 @@ var date = "";
 var content = "";
 var caption = "";
 var img = "";
+
+for (var key1 in data2.keyword) {
+  recKeywords.push(key1 + "  ");
+  recLinks.push(data2.keyword[key1]);
+}
+
+for (var key2 in data2.sentence) {
+  recSentences.push(data2.sentence[key2] + "\n\n");
+}
+
+let keywordcnt = recKeywords.length;
+const keywordlist = [];
 
 const TotalContent = ({ route }) => {
   const link = route.params;
@@ -35,8 +53,8 @@ const TotalContent = ({ route }) => {
   date = data.spo[link].date;
   content = data.spo[link].content;
   caption = data.spo[link].caption;
-  for (var key in data.spo[link].image) {
-    img = key;
+  for (var key3 in data.spo[link].image) {
+    img = key3;
     break;
   }
 
@@ -80,7 +98,36 @@ const TotalContent = ({ route }) => {
   const toggleModal2 = () => {
     setModalVisible2(!isModalVisible2);
   };
-  const newContect = content.replace(/ /g, "\u00A0");
+  const newContent = content.replace(/ /g, "\u00A0");
+
+  for (let i = 0; i < keywordcnt; i++) {
+    keywordnum = i + 1;
+    keywordlist.push(
+      <View key={i}>
+        <Pressable
+          onPress={toggleModal1}
+          android_ripple={{ color: "purple" }}
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+          }}
+        >
+          <View style={{ flex: 1, width: width * 0.95 }}>
+            <Text
+              style={{
+                fontSize: 15,
+                backgroundColor: "lightgrey",
+              }}
+            >
+              {recKeywords[i]}
+            </Text>
+            <Text>{"\n"}</Text>
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView
@@ -143,40 +190,44 @@ const TotalContent = ({ route }) => {
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
-            <Text
+            <View
               style={{
-                padding: 5,
-                marginTop: 10,
-                fontSize: 15,
-              }}
-            >
-              {newContect}
-            </Text>
-            <Pressable
-              onPress={toggleModal2}
-              android_ripple={{ color: "purple" }}
-              style={{
-                justifyContent: "center",
-                alignItems: "center",
                 flex: 1,
-                backgroundColor: "yellow",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <View style={{ flex: 1, width: width * 0.95 }}>
+              <View
+                style={{
+                  flex: 1,
+                  padding: "5%",
+
+                  width: width * 0.8,
+                  backgroundColor: "lightblue",
+                  borderRadius: 6,
+                }}
+              >
                 <Text
                   style={{
                     fontSize: 15,
                   }}
                 >
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
-                  Modal Modal
+                  {recSentences}
                 </Text>
               </View>
-            </Pressable>
+              <Text
+                style={{
+                  padding: 5,
+                  marginTop: 10,
+                  fontSize: 15,
+                }}
+              >
+                {newContent}
+              </Text>
+            </View>
           </View>
 
+          <View>{keywordlist}</View>
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}
@@ -195,7 +246,7 @@ const TotalContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {newContect}
+                  {keywordnum}
                 </Text>
               </ScrollView>
             </View>

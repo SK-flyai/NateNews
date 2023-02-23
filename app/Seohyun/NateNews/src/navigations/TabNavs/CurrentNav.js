@@ -1,8 +1,8 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform } from "react-native";
-import TotalMain from "../../Tabscreens/TotalMain";
-import TotalContent from "../../Tabscreens/TotalContent";
+import CurrentMain from "../../Tabscreens/CurrentMain";
+import CurrentContent from "../../Tabscreens/CurrentContent";
 
 const Stack = createStackNavigator();
 
@@ -10,8 +10,8 @@ const CurrentNav = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen // Page2 - '스포츠' Tab (뉴스 기사 목록)
-        name="TotalMain"
-        component={TotalMain}
+        name="CurrentMain"
+        component={CurrentMain}
         options={{
           headerShown: false,
           headerStyle: {
@@ -34,8 +34,8 @@ const CurrentNav = () => {
       />
 
       <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
-        name="TotalContent"
-        component={TotalContent}
+        name="CurrentContent"
+        component={CurrentContent}
         options={{
           headerShown: false,
           headerStyle: {

@@ -44,7 +44,7 @@ for (var key2 in data2.sentence) {
 let keywordcnt = recKeywords.length;
 const keywordlist = [];
 
-const EconomicContent = ({ route }) => {
+const ScienceContent = ({ route }) => {
   const link = route.params;
 
   title = data.spo[link].title;
@@ -268,7 +268,7 @@ const EconomicContent = ({ route }) => {
   );
 };
 
-export default EconomicContent;
+export default ScienceContent;
 
 const styles = StyleSheet.create({
   // 기사 제목 style

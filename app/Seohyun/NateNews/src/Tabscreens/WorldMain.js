@@ -1,197 +1,270 @@
-import React from "react";
-import styled from "styled-components/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Text, FlatList, StyleSheet, SafeAreaView } from "react-native";
-import SearchBar from "../components/Searchbar";
-import { Button } from "react-native-elements";
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import { Dimensions } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import data from "../flask/ranking.json";
 
-const DATA = [
-  {
-    id: "1",
-    title: "1. 곽상도가 돈 달래, 아들 통해서 녹음파일...",
-  },
-  {
-    id: "2",
-    title: "2. 탄핵안 설명 중에…'필리핀 날씨' 검색한...",
-  },
-  {
-    id: "3",
-    title: "3. 편의점 직원 살해 후 달아난 30대…",
-  },
-  {
-    id: "4",
-    title: "4. 대기업 다니던 딸, 출산 중 지적장애 얻어…",
-  },
-  {
-    id: "5",
-    title: "5. 빅뱅 승리 오늘(9일) 오전 출소",
-  },
-  {
-    id: "6",
-    title: "6. 신정환, 라방 중 도박·뎅기열 언급하는...",
-  },
-  {
-    id: "7",
-    title: "7. '기부 요정' 한지민, 튀르키예·시리아...",
-  },
-  {
-    id: "8",
-    title: "8. 송민호 맞아? 몰라보게 달라진 충격 근황...",
-  },
-  {
-    id: "9",
-    title: "9. 유재석, 갈비뼈 실금 간 전소민에...",
-  },
-  {
-    id: "10",
-    title: "10. 조국 딸 600만 원 '유죄', 곽상도 아들 50억...",
-  },
-  {
-    id: "11",
-    title: "11. 곽상도가 돈 달래, 아들 통해서 녹음파일...",
-  },
-  {
-    id: "12",
-    title: "12. 탄핵안 설명 중에…'필리핀 날씨' 검색한...",
-  },
-  {
-    id: "13",
-    title: "13. 편의점 직원 살해 후 달아난 30대…",
-  },
-  {
-    id: "14",
-    title: "14. 대기업 다니던 딸, 출산 중 지적장애 얻어…",
-  },
-  {
-    id: "15",
-    title: "15. 빅뱅 승리 오늘(9일) 오전 출소",
-  },
-  {
-    id: "16",
-    title: "16. 신정환, 라방 중 도박·뎅기열 언급하는...",
-  },
-  {
-    id: "17",
-    title: "17. '기부 요정' 한지민, 튀르키예·시리아...",
-  },
-  {
-    id: "18",
-    title: "18. 송민호 맞아? 몰라보게 달라진 충격 근황...",
-  },
-  {
-    id: "19",
-    title: "19. 유재석, 갈비뼈 실금 간 전소민에...",
-  },
-  {
-    id: "20",
-    title: "20. 조국 딸 600만 원 '유죄', 곽상도 아들 50억...",
-  },
-];
+const { width } = Dimensions.get("window");
+const Imagewidth = width * 0.3;
+const SmallImageWidth = width * 0.15;
 
-const styles = StyleSheet.create({
-  // 기사 제목 style
-  container: {
-    flex: 1,
-    width: "100%",
-  },
-  item: {
-    padding: 18,
-    marginHorizontal: 0,
-  },
-  separator: {
-    backgroundColor: "#e0e0e0",
-    height: 1,
-  },
-  title: {
-    fontSize: 16,
-    ...Platform.select({
-      ios: {
-        fontFamily: "Futura",
+function WorldMain({ navigation }) {
+  const links = [];
+  const titles = [];
+  const categories = [];
+  const presses = [];
+  const dates = [];
+  const contents = [];
+  const images = [];
+  var urlLink = "";
+  const [result, setResult] = useState(null);
+
+  const urlPushClick = (urls) => {
+    console.log(`urlPushClicked`);
+    fetch("http://192.168.11.162:5000/push_url", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      android: {
-        fontFamily: "monospace",
-      },
-    }),
-  },
-});
+      body: JSON.stringify({ text: urls }),
+    })
+      .then((response) => response.json())
+      .then((data) => setResult(data.message))
+      .catch((error) => setResult(error.message));
+  };
 
-const Container = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.background};
-  padding: 0 5px;
-`;
+  for (var key in data.spo) {
+    links.push(key);
+    titles.push(data.spo[key].title);
+    categories.push(data.spo[key].category);
+    presses.push(data.spo[key].press);
+    dates.push(data.spo[key].date);
+    contents.push(data.spo[key].content);
+    for (var key2 in data.spo[key].image) {
+      images.push(key2);
+      break;
+    }
+  }
 
-const WorldMain = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
+  const views = [];
+  for (let i = 0; i < 5; i++) {
+    const urlsend = links[i];
+    const [aspectRatio, setAspectRatio] = useState(null);
 
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const todaydate = date.getDate();
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
 
-  return (
-    <Container insets={insets}>
-      <View>
-        <Text
-          style={{
-            fontWeight: "bold",
-            fontSize: 20,
-            marginBottom: 10,
-            marginTop: 10,
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
+
+    const fview = isFirstView ? (
+      <Image style={Istyle} source={{ uri: images[i] }} />
+    ) : null;
+    const nameView = isFirstView
+      ? {
+          marginLeft: "1%",
+          width: width - (imageWidth + 20),
+          justifyContent: "center",
+          fontWeight: "bold",
+        }
+      : {
+          marginLeft: "1%",
+          width: width * 0.93,
+          marginVertical: "2%",
+          justifyContent: "center",
+        };
+    const newDivider = isFirstView ? (
+      <View style={{ marginVertical: "3%" }} />
+    ) : (
+      <View style={styles.divider} />
+    );
+
+    views.push(
+      <View styles={{ flex: 1 }} key={i}>
+        {newDivider}
+        <TouchableOpacity
+          onPress={() => {
+            urlPushClick(urlsend);
+            console.log(urlsend); // call urlPushClick with the appropriate text
+            navigation.navigate("WorldContent", links[i]);
           }}
         >
-          {year}.{month}.{todaydate}
-        </Text>
-      </View>
-      <SearchBar />
-      <SafeAreaView
-        style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
-      >
-        {/*기사 목록 FlatList로 띄움*/}
-        <FlatList
-          showsVerticalScrollIndicator={false}
-          data={DATA}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <View>
-              <Button
-                title={item.title}
-                titleStyle={{
-                  color: "black",
-                  ...Platform.select({
-                    ios: {
-                      fontFamily: "Futura",
-                    },
-                    android: {
-                      fontFamily: "monospace",
-                    },
-                  }),
-                }}
-                onPress={() => navigation.navigate("WorldContent")}
-                buttonStyle={{
-                  backgroundColor: "white",
-                  margin: 10,
-                  alignSelf: "flex-start",
-                }}
-              >
-                <Text>{item.title}</Text>
-              </Button>
-              {index !== DATA.length - 1 && (
-                <View
-                  style={{
-                    borderBottomColor: "#e0e0e0",
-                    borderBottomWidth: 1,
-                  }}
-                />
-              )}
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            {fview}
+
+            <View style={nameView}>
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
             </View>
-          )}
-        />
-      </SafeAreaView>
-    </Container>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const views2 = [];
+  for (let i = 5; i < 10; i++) {
+    const urlsend = links[i];
+
+    views2.push(
+      <View styles={{ flex: 1 }} key={i}>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          onPress={() => {
+            urlPushClick(urlsend);
+            console.log(urlsend); // call urlPushClick with the appropriate text
+            navigation.navigate("WorldContent", links[i]);
+          }}
+        >
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Image
+              style={{
+                width: SmallImageWidth,
+                height: width * 0.12,
+                backgroundColor: "black",
+                resizeMode: "stretch",
+              }}
+              source={{ uri: images[i] }}
+            />
+
+            <View
+              style={{
+                marginLeft: "1%",
+                width: width * 0.8,
+                justifyContent: "center",
+              }}
+            >
+              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
+
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          marginHorizontal: "3%",
+          marginTop: "3%",
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          얼음판 위엔 연아킴 비트위엔 vj 항상 기막힌
+        </Text>
+        <View style={{ flex: 1 }}>{views}</View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <View style={[styles.middle]}>
+          <Text>2030 부산 액스포</Text>
+        </View>
+        <View
+          style={[
+            styles.middle,
+            { borderLeftWidth: 1 },
+            { borderRightWidth: 1 },
+          ]}
+        >
+          <Text>20대 대통령 윤석열</Text>
+        </View>
+        <View style={styles.middle}>
+          <Text>코로나 19 현황</Text>
+        </View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          marginHorizontal: "3%",
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          스포츠 주요뉴스
+        </Text>
+
+        <View style={{ flex: 1 }}>{views2}</View>
+      </View>
+
+      <View style={[styles.divider, { borderBottomWidth: 10 }]} />
+    </ScrollView>
   );
-};
+}
 
 export default WorldMain;
+
+const styles = StyleSheet.create({
+  divider: {
+    borderBottomColor: "#e0e0e0",
+    borderBottomWidth: 1,
+    marginVertical: "1%",
+  },
+  firstViewContainer: {
+    backgroundColor: "lightgrey",
+    width: 150,
+    justifyContent: "center",
+  },
+  mainnews: {
+    marginVertical: "2%",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    flexDirection: "row",
+  },
+  textcontainer: {
+    flex: 1,
+    marginLeft: "1%",
+    backgroundColor: "white",
+  },
+  middle: {
+    flex: 1,
+    borderColor: "#e0e0e0",
+    paddingVertical: "2%",
+
+    marginVertical: "3%",
+    borderTopWidth: 10,
+    borderBottomWidth: 15,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
