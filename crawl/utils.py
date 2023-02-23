@@ -234,7 +234,7 @@ def _create(url:str):
             return None
         # 기사가 있다 -> 길이 확인하기
         if len(news.text) < 300:
-            print(f'{news.url} has too short article!')
+            print(f"{news.url} has too short article!")
             return None
         else:
             return news
