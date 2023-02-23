@@ -2,13 +2,11 @@ from bs4 import BeautifulSoup as bs
 from concurrent.futures import ThreadPoolExecutor
 from news_crawl import NateNews
 from preprocessing import text_cleaning
-from typing import List
 from typing import List, Union
 
 import datetime as dt
 import pandas as pd
 import requests
-import time
 import re
 
 
@@ -33,11 +31,10 @@ def get_news_df(
     info_list = list()
     for news in news_list:
         try:
-            info_list.append(news.get_info())
+            info_list.append(news.get_list())
         except:
             print('Error occurs')
             print(news.url)
-    # info_list = [news.get_info() for news in news_list]
     return pd.DataFrame(info_list, columns=COLUMNS)
 
 
@@ -55,11 +52,11 @@ def get_news(
             2. None: Abnormal Request(won't get that page)
     """
     url_list = url_list if isinstance(url_list, list) else [url_list]
+
     if len(url_list) < 100:
         with ThreadPoolExecutor(max_workers=10) as mult:
             _news_list = list(mult.map(_create, url_list))
     else:
-        # _news_list = [_create(url) for url in url_list]
         _news_list = list()
         for url in url_list:
             try:
@@ -69,7 +66,6 @@ def get_news(
     
     news_list = [news for news in _news_list if news]
     return news_list
-
 
 def get_urls(
     date1: Union[int, None]=None,
@@ -205,39 +201,40 @@ def _create(url:str):
         Union[NateNews, None]: 
     """        
     # time.sleep(0.5)
-    # TODO: handling sleep stuff...
-    new_class = NateNews(url)
-    which_news = new_class.content.find(
-        'a',
-        {'class': 'svcname'}
-    ).text
+    # TODO: handling sleep stuff... => Only when collect huge amount of dataset
+    news = NateNews(url)
     
     # 연예 기사는 제외
-    if which_news == '연예':
+    
+    if news.category in [
+        "연예가화제",
+        "방송/가요",
+        "영화",
+        "해외연예",
+        "POLL",
+        "포토/TV",
+        "아이돌24시"
+    ]:
+        print(f"{news.url} is Entertainment News!")
         return None
 
     # 연합 뉴스들 제외
-    if new_class.press == 'AP연합뉴스' or new_class.press == 'EPA연합뉴스':
+    if news.press == 'AP연합뉴스' or news.press == 'EPA연합뉴스':
+        print(f"{news.url} is English News!")
         return None
-
-    article = new_class.content.find(
-        'div',
-        {'id': 'articleContetns'}
-    )
     
     # 기사가 없는 경우
-    if not article:
-        print(f"There's no article in {url}")
+    if not news.text:
+        print(f"{news.url} has no article!")
         return None
     else:
+        # 특수 기사들은 제외
+        if '[속보]' in news.title or '[포토]' in news.title or '[부고]' in news.title:
+            print(f"{news.url} is not Normal News!")
+            return None
         # 기사가 있다 -> 길이 확인하기
-        content_len = len(_remove_bracket(text_cleaning(article)))
-        if content_len < 300:
+        if len(news.text) < 300:
+            print(f'{news.url} has too short article!')
             return None
         else:
-            return new_class
-
-
-def _remove_bracket(text):
-    pattern = '\[[^\]]*\]'
-    return re.sub(pattern, '', text)
+            return news
