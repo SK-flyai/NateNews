@@ -4,7 +4,7 @@ from utils import get_news
 
 import datetime as dt
 import requests
-
+import json
 
 CATEGORY=['all', 'sisa', 'spo', 'pol', 'eco', 'soc', 'int', 'its']
 
@@ -27,7 +27,10 @@ def get_ranking(num: int=20):
         print(f"\n{category}")
         news_list = get_news(url_list)[:num]
         ranking_dict[category] = {news.url: news.get_dict() for news in news_list}
-    
+        
+    with open('C:/Users/frica/OneDrive/바탕 화면/GitHub/NateNews/app/Seohyun/NateNews/src/flask/ranking.json', 'w', -1, 'utf-8') as f : 
+            json.dump(ranking_dict, f, indent=4, ensure_ascii=False)
+             
     return ranking_dict
 
 def _get_ranking(
@@ -40,7 +43,6 @@ def _get_ranking(
     
     links = main.find_all('a')
     ranking = [link['href'] for link in links if 'nate.com/view' in link['href']]
-    
     return ranking
 
 if __name__ == '__main__':

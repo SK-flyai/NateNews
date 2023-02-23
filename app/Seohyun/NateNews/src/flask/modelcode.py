@@ -1,5 +1,6 @@
-def modelcode(url):
-    print("URL : ", url)
+def modelcode(title, doc):
+    print("Title : ", title)
+    print("Doc : ", doc)
     print("MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL")
     print("MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL")
     print("MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL")

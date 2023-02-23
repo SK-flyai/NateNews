@@ -8,7 +8,6 @@ import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import { Pressable, TouchableOpacity } from "react-native";
 import data from "../flask/ranking.json";
-
 const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
@@ -24,14 +23,14 @@ function SportMain({ navigation }) {
   var urlLink = "";
   const [result, setResult] = useState(null);
 
-  const urlPushClick = (urls) => {
+  const urlPushClick = (titlesend, docsend) => {
     console.log(`urlPushClicked`);
     fetch("http://192.168.11.240:5000/push_url", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: urls }),
+      body: JSON.stringify({ title: titlesend, doc: docsend }),
     })
       .then((response) => response.json())
       .then((data) => setResult(data.message))
@@ -54,6 +53,8 @@ function SportMain({ navigation }) {
   const views = [];
   for (let i = 0; i < 5; i++) {
     const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
@@ -112,8 +113,8 @@ function SportMain({ navigation }) {
         {newDivider}
         <TouchableOpacity
           onPress={() => {
-            urlPushClick(urlsend);
-            console.log(urlsend); // call urlPushClick with the appropriate text
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
             navigation.navigate("SportContent", links[i]);
           }}
         >
@@ -134,6 +135,8 @@ function SportMain({ navigation }) {
   const views2 = [];
   for (let i = 5; i < 20; i++) {
     const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
@@ -170,8 +173,8 @@ function SportMain({ navigation }) {
         <View style={styles.divider} />
         <TouchableOpacity
           onPress={() => {
-            urlPushClick(urlsend);
-            console.log(urlsend); // call urlPushClick with the appropriate text
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
             navigation.navigate("SportContent", links[i]);
           }}
         >

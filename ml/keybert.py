@@ -3,7 +3,7 @@ from typing import *
 import pandas as pd
 from tqdm import tqdm
 from sklearn.feature_extraction.text import CountVectorizer
-from konlpy.tag import Mecab
+# from konlpy.tag import Mecab
 from pathlib import Path
 import numpy as np
 import itertools
@@ -16,6 +16,7 @@ from collections import defaultdict
 
 from load_dataset import *
 from preprocess import CustomTokenizer
+from bareunpy import Tagger
 
 class KeyBERT:
     """
@@ -25,33 +26,41 @@ class KeyBERT:
         keybert = KeyBERT(model_path='sinjy1203/ko-sbert-natenews')
         키워드들 5개 = keybert.pred(뉴스내용한개)
     """
-    def __init__(self, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'), model_path="sinjy1203/ko-sbert-natenews"):
+    def __init__(self, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+                 model_path="sinjy1203/ko-sbert-natenews", user_words_path: str = './user_words'):
         """
         Args:
+            tagger: 형태소분석기
             tag: preprocess.CustomTokenizer의 tag로 사용
             model_path: huggingface hub에 있는 finetuning한 sbert model
+            user_words_path: 사용자사전 위치
 
         """
         self.model = SentenceTransformer(model_path)
-        self.tokenizer = CustomTokenizer(Mecab(), tag=tag) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
+        self.tokenizer = CustomTokenizer(
+            tagger, tag=tag, user_words_path=user_words_path) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             words: np.ndarray, top_n: int, nr_candidates: int) -> List[str]:
+             words: np.ndarray, top_n: int, nr_candidates: int,
+             title_w: float = 0.5) -> List[str]:
         """
         Max Sum Similarity
         후보간 유사성은 최소화, 문서와의 유사성은 최대화
         Args:
-            doc_embedding: 뉴스본문의 임베딩값
+            doc_embedding: 뉴스본문과 제목의 임베딩값
             candidate_embeddings: 키워드 후보군들의 임베딩값들
             words: 키워드 후보군 단어들
             top_n: top n개의 단어들을 키워드로 리턴
             nr_candidates: 처음에 추출할 문서와의 유사도가 높은 단어 개수
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 키워드 리스트
         """
-        # 문서와 각 키워드들 간의 유사도
+        # 문서_제목과 각 키워드들 간의 유사도
         distances = cosine_similarity(doc_embedding, candidate_embeddings)
+        distances = distances[0] * (1-title_w) + distances[1] * title_w
+        distances = distances[np.newaxis]
 
         # 각 키워드들 간의 유사도
         distances_candidates = cosine_similarity(candidate_embeddings,
@@ -74,24 +83,29 @@ class KeyBERT:
         return [words_vals[idx] for idx in candidate]
 
     def mmr_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
-             words: np.ndarray, top_n: int, diversity: float) -> List[str]:
+             words: np.ndarray, top_n: int, diversity: float,
+             title_w: float = 0.5) -> List[str]:
         """
         Maximal Marginal Relevance
         문서와 유사도가 가장 높은 단어를 선택하고
         이미 선택된 키워드와 유사하지 않으면서 문서와 유사한 단어르 반복적으로 선택
         Args:
-            doc_embedding: 뉴스본문의 임베딩값
+            doc_embedding: 뉴스본문과 제목의 임베딩값
             candidate_embeddings: 키워드 후보군들의 임베딩값들
             words: 키워드 후보군 단어들
             top_n: top n개의 단어들을 키워드로 리턴
             diversity: top_n개의 키워드들의 유사도정도 (0~1)
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 키워드 리스트
         """
 
-        # 문서와 각 키워드들 간의 유사도가 적혀있는 리스트
+        # 문서_제목과 각 키워드들 간의 유사도가 적혀있는 리스트
         word_doc_similarity = cosine_similarity(candidate_embeddings, doc_embedding)
+        word_doc_similarity = word_doc_similarity[:, 0] * (1 - title_w) +\
+                              word_doc_similarity[:, 1] * title_w
+        word_doc_similarity = word_doc_similarity[:, np.newaxis]
 
         # 각 키워드들 간의 유사도
         word_similarity = cosine_similarity(candidate_embeddings)
@@ -118,10 +132,12 @@ class KeyBERT:
             keywords_idx.append(mmr_idx)
             candidates_idx.remove(mmr_idx)
 
-        return [words[idx] for idx in keywords_idx]
+        return [words[idx] + f'{np.round(word_doc_similarity[idx], 4)}' for idx in keywords_idx]
+        # return [words[idx] for idx in keywords_idx]
 
-    def predict(self, doc: str, ngram_range: Tuple[int, int] = (1, 1), mode: str = 'mmr', top_n: int = 5, nr_candidates: int = 10,
-                diversity: float = 0.2) -> List[str]:
+    def predict(self, doc: str, title: str, ngram_range: Tuple[int, int] = (1, 1),
+                mode: str = 'mmr', top_n: int = 5, nr_candidates: int = 10,
+                diversity: float = 0.2, title_w: float = 0.5) -> List[str]:
         """
         뉴스기사에서 키워드들을 리턴
         Args:
@@ -131,6 +147,7 @@ class KeyBERT:
             top_n: 추출할 키워드 개수
             nr_candidates: mss의 파라미터
             diversity: mmr의 파라미터
+            title_w: 뉴스의 임베딩 값을 구할 때 title의 가중치
 
         Returns:
             top_n개의 키워드 리스트
@@ -139,19 +156,21 @@ class KeyBERT:
             count = CountVectorizer(tokenizer=self.tokenizer, ngram_range=ngram_range).fit([doc])
         except ValueError:
             return []
-
         candidates = count.get_feature_names_out()
 
+        # 뉴스의 임베딩 = 본문 * (1- title_w) + 제목 * title_w
+        doc_embedding = self.model.encode([doc, title])
 
-        doc_embedding = self.model.encode([doc])
+        # doc_embedding = self.model.encode([title])
         candidate_embeddings = self.model.encode(candidates)
 
         keyword = None
         if mode == 'mss':
             keyword = self.mss_(doc_embedding, candidate_embeddings, candidates, top_n=top_n,
-                                nr_candidates=nr_candidates)
+                                nr_candidates=nr_candidates, title_w=title_w)
         elif mode == 'mmr':
-            keyword = self.mmr_(doc_embedding, candidate_embeddings, candidates, top_n=top_n, diversity=diversity)
+            keyword = self.mmr_(doc_embedding, candidate_embeddings, candidates, top_n=top_n,
+                                diversity=diversity, title_w=title_w)
         else:
             raise Exception('keyerror')
 
@@ -183,7 +202,8 @@ class KeyBERT:
         total_keywords = []
         news_keywords_df = data_df.copy()
         for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
-            keywords = self.predict(news_keywords_df.loc[i, 'contents'], top_n=top_n, ngram_range=(1, 1))
+            keywords = self.predict(news_keywords_df.loc[i, 'contents'], news_keywords_df.loc[i, 'titles'], top_n=top_n,
+                                    title_w=0.5, diversity=0.0)
             total_keywords += keywords
             for j, keyword in enumerate(keywords):
                 news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
@@ -219,7 +239,10 @@ if __name__ == '__main__':
 
     ## load model
     # keybert = KeyBERT(model_path='./model')
-    keybert = KeyBERT(model_path='./ko-sbert-natenews')
+    tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
+    # keybert = KeyBERT(tagger=tagger, model_path='sinjy1203/ko-sbert-natenews')
+    model = KeyBERT(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
+    # keybert.predict(df.loc[0, 'contents'], df.loc[0, 'titles'], mode='mmr')
     # keybert = KeyBERT()
 
     # ## data check
@@ -244,6 +267,11 @@ if __name__ == '__main__':
     #     f.write('\n' + ', '.join(keywords))
 
     ## pred_keyword & titles about keyword to save
-    keybert.pred_df(df)
+    model.pred_df(df, top_n=10)
+
+    ##
+    # doc = keybert.model.encode(['"난 천하람의 빠니보틀" 이준석 발언에 찐 빠니보틀이 답했다'])
+    # word = keybert.model.encode(['빠니보틀'])
+    # sim = cosine_similarity(doc, word)
 
 

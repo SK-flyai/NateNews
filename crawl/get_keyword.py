@@ -27,6 +27,8 @@ def keyword(
     if save:
         with open('ex_keyword.json', 'w', -1, 'utf-8') as f : 
             json.dump(key_dict, f, indent=4, ensure_ascii=False)
+    with open('C:/Users/frica/OneDrive/바탕 화면/GitHub/NateNews/app/Seohyun/NateNews/src/flask/recommend.json', 'w', -1, 'utf-8') as f : 
+            json.dump(key_dict, f, indent=4, ensure_ascii=False)
     return key_dict
 
 
