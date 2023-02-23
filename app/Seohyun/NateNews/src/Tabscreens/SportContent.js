@@ -282,25 +282,26 @@ const SportContent = ({ navigation }) => {
               기각한 바 있다.
               {"\n"}
               {"\n"}
-            </Text>
-            <Pressable
-              onPress={toggleModal2}
-              android_ripple={{ color: "#8EECF5" }}
-              style={{
-                width: width * 0.95,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: 4,
+              <Pressable
+                onPress={toggleModal2}
+                android_ripple={{ color: "#8EECF5" }}
+                style={{
+                  width: width * 0.95,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 4,
 
-                backgroundColor: "#A3C4F3",
-              }}
-            >
-              <View style={{ flex: 1, width: width * 0.95 }}>
-                <Text
+                  backgroundColor: "#A3C4F3",
+                }}
+              >
+                <View
                   style={{
-                    fontSize: 15,
+                    width: width * 0.95,
+                    flexDirection: "row",
+                    flexWrap: "wrap",
                   }}
                 >
+<<<<<<< HEAD
                   Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
                   Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
                   Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
@@ -309,6 +310,21 @@ const SportContent = ({ navigation }) => {
               </View>
             </Pressable>
 >>>>>>> a042843 (Initial commit)
+=======
+                  <Text
+                    style={{
+                      fontSize: 15,
+                    }}
+                  >
+                    Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                    Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                    Modal Modal Modal Modal Modal Modal Modal Modal Modal Modal
+                    Modal Modal
+                  </Text>
+                </View>
+              </Pressable>
+            </Text>
+>>>>>>> a713858 (FIX: ModalBackground)
           </View>
 
           <View>
