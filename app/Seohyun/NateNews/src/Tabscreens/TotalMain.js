@@ -13,7 +13,7 @@ const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
-function SportMain({ navigation }) {
+function TotalMain({ navigation }) {
   const links = [];
   const titles = [];
   const categories = [];
@@ -53,7 +53,7 @@ function SportMain({ navigation }) {
 
     const isFirstView = i === 0; // check if it's the first view
     const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
-    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const imageHeight = isFirstView ? width : width * 0.12; // set image width based on isFirstView
     const num = isFirstView ? 2 : 1;
     const Istyle = isFirstView
       ? {
@@ -64,7 +64,7 @@ function SportMain({ navigation }) {
       : {
           width: imageWidth,
           height: imageHeight,
-          backgroundColor: "black",
+          backgroundColor: "white",
           resizeMode: "stretch",
         };
 
@@ -85,7 +85,7 @@ function SportMain({ navigation }) {
           justifyContent: "center",
         };
     const newDivider = isFirstView ? (
-      <View style={{ marginVertical: "3%" }} />
+      <View style={{ marginVertical: "2%" }} />
     ) : (
       <View style={styles.divider} />
     );
@@ -234,7 +234,7 @@ function SportMain({ navigation }) {
   );
 }
 
-export default SportMain;
+export default TotalMain;
 
 const styles = StyleSheet.create({
   divider: {

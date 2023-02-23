@@ -1,17 +1,17 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Platform } from "react-native";
-import SportMain from "../../Tabscreens/SportMain";
-import SportContent from "../../Tabscreens/SportContent";
+import TotalMain from "../../Tabscreens/TotalMain";
+import TotalContent from "../../Tabscreens/TotalContent";
 
 const Stack = createStackNavigator();
 
-const SportNav = () => {
+const TotalNav = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen // Page2 - '스포츠' Tab (뉴스 기사 목록)
-        name="SportMain"
-        component={SportMain}
+        name="TotalMain"
+        component={TotalMain}
         options={{
           headerShown: false,
           headerStyle: {
@@ -34,8 +34,8 @@ const SportNav = () => {
       />
 
       <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
-        name="SportContent"
-        component={SportContent}
+        name="TotalContent"
+        component={TotalContent}
         options={{
           headerShown: false,
           headerStyle: {
@@ -60,4 +60,4 @@ const SportNav = () => {
   );
 };
 
-export default SportNav;
+export default TotalNav;

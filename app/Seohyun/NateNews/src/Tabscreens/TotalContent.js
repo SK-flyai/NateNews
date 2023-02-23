@@ -26,7 +26,7 @@ var content = "";
 var caption = "";
 var img = "";
 
-const SportContent = ({ route }) => {
+const TotalContent = ({ route }) => {
   const link = route.params;
 
   title = data.spo[link].title;
@@ -224,7 +224,7 @@ const SportContent = ({ route }) => {
   );
 };
 
-export default SportContent;
+export default TotalContent;
 
 const styles = StyleSheet.create({
   // 기사 제목 style
