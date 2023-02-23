@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from concurrent.futures import ThreadPoolExecutor
 from search import search_news
-from utils import get_news
+# from utils import get_news
 
 import sys
 import os
@@ -15,13 +16,17 @@ def keyword(
     save: bool=False
 ):
     # this = time.time()
-    keywords, sentence = model.predict(doc, title)
+    keywords, sentence = model.predict(doc, title, sent_top_n=3)
     keywords = list(map(lambda x: x.split('[')[0], keywords))
     # print(f"Inference Time of keys : {time.time() - this}\n\n"); this = time.time()
     
-    key_dict = {'keyword' : {keyword : {news.url: news.get_dict() for news in get_news(search_news(keyword))} for keyword in keywords}}
+    with ThreadPoolExecutor(max_workers=5) as mult:
+        key_list = list(mult.map(search_news, keywords))
 
-
+    key_dict = {'keyword': dict()}
+    for keyword in key_list:
+        # add keyword to dictionary one by one
+        key_dict['keyword'].update(keyword)
     key_dict['sentence'] = sentence
     # print(f"Inference Time of recom articles : {time.time() - this}\n\n")
     if save:
