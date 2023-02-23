@@ -202,7 +202,10 @@ def _remove_newline(text):
     text = re.sub('-\n', '\n\n', text)
     text = re.sub('\n{2,}', '\n\n', text)
     text = re.sub('- \n', '\n\n', text)
+<<<<<<< HEAD
     text = re.sub('\n-', '\n\n', text)
+=======
+>>>>>>> 744dc99 (Style: eliminate newline with `strip()`)
     if len(text) < 2:
         return ''
 
