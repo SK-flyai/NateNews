@@ -87,10 +87,9 @@ colab gpu를 활용하여 model finetuning
 [20230212_100.xlsx](https://docs.google.com/spreadsheets/d/1SbKPI4Y0O6xgrYXHFIu8u-l9ucr5O45Q/edit?usp=share_link&ouid=104879418112776533120&rtpof=true&sd=true)  
 [20230212_100.csv](https://drive.google.com/file/d/1De0uG-F9L916WAXN9yRfknhvwTjbeGUf/view?usp=share_link)
 
-### mecab compile 파일 다운
+### mecab compile 파일 다운 & 초기 mecab 사용자사전 추가 (mecab 사용할 시에만 할것)
 [compile-win.ps1](https://drive.google.com/file/d/1HH6D5Y89OOO_R2WSblDGXUdCkJNJt85f/view?usp=share_link)  
 => 이 파일을 C:/mecab/tools 경로에 넣어주기
-
 ```
 # mecab의 사용자 사전 추가 (처음 실행할때 한번만 하면 됨)
 python initial_mecab_userdic.py
@@ -98,7 +97,9 @@ python initial_mecab_userdic.py
 # add_mecab_userdic.py 실행 전에 ./user_words/mecab_words.txt 에 모든 단어 앞에 /표시 없애기
 # 단어 앞에 /표시는 그 단어를 추가 안하겟다는 의미이기 때문
 python add_mecab_userdic.py 
-```
+``` 
+
+### main
 ```
 # load dataset
 news = NateNews()
@@ -106,8 +107,9 @@ df = news.load_data()
 
 # load model & tagger
 tagger = Tagger(API-KEY)
-model = NewsModel(tagger=tagger, model_path="sinjy1203/ko-sbert-natenews")
+model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
 
 # pred keyword & main sentence 
-keywords, sentence = model.predict(df.loc[i, 'contents'], word_top_n=5)
+keywords, keysent = model.predict(df.loc[i, 'contents'], df.loc[i, 'titles'], word_top_n=5,
+                                        sent_top_n=2, title_w=0.5, diversity=0)
 ```
