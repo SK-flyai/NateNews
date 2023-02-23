@@ -7,11 +7,16 @@ import {
 import MainPage from "./MainPage";
 import { Button } from "../components";
 import Tab from "./Tab";
+<<<<<<< HEAD
 import axios from "axios";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "./Header";
 
+=======
+>>>>>>> bce5f48 (FIX: Header)
 const Drawer = createDrawerNavigator();
+
+import Header from "./Header";
 
 const styles = StyleSheet.create({
   drawerLabel: {
