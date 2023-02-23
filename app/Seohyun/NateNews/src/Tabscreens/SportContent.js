@@ -22,6 +22,7 @@ import data2 from "../flask/recommend.json";
 const recSentences = [];
 const recKeywords = [];
 const recLinks = [];
+
 let keywordnum = 0;
 
 var title = "";
@@ -42,7 +43,8 @@ for (var key2 in data2.sentence) {
 }
 
 let keywordcnt = recKeywords.length;
-const keywordlist = [];
+let keywordlist = [];
+let modallink = [];
 
 const SportContent = ({ route }) => {
   const link = route.params;
@@ -58,9 +60,19 @@ const SportContent = ({ route }) => {
     break;
   }
 
-  const [isModalVisible1, setModalVisible1] = useState(false);
-  const [isModalVisible2, setModalVisible2] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
+
+  const [isModalVisible2, setModalVisible2] = useState(false);
+  const toggleModal2 = () => {
+    setModalVisible2(!isModalVisible2);
+  };
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const toggleModal1 = (keywordnum) => {
+    setModalVisible1(!isModalVisible1);
+    console.log(keywordnum);
+    modallink = recLinks[keywordnum];
+  };
 
   useEffect(() => {
     Image.getSize(
@@ -90,22 +102,14 @@ const SportContent = ({ route }) => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
   }, [isModalVisible1, isModalVisible2]);
-
-  const toggleModal1 = () => {
-    setModalVisible1(!isModalVisible1);
-  };
-
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
   const newContect = content.replace(/ /g, "\u00A0");
 
-  for (let i = 0; i < keywordcnt; i++) {
-    keywordnum = i + 1;
-    keywordlist.push(
+  keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
+    const keywordnum = i;
+    return (
       <View key={i}>
         <Pressable
-          onPress={toggleModal1}
+          onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
@@ -127,7 +131,7 @@ const SportContent = ({ route }) => {
         </Pressable>
       </View>
     );
-  }
+  });
 
   return (
     <SafeAreaView
@@ -216,7 +220,6 @@ const SportContent = ({ route }) => {
               </Text>
             </View>
           </View>
-
           <View>
             <Text>{"\n"}</Text>
             {keywordlist}
@@ -239,7 +242,7 @@ const SportContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {keywordnum}
+                  {modallink}
                 </Text>
               </ScrollView>
             </View>

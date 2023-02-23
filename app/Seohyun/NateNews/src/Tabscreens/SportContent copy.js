@@ -265,30 +265,6 @@ const SportContent = ({ route }) => {
               </ScrollView>
             </View>
           </Modal>
-          <View style={{ flex: 1 }}>
-            <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-              {content}
-            </Text>
-            <Text>{"\n"}</Text>
-
-            <View
-              style={{
-                flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightgrey",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "bold",
-                }}
-              >
-                {recSentences}
-              </Text>
-            </View>
-            <View>{keywordlist}</View>
-          </View>
         </ScrollView>
       </View>
     </SafeAreaView>

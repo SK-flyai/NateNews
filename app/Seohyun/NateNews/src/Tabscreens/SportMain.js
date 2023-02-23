@@ -26,7 +26,7 @@ function SportMain({ navigation }) {
 
   const urlPushClick = (urls) => {
     console.log(`urlPushClicked`);
-    fetch("http://192.168.1.10:5000/push_url", {
+    fetch("http://192.168.11.240:5000/push_url", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
