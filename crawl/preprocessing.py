@@ -48,11 +48,24 @@ PRESS = [
     '일간스포츠. All rights reserved',
 ]
 
+<<<<<<< HEAD
+=======
+def text_cleaning(article: bs4.element.Tag):
+    """Cleaning news content and divide images & texts
+
+    Args:
+        article (bs4.element.Tag): content of article found with `bs`
+
+>>>>>>> d466a4b (Comment: add comments)
     Returns:
         Tuple[str, Dict[str, str]]:
             str: Content of news article after cleaning noise
             Dict[str, str]: pair of image-caption
+<<<<<<< HEAD
     """
+=======
+    """    
+>>>>>>> d466a4b (Comment: add comments)
     article_text = str(article)
     i = 0
     # [] 내부 모두 제거
@@ -100,6 +113,8 @@ PRESS = [
     return (text.strip() + '.', images)
 
 def _seperate_text(text):
+    """Seperate text with images(and captions)
+    """
     pattern_link = re.compile('\[(http://[^\]]*)\]')
     result_img = pattern_link.finditer(text)
     text = re.sub(pattern_link, '', text)
@@ -119,10 +134,14 @@ def _seperate_text(text):
     return text, image_dict
 
 def _remove_press(text):
+    """Remove noise in each article in press
+    """
     text = re.sub(('|').join(PRESS), '', text)
     return text
 
 def _remove_link(text):
+    """Remove links
+    """
     pattern = re.compile('^[^\[\n]*https?://[^ \n]+', re.MULTILINE)
     text = re.sub(pattern, '', text)
     return text
