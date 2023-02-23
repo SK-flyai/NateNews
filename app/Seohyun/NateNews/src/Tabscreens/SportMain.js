@@ -68,6 +68,7 @@ function SportMain({ navigation }) {
     }
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
   const views = [];
   for (let i = 0; i < 5; i++) {
@@ -208,8 +209,90 @@ function SportMain({ navigation }) {
               </Text>
 
 =======
+=======
+
+>>>>>>> 005848f (230222 19:09)
   const views = [];
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 5; i++) {
+    const [aspectRatio, setAspectRatio] = useState(null);
+
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
+
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
+    const news = isFirstView ? contents[0] : null;
+    const fview = isFirstView ? (
+      <Image style={Istyle} source={{ uri: images[i] }} />
+    ) : null;
+    const nameView = isFirstView
+      ? {
+          marginLeft: "1%",
+          width: width - (imageWidth + 20),
+          justifyContent: "center",
+          fontWeight: "bold",
+        }
+      : {
+          marginLeft: "1%",
+          width: width * 0.93,
+          marginVertical: "2%",
+          justifyContent: "center",
+        };
+    const newDivider = isFirstView ? (
+      <View style={{ marginVertical: "3%" }} />
+    ) : (
+      <View style={styles.divider} />
+    );
+
+    views.push(
+      <View styles={{ flex: 1 }} key={i}>
+        {newDivider}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SportContent", links[i])}
+        >
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            {fview}
+
+            <View style={nameView}>
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
+              {/* <Text numberOfLines={2}>{news}</Text> */}
+              {/* <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text> */}
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const views2 = [];
+  for (let i = 5; i < 20; i++) {
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
@@ -241,7 +324,7 @@ function SportMain({ navigation }) {
           resizeMode: "stretch",
         };
 
-    views.push(
+    views2.push(
       <View styles={{ flex: 1 }} key={i}>
         <View style={styles.divider} />
         <TouchableOpacity
@@ -258,14 +341,18 @@ function SportMain({ navigation }) {
             <View
               style={{
                 marginLeft: "1%",
-                width: width - (imageWidth + 20),
+                width: width * 0.8,
                 justifyContent: "center",
               }}
             >
               <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
                 {titles[i].replace(/ /g, "\u00A0")}
               </Text>
+<<<<<<< HEAD
 >>>>>>> 93555d0 (230222 11:58)
+=======
+
+>>>>>>> 005848f (230222 19:09)
               <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
                 {presses[i]}
               </Text>
@@ -280,6 +367,9 @@ function SportMain({ navigation }) {
     <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
       <View
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 005848f (230222 19:09)
         style={{
           flex: 1,
           backgroundColor: "white",
@@ -288,6 +378,9 @@ function SportMain({ navigation }) {
         }}
       >
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 005848f (230222 19:09)
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
           얼음판 위엔 연아킴 비트위엔 vj 항상 기막힌
         </Text>
@@ -304,6 +397,7 @@ function SportMain({ navigation }) {
         <View style={[styles.middle]}>
           <Text>2030 부산 액스포</Text>
         </View>
+<<<<<<< HEAD
 =======
         <View style={{ flex: 1, marginTop: "5%", backgroundColor: "white" }}>
           <Text style={{ fontSize: 20, fontWeight: "bold" }}>
@@ -371,6 +465,8 @@ function SportMain({ navigation }) {
         </View>
 
 >>>>>>> 929584e (02/22 09:41)
+=======
+>>>>>>> 005848f (230222 19:09)
         <View
           style={[
             styles.middle,
@@ -380,6 +476,7 @@ function SportMain({ navigation }) {
         >
           <Text>20대 대통령 윤석열</Text>
         </View>
+<<<<<<< HEAD
 <<<<<<< HEAD
         <View style={styles.middle}>
           <Text>코로나 19 현황</Text>
@@ -398,11 +495,24 @@ function SportMain({ navigation }) {
 >>>>>>> 929584e (02/22 09:41)
 =======
         style={{ flex: 1, backgroundColor: "white", marginHorizontal: "3%" }}
+=======
+        <View style={styles.middle}>
+          <Text>코로나 19 현황</Text>
+        </View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          marginHorizontal: "3%",
+        }}
+>>>>>>> 005848f (230222 19:09)
       >
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
           스포츠 주요뉴스
         </Text>
 
+<<<<<<< HEAD
         <View style={{ flex: 1 }}>{views}</View>
 >>>>>>> 30a0c09 (230222 16:71)
       </View>
@@ -425,6 +535,10 @@ function SportMain({ navigation }) {
 
       <View style={styles.divider} />
 
+=======
+        <View style={{ flex: 1 }}>{views2}</View>
+      </View>
+>>>>>>> 005848f (230222 19:09)
       <View style={[styles.divider, { borderBottomWidth: 10 }]} />
     </ScrollView>
   );
