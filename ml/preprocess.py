@@ -6,6 +6,7 @@ import pickle
 from pathlib import Path
 import re
 from bareunpy import Tagger
+from load_dataset import NateNews
 
 class CustomTokenizer:
     """
@@ -105,7 +106,7 @@ class CustomTokenizer:
 
         """
         data = re.sub('[0-9]{4}\.[0-9]{2}\.[0-9]{2}', '', data)  # 날짜 형식
-        data = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
+        data = re.sub(' [가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', data)  # 기자, 특파원 제거
         data = re.sub('[가-힣]{2,3}뉴스', '', data)  # 뉴스 제거
         data = re.sub('무단복제 및 재배포 금지', '', data) # 너무 많이 나와서 제거
         return data
@@ -127,10 +128,12 @@ class CustomTokenizer:
             word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
             word_pos = self.tagger.pos(doc)
+            print(word_pos)
             word_pos = list(map(self.tonnp, word_pos))
             word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, word_pos)))
         else:
             raise Exception('keyerror')
+        # print(word_tokens)
 
         word_tokens = self.compound(word_tokens, self.comp_words)
 
@@ -144,6 +147,7 @@ class CustomTokenizer:
 
         # result = list(map(func, result))
         result = list(filter(lambda x: x not in self.filtering, result))
+        result = list(filter(lambda x: not x.isdigit(), result))
         return result
 
 if __name__ == '__main__':
@@ -154,7 +158,16 @@ if __name__ == '__main__':
     tokenizer = CustomTokenizer(tagger=tagger)
 
     ##
-    tagger.pos('인생샷')
+    news = NateNews()
+    df = news.load_data()
+
+    ##
+    tokenizer(df.loc[401, 'contents'])
+
+    ##
+    sents = re.split('\. |\? ', df.loc[401, 'contents'])
+    for sent in sents:
+        print(tagger.pos(sent))
 
 ##
     cust_dic.update()
