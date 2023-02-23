@@ -27,16 +27,18 @@ class KeyBERT:
         키워드들 5개 = keybert.pred(뉴스내용한개)
     """
     def __init__(self, tagger: Union[Tagger, Mecab] = Mecab(), tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
-                 model_path="sinjy1203/ko-sbert-natenews"):
+                 model_path="sinjy1203/ko-sbert-natenews", user_words_path: str = './user_words'):
         """
         Args:
             tagger: 형태소분석기
             tag: preprocess.CustomTokenizer의 tag로 사용
             model_path: huggingface hub에 있는 finetuning한 sbert model
+            user_words_path: 사용자사전 위치
 
         """
         self.model = SentenceTransformer(model_path)
-        self.tokenizer = CustomTokenizer(tagger, tag=tag) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
+        self.tokenizer = CustomTokenizer(
+            tagger, tag=tag, user_words_path=user_words_path) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
              words: np.ndarray, top_n: int, nr_candidates: int,
@@ -200,7 +202,8 @@ class KeyBERT:
         total_keywords = []
         news_keywords_df = data_df.copy()
         for i in tqdm(range(len(news_keywords_df)), desc='pred keyword'):
-            keywords = self.predict(news_keywords_df.loc[i, 'contents'], news_keywords_df.loc[i, 'titles'], top_n=top_n, title_w=0.5)
+            keywords = self.predict(news_keywords_df.loc[i, 'contents'], news_keywords_df.loc[i, 'titles'], top_n=top_n,
+                                    title_w=0.5, diversity=0.0)
             total_keywords += keywords
             for j, keyword in enumerate(keywords):
                 news_keywords_df.loc[i, 'top_{}'.format(j)] = keyword
@@ -237,7 +240,8 @@ if __name__ == '__main__':
     ## load model
     # keybert = KeyBERT(model_path='./model')
     tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
-    keybert = KeyBERT(tagger=tagger, model_path='sinjy1203/ko-sbert-natenews')
+    # keybert = KeyBERT(tagger=tagger, model_path='sinjy1203/ko-sbert-natenews')
+    model = KeyBERT(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
     # keybert.predict(df.loc[0, 'contents'], df.loc[0, 'titles'], mode='mmr')
     # keybert = KeyBERT()
 
@@ -263,7 +267,7 @@ if __name__ == '__main__':
     #     f.write('\n' + ', '.join(keywords))
 
     ## pred_keyword & titles about keyword to save
-    keybert.pred_df(df, top_n=10)
+    model.pred_df(df, top_n=10)
 
     ##
     # doc = keybert.model.encode(['"난 천하람의 빠니보틀" 이준석 발언에 찐 빠니보틀이 답했다'])
