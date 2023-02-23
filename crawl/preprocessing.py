@@ -46,6 +46,8 @@ PRESS = [
     '인터풋볼. 무단전재 및 재배포 금지',
     # 일간스포츠
     '일간스포츠. All rights reserved',
+    # 데일리뉴스
+    '데일리한국.',
 ]
 
 def text_cleaning(article: bs4.element.Tag):
