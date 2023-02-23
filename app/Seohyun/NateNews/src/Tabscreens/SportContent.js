@@ -76,6 +76,8 @@ const SportContent = ({ route }) => {
 =======
 
 const SportContent = ({ navigation }) => {
+  // 모달 쓰기위한 함수 구현부 이미지 함수 삭제
+
   const [isModalVisible1, setModalVisible1] = useState(false);
   const [isModalVisible2, setModalVisible2] = useState(false);
 >>>>>>> a042843 (Initial commit)
@@ -297,8 +299,6 @@ const SportContent = ({ navigation }) => {
                 <View
                   style={{
                     width: width * 0.95,
-                    flexDirection: "row",
-                    flexWrap: "wrap",
                   }}
                 >
 <<<<<<< HEAD
@@ -327,11 +327,16 @@ const SportContent = ({ navigation }) => {
 >>>>>>> a713858 (FIX: ModalBackground)
           </View>
 
+<<<<<<< HEAD
           <View>
             <Text>{"\n"}</Text>
             {keywordlist}
           </View>
           {/*Modal (팝업 바)*/}
+=======
+          {/* 첫번째 모달 */}
+
+>>>>>>> 638b6be (FIX:SportContent)
           <Modal
             visible={isModalVisible1}
             style={styles.bottomModal}
@@ -360,7 +365,12 @@ const SportContent = ({ navigation }) => {
             </View>
           </Modal>
 
+<<<<<<< HEAD
           {/* 모달 2 */}
+=======
+          {/*두번째 모달 */}
+
+>>>>>>> 638b6be (FIX:SportContent)
           <Modal
             visible={isModalVisible2}
             style={styles.bottomModal}
