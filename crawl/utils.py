@@ -22,6 +22,7 @@ COLUMNS = [
     'url',
 ]
 
+
 def get_news_df(
     news_list: List[NateNews]
 ):
@@ -67,22 +68,24 @@ def get_news(
                 _news_list.append(_create(url))
             except:
                 print(url)
-    
+
     news_list = [news for news in _news_list if news]
     return news_list
 
-def _convert_url(url:str):
+
+def _convert_url(url: str):
     url = url.split('?')[0].split('//')[-1]
     return f"https://{url}"
 
+
 def get_urls(
-    date1: Union[int, None]=None,
-    date2: Union[int, None]=None,
-    artc1: Union[int, None]=None,
-    artc2: Union[int, None]=None,
+    date1: Union[int, None] = None,
+    date2: Union[int, None] = None,
+    artc1: Union[int, None] = None,
+    artc2: Union[int, None] = None,
 ):
     """get url list
-    
+
     Desc:
         url list
         eg:
@@ -103,7 +106,7 @@ def get_urls(
 
     Returns:
         List[str]: url list
-    """    
+    """
     date1 = date1 if date1 else int(dt.datetime.now().strftime('%Y%m%d'))
     date2 = date2 if date2 else date1
     artc1 = artc1 if artc1 and artc1 > 0 else 1
@@ -118,7 +121,7 @@ def get_urls(
 
 def _get_date_list(
     date1: int,
-    date2: int, 
+    date2: int,
 ):
     """get date list
 
@@ -129,24 +132,24 @@ def _get_date_list(
     Returns:
         List[int]: date list from `date1` to `date2`
     """
-    
+
     if not date2:
         return [date1]
-    
-    date:int = date1
+
+    date: int = date1
     date_list = list()
-    
+
     while date <= date2:
         date_list.append(date)
         date = dt.datetime.strptime(str(date), "%Y%m%d") + dt.timedelta(days=1)
         date = int(date.strftime('%Y%m%d'))
-    
+
     return date_list
 
 
 def _get_artc_list(
     artc1: int,
-    artc2: Union[int,None],
+    artc2: Union[int, None],
     date: int,
 ):
     """get article list
@@ -180,21 +183,22 @@ def _get_recent(date: int):
 
     Returns:
         int: latest article number
-    """        
-    req = requests.get(f'https://news.nate.com/recent?mid=n0100&type=c&date={date}')
+    """
+    req = requests.get(
+        f'https://news.nate.com/recent?mid=n0100&type=c&date={date}')
     content = bs(req.text, 'html.parser')
     _recent = content.find_all('div', {'class': 'mlt01'})
-    
+
     latest = None
     for news in _recent:
         # recent = //news.nate.com/view/{YYYY}{mm}{dd}n{NNNNN}?mid=n0100
         recent = int(news.find('a')['href'].split('?')[0][-5:])
         if not latest or latest < recent:
             latest = recent
-    return latest # return latest article number
+    return latest  # return latest article number
 
 
-def _create(url:str):
+def _create(url: str):
     """create `NateNews` if it satisfy some conditions
 
     Args:
@@ -204,10 +208,10 @@ def _create(url:str):
         return `NateNews` if given url satisfy some conditions
         * 1. Should have article(articleContetns)
         * 2. Exclude English news
-        
+
     Returns:
         Union[NateNews, None]: 
-    """        
+    """
     # time.sleep(0.5)
     # TODO: handling sleep stuff...
     new_class = NateNews(url)
@@ -215,7 +219,7 @@ def _create(url:str):
         'a',
         {'class': 'svcname'}
     ).text
-    
+
     # 연예 기사는 제외
     if which_news == '연예':
         print(f"{url} is Entertainment News!")
@@ -230,7 +234,7 @@ def _create(url:str):
         'div',
         {'id': 'articleContetns'}
     )
-    
+
     # 기사가 없는 경우
     if not article:
         print(f"{url} has no article!")
@@ -239,7 +243,6 @@ def _create(url:str):
         # 특수 기사들은 제외
         title = new_class.title
         if '[속보]' in title or '[포토]' in title or '[부고]' in title:
-            print(f"{url} is not Normal News!")
             return None
         # 기사가 있다 -> 길이 확인하기
         content_len = len(_remove_bracket(text_cleaning(article)[0]))
