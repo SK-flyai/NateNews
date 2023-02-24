@@ -17,7 +17,7 @@ API_KEY = 'koba-6REWGFY-OPWE7ZI-TPNV3FQ-DCVQDKA' # 각자의 API키로 변경해
 tagger = Tagger(API_KEY)
 model = NewsModel(
     tagger=tagger, 
-    model_path='sinjy1203/ko-sbert-natenews', 
+    model_path='bongsoo/kpf-sbert-v1.1', 
     user_words_path='C:/Users/013/Desktop/code/NateNews/ml/user_words',
 )
 
