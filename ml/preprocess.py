@@ -128,7 +128,6 @@ class CustomTokenizer:
             word_tokens = self.tagger.morphs(doc)
         elif isinstance(self.tag, tuple): # 세부적으로 pos 지칭한 것만 추출
             word_pos = self.tagger.pos(doc)
-            print(word_pos)
             word_pos = list(map(self.tonnp, word_pos))
             word_tokens = list(map(lambda x: x[0], filter(lambda x: x[1] in self.tag, word_pos)))
         else:

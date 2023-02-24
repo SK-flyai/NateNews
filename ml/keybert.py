@@ -132,7 +132,7 @@ class KeyBERT:
             keywords_idx.append(mmr_idx)
             candidates_idx.remove(mmr_idx)
 
-        return [words[idx] + f'{np.round(word_doc_similarity[idx], 4)}' for idx in keywords_idx]
+        return [words[idx] for idx in keywords_idx]
         # return [words[idx] for idx in keywords_idx]
 
     def predict(self, doc: str, title: str, ngram_range: Tuple[int, int] = (1, 1),
