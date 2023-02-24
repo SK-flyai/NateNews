@@ -9,11 +9,11 @@ import json
 import sys
 path = 'C:/Users/frica/OneDrive/바탕 화면/GitHub/NateNews/crawl'
 sys.path.append(path)
-
-from nate import news_keyword
 from nate import news_ranking
+from nate import news_keyword
 
 app = Flask(__name__)
+
 
 @app.route('/crawl', methods=["GET"])
 def crawl():
@@ -23,16 +23,18 @@ def crawl():
     # news_ranking()
     return jsonify(result)
 
+
 @app.route('/push_url', methods=['POST'])
 def push_url():
     result = {'output': 'URL Send Code operate'}
     data = request.json
     title = data.get('title')
-    doc = data.get('doc') 
-    
+    doc = data.get('doc')
+
     # modelcode(title, doc) # recommend.json 파일 생성
     news_keyword(doc, title)
     return jsonify(result)
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='5000', debug=True)

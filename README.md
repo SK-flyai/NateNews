@@ -1,31 +1,28 @@
 # NateNews
 ---
-Implement app to show NateNews easily
+## Tap.js
+<<<<<<< HEAD
+<<<<<<< HEAD
+상단 탭 네비게이트 이름만 바꿈 + 한번에 5개 표현 ,스크롤 하면 따라오게 바꿈   
+페이지 증가에 따른 코드는 내일 오전 중으로 변경 예정   
+sport가 종합 페이지임
 
-* Branch name
-1. ml/`FEATURE_NAME`
-2. front/`FEATURE_NAME`
-3. back/`FEATURE_NAME`
-4. crawl/`FEATURE_NAME`
+## SportMain.js
+첫 화면 기존 화면과 최대한 비슷하게 만들어 놓음   
+=======
+상단 탭 네비게이트 이름만 바꿈 + 한번에 5개 표현 , 스크롤 하면 따라오게 바꿈
+페이지 증가에 따른 코드는 내일 오전 중으로 변경 예정
+sport가 종합 페이지임
 
+## SportMain.js
+첫 화면 기존 화면과 최대한 비슷하게 만들어 놓음
+>>>>>>> 1484748 (Update README.md)
+=======
+상단 탭 네비게이트 이름만 바꿈 + 한번에 5개 표현 ,스크롤 하면 따라오게 바꿈   
+페이지 증가에 따른 코드는 내일 오전 중으로 변경 예정   
+sport가 종합 페이지임
 
-* Commit message
-1. Feat: `DESC` / 새로운 기능 추가
-2. FIX: `DESC` / 버그 수정
-3. Style: `DESC` / 단순한 코드 포맷 변경
-4. Comment: `DESC` / 주석 추가 및 변경
-5. Rename: `DESC` / 파일, 폴더명 수정 or 위치 변경
-6. Remove: `DESC` / 파일 삭제
-7. Docs: `DESC` / 문서 수정
-8. Initial commit / 초기 커밋(파일 생성 등..)
-
-
-* folders(__temporary__)\
-/\
-L ml\
-L app\
-L crawl
-
-
-* playground 디렉토리\
-디렉토리 내의 \*.ipynb 는 .gitignore 걸어놨습니다. 해당 디렉토리에서 자유롭게 실험해주세요 :)
+## SportMain.js
+첫 화면 기존 화면과 최대한 비슷하게 만들어 놓음   
+>>>>>>> c6861df (Update README.md)
+20개씩 받아오는걸 5개 15개 짤라서 스타일을 다르게 주고 끊어놓음

@@ -1,5 +1,8 @@
 import React from "react";
 import { StyleSheet, View, Image, SafeAreaView } from "react-native";
+import { Dimensions } from "react-native";
+
+const { width } = Dimensions.get("window");
 
 export default function Header() {
   return (
@@ -22,10 +25,10 @@ const styles = StyleSheet.create({
 
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: "20%",
   },
   image: {
     width: 170,
     height: 50,
+    marginLeft: "22%",
   },
 });

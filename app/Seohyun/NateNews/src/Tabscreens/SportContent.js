@@ -107,7 +107,7 @@ const SportContent = ({ route }) => {
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
-      <View key={i}>
+      <View style={{ flex: 1 }} key={i}>
         <Pressable
           onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
@@ -115,18 +115,30 @@ const SportContent = ({ route }) => {
             justifyContent: "center",
             alignItems: "center",
             flex: 1,
+            flexDirection: "row",
           }}
         >
-          <View style={{ flex: 1, width: width * 0.95 }}>
+          <View
+            style={{
+              flex: 1,
+              width: width * 0.95,
+              backgroundColor: "lightgrey",
+              justifyContent: "center",
+              alignItems: "center",
+              borderColor: "black",
+              borderWidth: 1,
+              marginVertical: "20%",
+              padding: "5%",
+            }}
+          >
             <Text
               style={{
                 fontSize: 15,
-                backgroundColor: "lightgrey",
               }}
             >
               {recKeywords[i]}
             </Text>
-            <Text>{"\n"}</Text>
+            {/* <Text>{"\n"}</Text> */}
           </View>
         </Pressable>
       </View>
@@ -177,20 +189,19 @@ const SportContent = ({ route }) => {
           </View>
           <Divider style={{ height: 5 }} />
 
-          <TouchableOpacity onPress={toggleModal1}>
-            <Image
-              style={{
-                width: width,
-                aspectRatio,
-                marginTop: 15,
-                // resizeMode: "contain",
-                // height: width * aspectRatio,
-              }}
-              source={{
-                uri: img,
-              }}
-            />
-          </TouchableOpacity>
+          <Image
+            style={{
+              width: width,
+              aspectRatio,
+              marginTop: 15,
+              // resizeMode: "contain",
+              // height: width * aspectRatio,
+            }}
+            source={{
+              uri: img,
+            }}
+          />
+
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
@@ -203,27 +214,36 @@ const SportContent = ({ route }) => {
             >
               {newContect}
             </Text>
-
             <View
               style={{
-                flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightblue",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Text
+              <Text>{"\n"}</Text>
+              <View
                 style={{
-                  fontSize: 15,
+                  flex: 1,
+                  width: width * 0.85,
+                  backgroundColor: "lightblue",
+                  borderRadius: 6,
+                  padding: "5%",
                 }}
               >
-                {recSentences}
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row", flex: 1 }}>
+                {keywordlist}
+              </View>
             </View>
           </View>
-          <View>
-            <Text>{"\n"}</Text>
-            {keywordlist}
-          </View>
+
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}
