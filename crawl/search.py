@@ -48,7 +48,7 @@ def _info(article) -> dict:
     return {
         url: {
             "title": title,
-            "img": image,
+            "image": image,
             "content": content,
             "press": press,
             "date": date,
