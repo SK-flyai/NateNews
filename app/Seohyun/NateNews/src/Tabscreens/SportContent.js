@@ -23,6 +23,18 @@ const recSentences = [];
 const recKeywords = [];
 const recLinks = [];
 
+const recImages = [];
+const recTitles = [];
+const recContents = [];
+const recDates = [];
+const recPresses = [];
+
+var tempTitle = [];
+var tempPress = [];
+var tempDate = [];
+var tempContent = [];
+var tempImage = [];
+
 let keywordnum = 0;
 
 var title = "";
@@ -35,8 +47,36 @@ var img = "";
 
 for (var key1 in data2.keyword) {
   recKeywords.push(key1 + "  ");
-  recLinks.push(data2.keyword[key1]);
+  recLinks.push(Object.keys(data2.keyword[key1]));
+  tempTitle = [];
+  tempPress = [];
+  tempDate = [];
+  tempContent = [];
+  tempImage = [];
+
+  console.log("--------------------------------------");
+  for (var key2 in data2.keyword[key1]) {
+    tempTitle.push(data2.keyword[key1][key2].title + "\n\n");
+    tempPress.push(data2.keyword[key1][key2].press);
+    tempDate.push(data2.keyword[key1][key2].date);
+    tempContent.push(data2.keyword[key1][key2].content);
+    tempImage.push(data2.keyword[key1][key2].image);
+  }
+  recTitles.push(tempTitle);
+  recImages.push(tempImage);
+  recPresses.push(tempPress);
+  recDates.push(tempDate);
+  recContents.push(tempContent);
 }
+
+// for (var i in recTitles) {
+//   console.log(i);
+//   for (var j in recTitles[i]) {
+//     console.log(recTitles[i][j]);
+//     console.log(recPresses[i][j]);
+//     console.log(recDates[i][j]);
+//   }
+// }
 
 for (var key2 in data2.sentence) {
   recSentences.push(data2.sentence[key2] + "\n\n");
@@ -44,7 +84,12 @@ for (var key2 in data2.sentence) {
 
 let keywordcnt = recKeywords.length;
 let keywordlist = [];
-let modallink = [];
+let modalTitle = [];
+let modalPress = [];
+let modalLink = [];
+let modalDate = [];
+let modalContent = [];
+let modalImage = [];
 
 const SportContent = ({ route }) => {
   const link = route.params;
@@ -71,7 +116,13 @@ const SportContent = ({ route }) => {
   const toggleModal1 = (keywordnum) => {
     setModalVisible1(!isModalVisible1);
     console.log(keywordnum);
-    modallink = recLinks[keywordnum];
+    //console.log(recTitles);
+    modalLink = recLinks[keywordnum];
+    modalTitle = recTitles[keywordnum];
+    modalPress = recPresses[keywordnum];
+    modalDate = recDates[keywordnum];
+    modalContent = recContents[keywordnum];
+    modalImage = recImages[keywordnum];
   };
 
   useEffect(() => {
@@ -109,7 +160,7 @@ const SportContent = ({ route }) => {
     return (
       <View style={{ flex: 1 }} key={i}>
         <Pressable
-          onPress={() => toggleModal1(i + 1)}
+          onPress={() => toggleModal1(i)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
@@ -262,7 +313,12 @@ const SportContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {modallink}
+                  {modalTitle}
+                  {modalLink}
+                  {/* {modalPress}
+                  {modalDate}
+                  {modalContent}
+                  {modalImage} */}
                 </Text>
               </ScrollView>
             </View>
