@@ -107,40 +107,22 @@ const TotalContent = ({ route }) => {
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
-      <View style={{ flex: 1 }}>
-        <Pressable
-          onPress={() => toggleModal1(i + 1)}
-          android_ripple={{ color: "purple" }}
+      <Pressable
+        onPress={() => toggleModal1(i + 1)}
+        android_ripple={{ color: "purple" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
           style={{
-            justifyContent: "center",
-            alignItems: "center",
+            fontSize: 30,
           }}
         >
-          <View
-            style={{
-              width: width * 0.95,
-              backgroundColor: "white",
-              justifyContent: "center",
-              alignItems: "center",
-              borderColor: "black",
-              borderWidth: 1,
-
-              padding: "5%",
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontSize: 20,
-                }}
-              >
-                {recKeywords[i]}
-              </Text>
-            </View>
-            {/* <Text>{"\n"}</Text> */}
-          </View>
-        </Pressable>
-      </View>
+          {recKeywords[i]}
+        </Text>
+      </Pressable>
     );
   });
 
@@ -238,8 +220,11 @@ const TotalContent = ({ route }) => {
                   {"\n"}
                 </Text>
               </View>
-              <View style={{ flex: 1 }}>{keywordlist}</View>
             </View>
+          </View>
+
+          <View style={{ flexDirection: "row", width: width }}>
+            <Text>{keywordlist}</Text>
           </View>
 
           {/*Modal (팝업 바)*/}

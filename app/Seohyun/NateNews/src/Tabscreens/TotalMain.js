@@ -25,7 +25,7 @@ function TotalMain({ navigation }) {
 
   const urlPushClick = (titlesend, docsend) => {
     console.log(`urlPushClicked`);
-    fetch("http://172.30.2.13:5000/push_url", {
+    fetch("http://192.168.0.13:5000/push_url", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
