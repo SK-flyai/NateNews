@@ -18,6 +18,8 @@ import { Dimensions } from "react-native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
+const Imagewidth = width * 0.3;
+const SmallImageWidth = width * 0.15;
 
 const recSentences = [];
 const recKeywords = [];
@@ -91,22 +93,28 @@ let modalDate = [];
 let modalContent = [];
 let modalImage = [];
 
-const SportContent = ({ route }) => {
+const SportContent = ({ route, navigation }) => {
   const link = route.params;
 
-  title = data.spo[link].title;
-  category = data.spo[link].category;
-  press = data.spo[link].press;
-  date = data.spo[link].date;
-  content = data.spo[link].content;
-  caption = data.spo[link].caption;
+  const [count, setCount] = useState(0);
+  const Refresh = () => {
+    setCount(count + 1);
+  };
+  if (count == 0) {
+    title = data.spo[link].title;
+    category = data.spo[link].category;
+    press = data.spo[link].press;
+    date = data.spo[link].date;
+    content = data.spo[link].content;
+    caption = data.spo[link].caption;
+  }
   for (var key3 in data.spo[link].image) {
     img = key3;
     break;
   }
 
   const [aspectRatio, setAspectRatio] = useState(null);
-
+  console.log("CNT : ", count);
   const [isModalVisible2, setModalVisible2] = useState(false);
   const toggleModal2 = () => {
     setModalVisible2(!isModalVisible2);
@@ -116,7 +124,6 @@ const SportContent = ({ route }) => {
   const toggleModal1 = (keywordnum) => {
     setModalVisible1(!isModalVisible1);
     console.log(keywordnum);
-    //console.log(recTitles);
     modalLink = recLinks[keywordnum];
     modalTitle = recTitles[keywordnum];
     modalPress = recPresses[keywordnum];
@@ -196,6 +203,56 @@ const SportContent = ({ route }) => {
     );
   });
 
+  //
+
+  const views3 = [];
+  for (let i = 0; i < keywordcnt; i++) {
+    const urlsend = recLinks[i];
+    views3.push(
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            console.log(title);
+            title =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].title;
+            category =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].category;
+            press =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].press;
+            date =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].date;
+            content =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].content;
+            caption =
+              data2.keyword["손흥민"][
+                "https://news.nate.com/view/20230224n21994"
+              ].caption;
+            toggleModal1();
+            Refresh();
+            console.log(title);
+          }}
+        >
+          <View>
+            <Text>SESESESESESESE</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  console.log(recLinks[0]);
+  //
+  console.log("TTT : ", title);
   return (
     <SafeAreaView
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
@@ -313,12 +370,10 @@ const SportContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {modalTitle}
-                  {modalLink}
-                  {/* {modalPress}
-                  {modalDate}
-                  {modalContent}
-                  {modalImage} */}
+                  <View>
+                    <View>{views3}</View>
+                    <Text>HI</Text>
+                  </View>
                 </Text>
               </ScrollView>
             </View>
