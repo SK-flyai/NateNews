@@ -22,6 +22,7 @@ import data2 from "../flask/recommend.json";
 const recSentences = [];
 const recKeywords = [];
 const recLinks = [];
+
 let keywordnum = 0;
 
 var title = "";
@@ -42,25 +43,36 @@ for (var key2 in data2.sentence) {
 }
 
 let keywordcnt = recKeywords.length;
-const keywordlist = [];
-
+let keywordlist = [];
+let modallink = [];
+// 다른 장르로 바꿀라면 spo를 바꾸면 됨 json 안에 들어있음
 const SocialContent = ({ route }) => {
   const link = route.params;
 
-  title = data.spo[link].title;
-  category = data.spo[link].category;
-  press = data.spo[link].press;
-  date = data.spo[link].date;
-  content = data.spo[link].content;
-  caption = data.spo[link].caption;
-  for (var key3 in data.spo[link].image) {
+  title = data.soc[link].title;
+  category = data.soc[link].category;
+  press = data.soc[link].press;
+  date = data.soc[link].date;
+  content = data.soc[link].content;
+  caption = data.soc[link].caption;
+  for (var key3 in data.soc[link].image) {
     img = key3;
     break;
   }
 
-  const [isModalVisible1, setModalVisible1] = useState(false);
-  const [isModalVisible2, setModalVisible2] = useState(false);
   const [aspectRatio, setAspectRatio] = useState(null);
+
+  const [isModalVisible2, setModalVisible2] = useState(false);
+  const toggleModal2 = () => {
+    setModalVisible2(!isModalVisible2);
+  };
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const toggleModal1 = (keywordnum) => {
+    setModalVisible1(!isModalVisible1);
+    console.log(keywordnum);
+    modallink = recLinks[keywordnum];
+  };
 
   useEffect(() => {
     Image.getSize(
@@ -90,44 +102,47 @@ const SocialContent = ({ route }) => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
   }, [isModalVisible1, isModalVisible2]);
-
-  const toggleModal1 = () => {
-    setModalVisible1(!isModalVisible1);
-  };
-
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
   const newContect = content.replace(/ /g, "\u00A0");
 
-  for (let i = 0; i < keywordcnt; i++) {
-    keywordnum = i + 1;
-    keywordlist.push(
-      <View key={i}>
+  keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
+    const keywordnum = i;
+    return (
+      <View style={{ flex: 1 }}>
         <Pressable
-          onPress={toggleModal1}
+          onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
             alignItems: "center",
-            flex: 1,
           }}
         >
-          <View style={{ flex: 1, width: width * 0.95 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                backgroundColor: "lightgrey",
-              }}
-            >
-              {recKeywords[i]}
-            </Text>
-            <Text>{"\n"}</Text>
+          <View
+            style={{
+              width: width * 0.95,
+              backgroundColor: "white",
+              justifyContent: "center",
+              alignItems: "center",
+              borderColor: "black",
+              borderWidth: 1,
+
+              padding: "5%",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontSize: 20,
+                }}
+              >
+                {recKeywords[i]}
+              </Text>
+            </View>
+            {/* <Text>{"\n"}</Text> */}
           </View>
         </Pressable>
       </View>
     );
-  }
+  });
 
   return (
     <SafeAreaView
@@ -173,20 +188,19 @@ const SocialContent = ({ route }) => {
           </View>
           <Divider style={{ height: 5 }} />
 
-          <TouchableOpacity onPress={toggleModal1}>
-            <Image
-              style={{
-                width: width,
-                aspectRatio,
-                marginTop: 15,
-                // resizeMode: "contain",
-                // height: width * aspectRatio,
-              }}
-              source={{
-                uri: img,
-              }}
-            />
-          </TouchableOpacity>
+          <Image
+            style={{
+              width: width,
+              aspectRatio,
+              marginTop: 15,
+              // resizeMode: "contain",
+              // height: width * aspectRatio,
+            }}
+            source={{
+              uri: img,
+            }}
+          />
+
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
@@ -199,28 +213,35 @@ const SocialContent = ({ route }) => {
             >
               {newContect}
             </Text>
-
             <View
               style={{
-                flex: 1,
-                width: width * 0.95,
-                backgroundColor: "lightblue",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Text
+              <Text>{"\n"}</Text>
+              <View
                 style={{
-                  fontSize: 15,
+                  flex: 1,
+                  width: width * 0.85,
+                  backgroundColor: "lightblue",
+                  borderRadius: 6,
+                  padding: "5%",
                 }}
               >
-                {recSentences}
-              </Text>
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                  {"\n"}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>{keywordlist}</View>
             </View>
           </View>
 
-          <View>
-            <Text>{"\n"}</Text>
-            {keywordlist}
-          </View>
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}
@@ -239,7 +260,7 @@ const SocialContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {keywordnum}
+                  {modallink}
                 </Text>
               </ScrollView>
             </View>

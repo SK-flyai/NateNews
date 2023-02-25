@@ -8,7 +8,6 @@ import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import { Pressable, TouchableOpacity } from "react-native";
 import data from "../flask/ranking.json";
-
 const { width } = Dimensions.get("window");
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
@@ -24,28 +23,28 @@ function CurrentMain({ navigation }) {
   var urlLink = "";
   const [result, setResult] = useState(null);
 
-  const urlPushClick = (urls) => {
+  const urlPushClick = (titlesend, docsend) => {
     console.log(`urlPushClicked`);
-    fetch("http://192.168.11.162:5000/push_url", {
+    fetch("http://172.30.2.13:5000/push_url", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ text: urls }),
+      body: JSON.stringify({ title: titlesend, doc: docsend }),
     })
       .then((response) => response.json())
       .then((data) => setResult(data.message))
       .catch((error) => setResult(error.message));
   };
 
-  for (var key in data.spo) {
+  for (var key in data.sisa) {
     links.push(key);
-    titles.push(data.spo[key].title);
-    categories.push(data.spo[key].category);
-    presses.push(data.spo[key].press);
-    dates.push(data.spo[key].date);
-    contents.push(data.spo[key].content);
-    for (var key2 in data.spo[key].image) {
+    titles.push(data.sisa[key].title);
+    categories.push(data.sisa[key].category);
+    presses.push(data.sisa[key].press);
+    dates.push(data.sisa[key].date);
+    contents.push(data.sisa[key].content);
+    for (var key2 in data.sisa[key].image) {
       images.push(key2);
       break;
     }
@@ -54,6 +53,8 @@ function CurrentMain({ navigation }) {
   const views = [];
   for (let i = 0; i < 5; i++) {
     const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
     const [aspectRatio, setAspectRatio] = useState(null);
 
     useEffect(() => {
@@ -112,8 +113,8 @@ function CurrentMain({ navigation }) {
         {newDivider}
         <TouchableOpacity
           onPress={() => {
-            urlPushClick(urlsend);
-            console.log(urlsend); // call urlPushClick with the appropriate text
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
             navigation.navigate("CurrentContent", links[i]);
           }}
         >
@@ -132,29 +133,53 @@ function CurrentMain({ navigation }) {
   }
 
   const views2 = [];
-  for (let i = 5; i < 15; i++) {
+  for (let i = 5; i < 20; i++) {
     const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
+    const [aspectRatio, setAspectRatio] = useState(null);
+
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
+
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
 
     views2.push(
       <View styles={{ flex: 1 }} key={i}>
         <View style={styles.divider} />
         <TouchableOpacity
           onPress={() => {
-            urlPushClick(urlsend);
-            console.log(urlsend); // call urlPushClick with the appropriate text
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
             navigation.navigate("CurrentContent", links[i]);
           }}
         >
           <View style={{ flex: 1, flexDirection: "row" }}>
-            <Image
-              style={{
-                width: SmallImageWidth,
-                height: width * 0.12,
-                backgroundColor: "black",
-                resizeMode: "stretch",
-              }}
-              source={{ uri: images[i] }}
-            />
+            <Image style={Istyle} source={{ uri: images[i] }} />
 
             <View
               style={{
@@ -163,7 +188,7 @@ function CurrentMain({ navigation }) {
                 justifyContent: "center",
               }}
             >
-              <Text numberOfLines={1} style={{ fontWeight: "bold" }}>
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
                 {titles[i].replace(/ /g, "\u00A0")}
               </Text>
 

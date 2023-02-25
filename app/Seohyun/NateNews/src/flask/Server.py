@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from nate import news_ranking
-from nate import news_keyword
 from flask import Flask, jsonify, request
 # from articles import *
 from crawlcode import *
@@ -11,7 +9,8 @@ import json
 import sys
 path = 'C:/Users/012/Desktop/git/NateNews/crawl'
 sys.path.append(path)
-
+from nate import news_ranking
+from nate import news_keyword
 
 app = Flask(__name__)
 

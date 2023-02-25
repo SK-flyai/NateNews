@@ -1,5 +1,5 @@
 from bareunpy import Tagger
-from newspred import NewsModel
+
 from get_keyword import keyword
 from ranking import get_ranking
 
@@ -10,21 +10,22 @@ import sys
 # path = './../ml'
 path = 'C:/Users/012/Desktop/git/NateNews/ml'
 
-
 sys.path.append(path)
 print(path)
 
+from newspred import NewsModel
 
 API_KEY = 'koba-6REWGFY-OPWE7ZI-TPNV3FQ-DCVQDKA'  # 각자의 API키로 변경해주세요!
 
 tagger = Tagger(API_KEY)
-model = NewsModel(tagger=tagger, model_path='sinjy1203/ko-sbert-natenews',
-                  user_words_path='C:/Users/frica/OneDrive/바탕 화면/GitHub/NateNews/ml/user_words')
+model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1',
+                  user_words_path='C:/Users/012/Desktop/git/NateNews/ml/user_words')
 title = "This is title"
 doc = "This is doc"
 
 
 def news_keyword(doc: str, title: str):
+    
     return keyword(model, doc, title)
 
 

@@ -15,7 +15,7 @@ def keyword(
     save: bool = False
 ):
     # this = time.time()
-    keywords, sentence = model.predict(doc, title)
+    keywords, sentence = model.predict(doc, title, sent_top_n=3)
     keywords = list(map(lambda x: x.split('[')[0], keywords))
     # print(f"Inference Time of keys : {time.time() - this}\n\n"); this = time.time()
 

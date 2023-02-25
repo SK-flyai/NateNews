@@ -45,17 +45,17 @@ for (var key2 in data2.sentence) {
 let keywordcnt = recKeywords.length;
 let keywordlist = [];
 let modallink = [];
-
+// 다른 장르로 바꿀라면 spo를 바꾸면 됨 json 안에 들어있음
 const WorldContent = ({ route }) => {
   const link = route.params;
 
-  title = data.spo[link].title;
-  category = data.spo[link].category;
-  press = data.spo[link].press;
-  date = data.spo[link].date;
-  content = data.spo[link].content;
-  caption = data.spo[link].caption;
-  for (var key3 in data.spo[link].image) {
+  title = data.int[link].title;
+  category = data.int[link].category;
+  press = data.int[link].press;
+  date = data.int[link].date;
+  content = data.int[link].content;
+  caption = data.int[link].caption;
+  for (var key3 in data.int[link].image) {
     img = key3;
     break;
   }
@@ -107,26 +107,37 @@ const WorldContent = ({ route }) => {
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
-      <View key={i}>
+      <View style={{ flex: 1 }}>
         <Pressable
           onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
             alignItems: "center",
-            flex: 1,
           }}
         >
-          <View style={{ flex: 1, width: width * 0.95 }}>
-            <Text
-              style={{
-                fontSize: 15,
-                backgroundColor: "lightgrey",
-              }}
-            >
-              {recKeywords[i]}
-            </Text>
-            <Text>{"\n"}</Text>
+          <View
+            style={{
+              width: width * 0.95,
+              backgroundColor: "white",
+              justifyContent: "center",
+              alignItems: "center",
+              borderColor: "black",
+              borderWidth: 1,
+
+              padding: "5%",
+            }}
+          >
+            <View>
+              <Text
+                style={{
+                  fontSize: 20,
+                }}
+              >
+                {recKeywords[i]}
+              </Text>
+            </View>
+            {/* <Text>{"\n"}</Text> */}
           </View>
         </Pressable>
       </View>
@@ -177,49 +188,22 @@ const WorldContent = ({ route }) => {
           </View>
           <Divider style={{ height: 5 }} />
 
-          <TouchableOpacity onPress={toggleModal1}>
-            <Image
-              style={{
-                width: width,
-                aspectRatio,
-                marginTop: 15,
-                // resizeMode: "contain",
-                // height: width * aspectRatio,
-              }}
-              source={{
-                uri: img,
-              }}
-            />
-          </TouchableOpacity>
+          <Image
+            style={{
+              width: width,
+              aspectRatio,
+              marginTop: 15,
+              // resizeMode: "contain",
+              // height: width * aspectRatio,
+            }}
+            source={{
+              uri: img,
+            }}
+          />
+
           <Divider style={{ height: 5 }} />
 
           <View style={{ flex: 1 }}>
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Text>{"\n"}</Text>
-              <View
-                style={{
-                  flex: 1,
-                  width: width * 0.75,
-                  backgroundColor: "lightblue",
-                  borderRadius: 8,
-                  padding: "5%",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 15,
-                  }}
-                >
-                  {recSentences}
-                </Text>
-              </View>
-            </View>
             <Text
               style={{
                 padding: 5,
@@ -229,11 +213,35 @@ const WorldContent = ({ route }) => {
             >
               {newContect}
             </Text>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>{"\n"}</Text>
+              <View
+                style={{
+                  flex: 1,
+                  width: width * 0.85,
+                  backgroundColor: "lightblue",
+                  borderRadius: 6,
+                  padding: "5%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                  {"\n"}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>{keywordlist}</View>
+            </View>
           </View>
-          <View>
-            <Text>{"\n"}</Text>
-            {keywordlist}
-          </View>
+
           {/*Modal (팝업 바)*/}
           <Modal
             visible={isModalVisible1}

@@ -190,7 +190,7 @@ class KeySentence:
 
         return [candidates[idx] for idx in sents_idx]
 
-    def predict(self, doc: str, title: str, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
+    def predict(self, doc: str, title: str, mode: str = 'mmr', top_n: int = 3, nr_candidates: int = 10,
                 diversity: float = 0.2, title_w: float = 0.5) -> List[str]:
         """
         뉴스본문에서 주요문장들을 리턴
@@ -208,6 +208,9 @@ class KeySentence:
         """
         # candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
         # candidates = doc.split('. ')
+        # print([doc])
+        # print([title])
+        doc = re.sub('\.* *\\n+', '. ', doc)
         candidates = re.split('\. |\? ', doc)
 
         doc_embedding = self.model.encode([doc, title]) # 뉴스본문의 임베딩

@@ -45,17 +45,17 @@ for (var key2 in data2.sentence) {
 let keywordcnt = recKeywords.length;
 let keywordlist = [];
 let modallink = [];
-
+// 다른 장르로 바꿀라면 spo를 바꾸면 됨 json 안에 들어있음
 const TotalContent = ({ route }) => {
   const link = route.params;
 
-  title = data.spo[link].title;
-  category = data.spo[link].category;
-  press = data.spo[link].press;
-  date = data.spo[link].date;
-  content = data.spo[link].content;
-  caption = data.spo[link].caption;
-  for (var key3 in data.spo[link].image) {
+  title = data.all[link].title;
+  category = data.all[link].category;
+  press = data.all[link].press;
+  date = data.all[link].date;
+  content = data.all[link].content;
+  caption = data.all[link].caption;
+  for (var key3 in data.all[link].image) {
     img = key3;
     break;
   }
@@ -107,37 +107,36 @@ const TotalContent = ({ route }) => {
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
-      <View style={{ flex: 1 }} key={i}>
+      <View style={{ flex: 1 }}>
         <Pressable
           onPress={() => toggleModal1(i + 1)}
           android_ripple={{ color: "purple" }}
           style={{
             justifyContent: "center",
             alignItems: "center",
-            flex: 1,
-            flexDirection: "row",
           }}
         >
           <View
             style={{
-              flex: 1,
               width: width * 0.95,
-              backgroundColor: "lightgrey",
+              backgroundColor: "white",
               justifyContent: "center",
               alignItems: "center",
               borderColor: "black",
               borderWidth: 1,
-              marginVertical: "20%",
+
               padding: "5%",
             }}
           >
-            <Text
-              style={{
-                fontSize: 15,
-              }}
-            >
-              {recKeywords[i]}
-            </Text>
+            <View>
+              <Text
+                style={{
+                  fontSize: 20,
+                }}
+              >
+                {recKeywords[i]}
+              </Text>
+            </View>
             {/* <Text>{"\n"}</Text> */}
           </View>
         </Pressable>
@@ -236,11 +235,10 @@ const TotalContent = ({ route }) => {
                   }}
                 >
                   {recSentences}
+                  {"\n"}
                 </Text>
               </View>
-              <View style={{ flexDirection: "row", flex: 1 }}>
-                {keywordlist}
-              </View>
+              <View style={{ flex: 1 }}>{keywordlist}</View>
             </View>
           </View>
 

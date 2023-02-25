@@ -28,7 +28,7 @@ def get_ranking(num: int=20):
         news_list = get_news(url_list)[:num]
         ranking_dict[category] = {news.url: news.get_dict() for news in news_list}
         
-    with open('C:/Users/frica/OneDrive/바탕 화면/GitHub/NateNews/app/Seohyun/NateNews/src/flask/ranking.json', 'w', -1, 'utf-8') as f : 
+    with open('C:/Users/012/Desktop/git/NateNews/crawl/ranking.json', 'w', -1, 'utf-8') as f : 
             json.dump(ranking_dict, f, indent=4, ensure_ascii=False)
              
     return ranking_dict
