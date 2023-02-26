@@ -304,6 +304,11 @@ const TotalContent = ({ route, navigation }) => {
             >
               {newContect}
             </Text>
+            <View style={{ marginTop: "5%", marginLeft: "3%" }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                핵심 문장
+              </Text>
+            </View>
             <View
               style={{
                 alignItems: "center",
@@ -311,6 +316,7 @@ const TotalContent = ({ route, navigation }) => {
               }}
             >
               <Text>{"\n"}</Text>
+
               <View
                 style={{
                   flex: 1,
@@ -340,8 +346,8 @@ const TotalContent = ({ route, navigation }) => {
                 flexDirection: "row",
                 width: width,
                 marginVertical: "5%",
-                alignItems: "center",
-                justifyContent: "center",
+                // alignItems: "center",
+                // justifyContent: "center",
               }}
             >
               <Text>{keywordlist}</Text>
