@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Platform } from "react-native";
 import SportMain from "../../Tabscreens/SportMain";
 import SportContent from "../../Tabscreens/SportContent";
+import SportContent2 from "../../Tabscreens/SportContent2";
 
 const Stack = createStackNavigator();
 
@@ -36,6 +37,29 @@ const SportNav = () => {
       <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
         name="SportContent"
         component={SportContent}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#FA5858",
+          },
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 25,
+            color: "#ffffff",
+            ...Platform.select({
+              ios: {
+                fontFamily: "Futura",
+              },
+              android: {
+                fontFamily: "monospace",
+              },
+            }),
+          },
+        }}
+      />
+      <Stack.Screen // Page3 - '스포츠' Tab (뉴스 기사 본문)
+        name="SportContent2"
+        component={SportContent2}
         options={{
           headerShown: false,
           headerStyle: {

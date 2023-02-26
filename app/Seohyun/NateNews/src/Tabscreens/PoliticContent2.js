@@ -19,6 +19,8 @@ import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
+import { useRoute } from "@react-navigation/native";
+
 const Imagewidth = width * 0.3;
 const SmallImageWidth = width * 0.15;
 
@@ -55,6 +57,7 @@ for (var key1 in data2.keyword) {
   tempContent = [];
   tempImage = [];
 
+  console.log("--------------------------------------");
   for (var key2 in data2.keyword[key1]) {
     tempTitle.push(data2.keyword[key1][key2].title + "\n\n");
     tempPress.push(data2.keyword[key1][key2].press);
@@ -82,39 +85,51 @@ let modalDate = [];
 let modalContent = [];
 let modalImage = [];
 let vv = [];
-let lenlen = 0;
 
-const PoliticContent = ({ route }) => {
-  const link = route.params;
+const PoliticContent2 = ({}) => {
   const navigation = useNavigation();
   const [count, setCount] = useState(0);
   const [result, setResult] = useState(null);
+
   const Refresh = () => {
     setCount(count + 1);
   };
-  if (count == 0) {
-    title = data.pol[link].title;
-    category = data.pol[link].category;
-    press = data.pol[link].press;
-    date = data.pol[link].date;
-    content = data.pol[link].content;
-    caption = data.pol[link].caption;
-  }
-  for (var key3 in data.pol[link].image) {
-    img = key3;
+
+  const route = useRoute();
+  const param1 = route.params.param1; //LINK
+  const param2 = route.params.param2; //KEYWORD
+  const param3 = route.params.param3; //TITLE
+  const param4 = route.params.param4; //PRESS
+  const param5 = route.params.param5; //DATE
+  const param6 = route.params.param6; //CONTENT
+  const param7 = route.params.param7; //IMAGE
+  console.log("Parameters");
+  console.log(param1);
+  console.log(param2);
+  console.log(param3);
+  console.log(param4);
+  console.log(param5);
+  console.log(param6);
+  console.log(param7);
+
+  title = param3;
+  press = param4;
+  date = param5;
+  content = param6;
+  //img = param7;
+
+  for (var keyy in param7) {
+    img = keyy;
     break;
   }
 
-  const [param1, setParam1] = useState("parameter 1 value");
-  const [param2, setParam2] = useState("parameter 2 value");
-
   const [aspectRatio, setAspectRatio] = useState(null);
-  console.log("CNT : ", count);
 
-  const [isModalVisible1, setModalVisible1] = useState(false);
   const CloseModal = () => {
     setModalVisible1(!isModalVisible1);
   };
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
   const toggleModal1 = (keywordnum) => {
     setModalVisible1(!isModalVisible1);
     console.log(keywordnum);
@@ -125,7 +140,7 @@ const PoliticContent = ({ route }) => {
     modalDate = recDates[keywordnum];
     modalContent = recContents[keywordnum];
     modalImage = recImages[keywordnum];
-
+    CloseModal();
     if (!isModalVisible1) {
       vv = [];
 
@@ -186,10 +201,6 @@ const PoliticContent = ({ route }) => {
     );
   }, []);
 
-  // const CloseModal = () => {
-  //   setModalVisible1(!isModalVisible1);
-  // };
-
   useEffect(() => {
     const handleBackButton = () => {
       if (isModalVisible1) {
@@ -206,7 +217,6 @@ const PoliticContent = ({ route }) => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
   }, [isModalVisible1]);
-
   const newContect = content.replace(/ /g, "\u00A0");
 
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
@@ -232,7 +242,6 @@ const PoliticContent = ({ route }) => {
       </Pressable>
     );
   });
-
   //
 
   const views3 = [];
@@ -251,16 +260,13 @@ const PoliticContent = ({ route }) => {
           }}
         >
           <View>
-            <Text>{urlsend + "\n"}</Text>
+            <Text>SESESESESESESE</Text>
           </View>
         </TouchableOpacity>
       </View>
     );
   }
 
-  console.log(recLinks[0]);
-  //
-  console.log("TTT : ", title);
   return (
     <SafeAreaView
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
@@ -282,8 +288,6 @@ const PoliticContent = ({ route }) => {
                 }),
               }}
             >
-              {/* 편의점 직원 살해 후 달아난 30대男…16살부터 상습 강도질
-              {"\n"} */}
               {title.replace(/ /g, "\u00A0")}
             </Text>
             <Text style={{ color: "grey" }}>{date}</Text>
@@ -417,7 +421,7 @@ const PoliticContent = ({ route }) => {
   );
 };
 
-export default PoliticContent;
+export default PoliticContent2;
 
 const styles = StyleSheet.create({
   // 기사 제목 style

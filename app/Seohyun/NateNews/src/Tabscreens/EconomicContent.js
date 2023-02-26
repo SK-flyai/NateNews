@@ -15,63 +15,163 @@ import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
+const Imagewidth = width * 0.3;
+const SmallImageWidth = width * 0.15;
 
 const recSentences = [];
 const recKeywords = [];
 const recLinks = [];
 
+const recImages = [];
+const recTitles = [];
+const recContents = [];
+const recDates = [];
+const recPresses = [];
+
+var tempTitle = [];
+var tempPress = [];
+var tempDate = [];
+var tempContent = [];
+var tempImage = [];
+
 let keywordnum = 0;
 
 var title = "";
-var category = "";
 var press = "";
 var date = "";
 var content = "";
-var caption = "";
 var img = "";
 
 for (var key1 in data2.keyword) {
   recKeywords.push(key1 + "  ");
-  recLinks.push(data2.keyword[key1]);
+  recLinks.push(Object.keys(data2.keyword[key1]));
+  tempTitle = [];
+  tempPress = [];
+  tempDate = [];
+  tempContent = [];
+  tempImage = [];
+
+  for (var key2 in data2.keyword[key1]) {
+    tempTitle.push(data2.keyword[key1][key2].title + "\n\n");
+    tempPress.push(data2.keyword[key1][key2].press);
+    tempDate.push(data2.keyword[key1][key2].date);
+    tempContent.push(data2.keyword[key1][key2].content);
+    tempImage.push(data2.keyword[key1][key2].image);
+  }
+  recTitles.push(tempTitle);
+  recImages.push(tempImage);
+  recPresses.push(tempPress);
+  recDates.push(tempDate);
+  recContents.push(tempContent);
 }
 
 for (var key2 in data2.sentence) {
-  recSentences.push(data2.sentence[key2] + "\n\n");
+  recSentences.push(data2.sentence[key2].replace(/ /g, "\u00A0") + "\n\n");
 }
 
 let keywordcnt = recKeywords.length;
 let keywordlist = [];
-let modallink = [];
-// 다른 장르로 바꿀라면 spo를 바꾸면 됨 json 안에 들어있음
+let modalTitle = [];
+let modalPress = [];
+let modalLink = [];
+let modalDate = [];
+let modalContent = [];
+let modalImage = [];
+let vv = [];
+let lenlen = 0;
+
 const EconomicContent = ({ route }) => {
   const link = route.params;
-
-  title = data.eco[link].title;
-  category = data.eco[link].category;
-  press = data.eco[link].press;
-  date = data.eco[link].date;
-  content = data.eco[link].content;
-  caption = data.eco[link].caption;
+  const navigation = useNavigation();
+  const [count, setCount] = useState(0);
+  const [result, setResult] = useState(null);
+  const Refresh = () => {
+    setCount(count + 1);
+  };
+  if (count == 0) {
+    title = data.eco[link].title;
+    category = data.eco[link].category;
+    press = data.eco[link].press;
+    date = data.eco[link].date;
+    content = data.eco[link].content;
+    caption = data.eco[link].caption;
+  }
   for (var key3 in data.eco[link].image) {
     img = key3;
     break;
   }
 
-  const [aspectRatio, setAspectRatio] = useState(null);
+  const [param1, setParam1] = useState("parameter 1 value");
+  const [param2, setParam2] = useState("parameter 2 value");
 
-  const [isModalVisible2, setModalVisible2] = useState(false);
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
+  const [aspectRatio, setAspectRatio] = useState(null);
+  console.log("CNT : ", count);
 
   const [isModalVisible1, setModalVisible1] = useState(false);
+  const CloseModal = () => {
+    setModalVisible1(!isModalVisible1);
+  };
   const toggleModal1 = (keywordnum) => {
     setModalVisible1(!isModalVisible1);
     console.log(keywordnum);
-    modallink = recLinks[keywordnum];
+    modalLink = recLinks[keywordnum];
+    lenlen = recLinks[keywordnum].length;
+    modalTitle = recTitles[keywordnum];
+    modalPress = recPresses[keywordnum];
+    modalDate = recDates[keywordnum];
+    modalContent = recContents[keywordnum];
+    modalImage = recImages[keywordnum];
+
+    if (!isModalVisible1) {
+      vv = [];
+
+      for (let i = 0; i < lenlen; i++) {
+        vv.push(
+          <View key={i}>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible1(false);
+                console.log(modalLink[i]);
+                console.log(recKeywords);
+                fetch("http://192.168.0.13:5000/push_url", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    title: modalTitle[i],
+                    doc: modalContent[i],
+                  }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => setResult(data.message))
+                  .catch((error) => setResult(error.message));
+
+                navigation.navigate("EconomicContent2", {
+                  param1: modalLink[i],
+                  param2: recKeywords[i],
+                  param3: modalTitle[i],
+                  param4: modalPress[i],
+                  param5: modalDate[i],
+                  param6: modalContent[i],
+                  param7: modalImage[i],
+                });
+                Refresh();
+              }}
+            >
+              <View>
+                <Text>{modalTitle[i]}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+      console.log("1312312312313123123");
+    }
   };
 
   useEffect(() => {
@@ -86,11 +186,15 @@ const EconomicContent = ({ route }) => {
     );
   }, []);
 
+  // const CloseModal = () => {
+  //   setModalVisible1(!isModalVisible1);
+  // };
+
   useEffect(() => {
     const handleBackButton = () => {
-      if (isModalVisible1 || isModalVisible2) {
+      if (isModalVisible1) {
         setModalVisible1(false);
-        setModalVisible2(false);
+
         return true; // indicate that the back key was handled
       }
       return false; // default behavior of back key
@@ -101,49 +205,62 @@ const EconomicContent = ({ route }) => {
     return () => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
-  }, [isModalVisible1, isModalVisible2]);
+  }, [isModalVisible1]);
+
   const newContect = content.replace(/ /g, "\u00A0");
 
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
-      <View style={{ flex: 1 }}>
-        <Pressable
-          onPress={() => toggleModal1(i + 1)}
-          android_ripple={{ color: "purple" }}
+      <Pressable
+        key={i}
+        onPress={() => toggleModal1(i)}
+        android_ripple={{ color: "#e0e0e0" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
           style={{
-            justifyContent: "center",
-            alignItems: "center",
+            fontSize: 20,
           }}
         >
-          <View
-            style={{
-              width: width * 0.95,
-              backgroundColor: "white",
-              justifyContent: "center",
-              alignItems: "center",
-              borderColor: "black",
-              borderWidth: 1,
-
-              padding: "5%",
-            }}
-          >
-            <View>
-              <Text
-                style={{
-                  fontSize: 20,
-                }}
-              >
-                {recKeywords[i]}
-              </Text>
-            </View>
-            {/* <Text>{"\n"}</Text> */}
-          </View>
-        </Pressable>
-      </View>
+          {"#"}
+          {recKeywords[i]}
+        </Text>
+      </Pressable>
     );
   });
 
+  //
+
+  const views3 = [];
+  for (let i = 0; i < keywordcnt; i++) {
+    const urlsend = recLinks[i];
+    views3.push(
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            toggleModal1();
+            navigation.navigate("EconomicContent2", {
+              param1: "https://news.nate.com/view/20230226n07184",
+              param2: "이승우",
+            });
+            Refresh();
+          }}
+        >
+          <View>
+            <Text>{urlsend + "\n"}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  console.log(recLinks[0]);
+  //
+  console.log("TTT : ", title);
   return (
     <SafeAreaView
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
@@ -213,6 +330,11 @@ const EconomicContent = ({ route }) => {
             >
               {newContect}
             </Text>
+            <View style={{ marginTop: "5%", marginLeft: "3%" }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                핵심 문장
+              </Text>
+            </View>
             <View
               style={{
                 alignItems: "center",
@@ -220,11 +342,13 @@ const EconomicContent = ({ route }) => {
               }}
             >
               <Text>{"\n"}</Text>
+
               <View
                 style={{
                   flex: 1,
                   width: width * 0.85,
-                  backgroundColor: "lightblue",
+                  // backgroundColor: "#edede9",
+                  backgroundColor: "#edf2f4",
                   borderRadius: 6,
                   padding: "5%",
                 }}
@@ -235,10 +359,24 @@ const EconomicContent = ({ route }) => {
                   }}
                 >
                   {recSentences}
-                  {"\n"}
                 </Text>
               </View>
-              <View style={{ flex: 1 }}>{keywordlist}</View>
+            </View>
+            <View style={{ marginTop: "5%", marginLeft: "3%" }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                주요 키워드
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                width: width,
+                marginVertical: "5%",
+                // alignItems: "center",
+                // justifyContent: "center",
+              }}
+            >
+              <Text>{keywordlist}</Text>
             </View>
           </View>
 
@@ -246,10 +384,14 @@ const EconomicContent = ({ route }) => {
           <Modal
             visible={isModalVisible1}
             style={styles.bottomModal}
-            onRequestClose={toggleModal1}
+            onRequestClose={() => {
+              if (isModalVisible1) {
+                setModalVisible1(false);
+              }
+            }}
           >
             <View style={styles.modalContent}>
-              <Pressable style={styles.closeButton} onPress={toggleModal1}>
+              <Pressable style={styles.closeButton} onPress={CloseModal}>
                 <Text style={styles.closeButtonText}>X</Text>
               </Pressable>
               <ScrollView>
@@ -260,25 +402,11 @@ const EconomicContent = ({ route }) => {
                     fontSize: 15,
                   }}
                 >
-                  {modallink}
-                </Text>
-              </ScrollView>
-            </View>
-          </Modal>
-
-          {/* 모달 2 */}
-          <Modal
-            visible={isModalVisible2}
-            style={styles.bottomModal}
-            onRequestClose={toggleModal2}
-          >
-            <View style={styles.modalContent}>
-              <Pressable style={styles.closeButton} onPress={toggleModal2}>
-                <Text style={styles.closeButtonText}>X</Text>
-              </Pressable>
-              <ScrollView>
-                <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-                  mdoal2
+                  <View>
+                    <TouchableOpacity onPress={CloseModal}>
+                      <Text style={{ width: width }}>{vv}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </Text>
               </ScrollView>
             </View>

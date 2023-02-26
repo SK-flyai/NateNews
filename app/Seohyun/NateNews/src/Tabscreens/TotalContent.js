@@ -15,6 +15,7 @@ import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 const { width } = Dimensions.get("window");
 import data from "../flask/ranking.json";
 import data2 from "../flask/recommend.json";
@@ -40,11 +41,9 @@ var tempImage = [];
 let keywordnum = 0;
 
 var title = "";
-var category = "";
 var press = "";
 var date = "";
 var content = "";
-var caption = "";
 var img = "";
 
 for (var key1 in data2.keyword) {
@@ -56,7 +55,6 @@ for (var key1 in data2.keyword) {
   tempContent = [];
   tempImage = [];
 
-  console.log("--------------------------------------");
   for (var key2 in data2.keyword[key1]) {
     tempTitle.push(data2.keyword[key1][key2].title + "\n\n");
     tempPress.push(data2.keyword[key1][key2].press);
@@ -71,15 +69,6 @@ for (var key1 in data2.keyword) {
   recContents.push(tempContent);
 }
 
-// for (var i in recTitles) {
-//   console.log(i);
-//   for (var j in recTitles[i]) {
-//     console.log(recTitles[i][j]);
-//     console.log(recPresses[i][j]);
-//     console.log(recDates[i][j]);
-//   }
-// }
-
 for (var key2 in data2.sentence) {
   recSentences.push(data2.sentence[key2].replace(/ /g, "\u00A0") + "\n\n");
 }
@@ -92,11 +81,14 @@ let modalLink = [];
 let modalDate = [];
 let modalContent = [];
 let modalImage = [];
+let vv = [];
+let lenlen = 0;
 
-const TotalContent = ({ route, navigation }) => {
+const TotalContent = ({ route }) => {
   const link = route.params;
-
+  const navigation = useNavigation();
   const [count, setCount] = useState(0);
+  const [result, setResult] = useState(null);
   const Refresh = () => {
     setCount(count + 1);
   };
@@ -113,23 +105,73 @@ const TotalContent = ({ route, navigation }) => {
     break;
   }
 
+  const [param1, setParam1] = useState("parameter 1 value");
+  const [param2, setParam2] = useState("parameter 2 value");
+
   const [aspectRatio, setAspectRatio] = useState(null);
   console.log("CNT : ", count);
-  const [isModalVisible2, setModalVisible2] = useState(false);
-  const toggleModal2 = () => {
-    setModalVisible2(!isModalVisible2);
-  };
 
   const [isModalVisible1, setModalVisible1] = useState(false);
+  const CloseModal = () => {
+    setModalVisible1(!isModalVisible1);
+  };
   const toggleModal1 = (keywordnum) => {
     setModalVisible1(!isModalVisible1);
     console.log(keywordnum);
     modalLink = recLinks[keywordnum];
+    lenlen = recLinks[keywordnum].length;
     modalTitle = recTitles[keywordnum];
     modalPress = recPresses[keywordnum];
     modalDate = recDates[keywordnum];
     modalContent = recContents[keywordnum];
     modalImage = recImages[keywordnum];
+
+    if (!isModalVisible1) {
+      vv = [];
+
+      for (let i = 0; i < lenlen; i++) {
+        vv.push(
+          <View key={i}>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible1(false);
+                console.log(modalLink[i]);
+                console.log(recKeywords);
+                fetch("http://192.168.0.13:5000/push_url", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    title: modalTitle[i],
+                    doc: modalContent[i],
+                  }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => setResult(data.message))
+                  .catch((error) => setResult(error.message));
+
+                navigation.navigate("TotalContent2", {
+                  param1: modalLink[i],
+                  param2: recKeywords[i],
+                  param3: modalTitle[i],
+                  param4: modalPress[i],
+                  param5: modalDate[i],
+                  param6: modalContent[i],
+                  param7: modalImage[i],
+                });
+                Refresh();
+              }}
+            >
+              <View>
+                <Text>{modalTitle[i]}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+      console.log("1312312312313123123");
+    }
   };
 
   useEffect(() => {
@@ -144,11 +186,15 @@ const TotalContent = ({ route, navigation }) => {
     );
   }, []);
 
+  // const CloseModal = () => {
+  //   setModalVisible1(!isModalVisible1);
+  // };
+
   useEffect(() => {
     const handleBackButton = () => {
-      if (isModalVisible1 || isModalVisible2) {
+      if (isModalVisible1) {
         setModalVisible1(false);
-        setModalVisible2(false);
+
         return true; // indicate that the back key was handled
       }
       return false; // default behavior of back key
@@ -159,14 +205,16 @@ const TotalContent = ({ route, navigation }) => {
     return () => {
       BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
     };
-  }, [isModalVisible1, isModalVisible2]);
+  }, [isModalVisible1]);
+
   const newContect = content.replace(/ /g, "\u00A0");
 
   keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
     const keywordnum = i;
     return (
       <Pressable
-        onPress={() => toggleModal1(i + 1)}
+        key={i}
+        onPress={() => toggleModal1(i)}
         android_ripple={{ color: "#e0e0e0" }}
         style={{
           justifyContent: "center",
@@ -194,38 +242,16 @@ const TotalContent = ({ route, navigation }) => {
       <View>
         <TouchableOpacity
           onPress={() => {
-            console.log(title);
-            title =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].title;
-            category =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].category;
-            press =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].press;
-            date =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].date;
-            content =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].content;
-            caption =
-              data2.keyword["손흥민"][
-                "https://news.nate.com/view/20230224n21994"
-              ].caption;
             toggleModal1();
+            navigation.navigate("TotalContent2", {
+              param1: "https://news.nate.com/view/20230226n07184",
+              param2: "이승우",
+            });
             Refresh();
-            console.log(title);
           }}
         >
-          <View style={{ width: width * 0.8 }}>
-            <Text>"말씀 중에 죄송합니다. 절대 월드클래스 아닙니다."</Text>
+          <View>
+            <Text>{urlsend + "\n"}</Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -358,10 +384,14 @@ const TotalContent = ({ route, navigation }) => {
           <Modal
             visible={isModalVisible1}
             style={styles.bottomModal}
-            onRequestClose={toggleModal1}
+            onRequestClose={() => {
+              if (isModalVisible1) {
+                setModalVisible1(false);
+              }
+            }}
           >
             <View style={styles.modalContent}>
-              <Pressable style={styles.closeButton} onPress={toggleModal1}>
+              <Pressable style={styles.closeButton} onPress={CloseModal}>
                 <Text style={styles.closeButtonText}>X</Text>
               </Pressable>
               <ScrollView>
@@ -373,27 +403,10 @@ const TotalContent = ({ route, navigation }) => {
                   }}
                 >
                   <View>
-                    <View>{views3}</View>
-                    <Text>HI</Text>
+                    <TouchableOpacity onPress={CloseModal}>
+                      <Text style={{ width: width }}>{vv}</Text>
+                    </TouchableOpacity>
                   </View>
-                </Text>
-              </ScrollView>
-            </View>
-          </Modal>
-
-          {/* 모달 2 */}
-          <Modal
-            visible={isModalVisible2}
-            style={styles.bottomModal}
-            onRequestClose={toggleModal2}
-          >
-            <View style={styles.modalContent}>
-              <Pressable style={styles.closeButton} onPress={toggleModal2}>
-                <Text style={styles.closeButtonText}>X</Text>
-              </Pressable>
-              <ScrollView>
-                <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-                  mdoal2
                 </Text>
               </ScrollView>
             </View>
@@ -444,7 +457,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    height: "85%",
+    height: "80%",
   },
   closeButton: {
     position: "absolute",

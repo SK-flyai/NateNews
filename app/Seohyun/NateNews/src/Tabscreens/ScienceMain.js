@@ -212,7 +212,9 @@ function ScienceMain({ navigation }) {
           marginTop: "3%",
         }}
       >
-        <Text style={{ fontSize: 25, fontWeight: "bold" }}>경제 인기뉴스</Text>
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+          IT/과학 인기뉴스
+        </Text>
         <View style={{ flex: 1 }}>{views}</View>
       </View>
       <View
@@ -246,7 +248,9 @@ function ScienceMain({ navigation }) {
           marginHorizontal: "3%",
         }}
       >
-        <Text style={{ fontSize: 20, fontWeight: "bold" }}>경제 주요뉴스</Text>
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+          IT/과학 주요뉴스
+        </Text>
 
         <View style={{ flex: 1 }}>{views2}</View>
       </View>
