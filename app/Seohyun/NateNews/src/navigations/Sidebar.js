@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
 const Sidebar = () => {
   const flaskButtonClick = async () => {
     try {
-      const response = await axios.get("http://192.168.0.13:5000/crawl");
+      const response = await axios.get("http://172.30.121.76:5000/crawl");
       console.log(response.data.output);
     } catch (error) {
       console.error(error);
