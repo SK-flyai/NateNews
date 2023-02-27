@@ -92,14 +92,14 @@ const TotalContent = ({ route }) => {
   const Refresh = () => {
     setCount(count + 1);
   };
-  if (count == 0) {
-    title = data.all[link].title;
-    category = data.all[link].category;
-    press = data.all[link].press;
-    date = data.all[link].date;
-    content = data.all[link].content;
-    caption = data.all[link].caption;
-  }
+
+  title = data.all[link].title;
+  category = data.all[link].category;
+  press = data.all[link].press;
+  date = data.all[link].date;
+  content = data.all[link].content;
+  caption = data.all[link].caption;
+
   for (var key3 in data.all[link].image) {
     img = key3;
     break;
@@ -137,7 +137,7 @@ const TotalContent = ({ route }) => {
                 setModalVisible1(false);
                 console.log(modalLink[i]);
                 console.log(recKeywords);
-                fetch("http://192.168.0.13:5000/push_url", {
+                fetch("http://172.23.252.17:5000/push_url", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
