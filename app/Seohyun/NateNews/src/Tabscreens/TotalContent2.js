@@ -146,7 +146,10 @@ const TotalContent2 = ({}) => {
       vv = [];
 
       for (let i = 0; i < lenlen; i++) {
-        const title = modalTitle[i].replace(/ /g, "\u00A0");
+        const title = (String(i + 1) + ". " + modalTitle[i]).replace(
+          / /g,
+          "\u00A0"
+        );
         vv.push(
           <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
@@ -155,7 +158,7 @@ const TotalContent2 = ({}) => {
                 console.log(modalLink[i]);
                 console.log(recKeywords);
                 scrollViewRef.current.scrollTo({ y: 0 });
-                fetch("http://172.23.252.17:5000/push_url", {
+                fetch("http://192.168.0.13:5000/push_url", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

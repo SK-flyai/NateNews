@@ -130,7 +130,10 @@ const CurrentContent = ({ route }) => {
       vv = [];
 
       for (let i = 0; i < lenlen; i++) {
-        const title = modalTitle[i].replace(/ /g, "\u00A0");
+        const title = (String(i + 1) + ". " + modalTitle[i]).replace(
+          / /g,
+          "\u00A0"
+        );
         vv.push(
           <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
@@ -138,7 +141,7 @@ const CurrentContent = ({ route }) => {
                 setModalVisible1(false);
                 console.log(modalLink[i]);
                 console.log(recKeywords);
-                fetch("http://172.23.252.17:5000/push_url", {
+                fetch("http://192.168.0.13:5000/push_url", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -460,7 +463,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    height: "50%",
+    height: "80%",
   },
   closeButton: {
     position: "absolute",

@@ -128,9 +128,13 @@ const TotalContent = ({ route }) => {
 
     if (!isModalVisible1) {
       vv = [];
+      let count = 1;
 
       for (let i = 0; i < lenlen; i++) {
-        const title = modalTitle[i].replace(/ /g, "\u00A0");
+        const title = (String(i + 1) + ". " + modalTitle[i]).replace(
+          / /g,
+          "\u00A0"
+        );
         vv.push(
           <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
@@ -138,7 +142,7 @@ const TotalContent = ({ route }) => {
                 setModalVisible1(false);
                 console.log(modalLink[i]);
                 console.log(recKeywords);
-                fetch("http://172.23.252.17:5000/push_url", {
+                fetch("http://192.168.0.13:5000/push_url", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -333,7 +337,7 @@ const TotalContent = ({ route }) => {
             </Text>
             <View style={{ marginTop: "5%", marginLeft: "3%" }}>
               <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                핵심 문장
+                주요 문장
               </Text>
             </View>
             <View
@@ -365,7 +369,7 @@ const TotalContent = ({ route }) => {
             </View>
             <View style={{ marginTop: "5%", marginLeft: "3%" }}>
               <Text style={{ fontSize: 22, fontWeight: "bold" }}>
-                주요 키워드
+                핵심 키워드
               </Text>
             </View>
             <View
