@@ -124,14 +124,15 @@ const CurrentContent = ({ route }) => {
     modalPress = recPresses[keywordnum];
     modalDate = recDates[keywordnum];
     modalContent = recContents[keywordnum];
-    modalImage = recImages[key13wordnum];
+    modalImage = recImages[keywordnum];
 
     if (!isModalVisible1) {
       vv = [];
 
       for (let i = 0; i < lenlen; i++) {
+        const title = modalTitle[i].replace(/ /g, "\u00A0");
         vv.push(
-          <View key={i}>
+          <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible1(false);
@@ -164,7 +165,7 @@ const CurrentContent = ({ route }) => {
               }}
             >
               <View>
-                <Text>{modalTitle[i]}</Text>
+                <Text>{title}</Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -351,6 +352,8 @@ const CurrentContent = ({ route }) => {
                   backgroundColor: "#edf2f4",
                   borderRadius: 6,
                   padding: "5%",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <Text
@@ -372,8 +375,8 @@ const CurrentContent = ({ route }) => {
                 flexDirection: "row",
                 width: width,
                 marginVertical: "5%",
-                // alignItems: "center",
-                // justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Text>{keywordlist}</Text>
@@ -457,7 +460,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
-    height: "80%",
+    height: "50%",
   },
   closeButton: {
     position: "absolute",

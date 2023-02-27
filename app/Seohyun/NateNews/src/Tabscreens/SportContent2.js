@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Image,
   View,
@@ -90,6 +90,7 @@ const SportContent2 = ({}) => {
   const navigation = useNavigation();
   const [count, setCount] = useState(0);
   const [result, setResult] = useState(null);
+  const scrollViewRef = useRef();
 
   const Refresh = () => {
     setCount(count + 1);
@@ -145,13 +146,16 @@ const SportContent2 = ({}) => {
       vv = [];
 
       for (let i = 0; i < lenlen; i++) {
+        const title = modalTitle[i].replace(/ /g, "\u00A0");
+
         vv.push(
-          <View key={i}>
+          <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible1(false);
                 console.log(modalLink[i]);
                 console.log(recKeywords);
+                scrollViewRef.current.scrollTo({ y: 0 });
                 fetch("http://172.23.252.17:5000/push_url", {
                   method: "POST",
                   headers: {
@@ -179,7 +183,9 @@ const SportContent2 = ({}) => {
               }}
             >
               <View>
-                <Text>{modalTitle[i]}</Text>
+                <Text>
+                  {i + 1}.{title}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -272,7 +278,10 @@ const SportContent2 = ({}) => {
       style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
     >
       <View style={{ flex: 1, backgroundColor: "white" }}>
-        <ScrollView style={{ flex: 1, borderWidth: 1, borderColor: "#e0e0e0" }}>
+        <ScrollView
+          ref={scrollViewRef}
+          style={{ flex: 1, borderWidth: 1, borderColor: "#e0e0e0" }}
+        >
           {/* <Divider style={{ height: 30 }} /> */}
           <View style={{ flex: 1, backgroundColor: "white" }}>
             <Text
@@ -376,8 +385,8 @@ const SportContent2 = ({}) => {
                 flexDirection: "row",
                 width: width,
                 marginVertical: "5%",
-                // alignItems: "center",
-                // justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Text>{keywordlist}</Text>

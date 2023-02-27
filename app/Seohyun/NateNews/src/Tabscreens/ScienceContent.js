@@ -130,8 +130,10 @@ const ScienceContent = ({ route }) => {
       vv = [];
 
       for (let i = 0; i < lenlen; i++) {
+        const title = modalTitle[i].replace(/ /g, "\u00A0");
+
         vv.push(
-          <View key={i}>
+          <View key={i} style={{ width: width * 0.85 }}>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible1(false);
@@ -164,7 +166,9 @@ const ScienceContent = ({ route }) => {
               }}
             >
               <View>
-                <Text>{modalTitle[i]}</Text>
+                <Text>
+                  {i + 1}.{title}
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
@@ -372,8 +376,8 @@ const ScienceContent = ({ route }) => {
                 flexDirection: "row",
                 width: width,
                 marginVertical: "5%",
-                // alignItems: "center",
-                // justifyContent: "center",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
               <Text>{keywordlist}</Text>
