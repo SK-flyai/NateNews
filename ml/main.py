@@ -49,11 +49,11 @@ if __name__ == '__main__':
     warnings.filterwarnings('ignore')
     # tagger = Mecab()
     tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
-    output_fname = 'keyword_words.csv'
+    output_fname = 'keyword_sents.csv'
 
     tokenizer = CustomTokenizer(tagger=tagger)
 
-    pred_range = (400, 450)
+    pred_range = (0, 100)
 
     # model_path = "./ko-sbert-natenews"
     # word_model = KeyBERT(model_path=model_path)
@@ -79,11 +79,11 @@ if __name__ == '__main__':
         # df.loc[i, 'textrank'] = textrank_sent
         df.loc[i, 'keysent'] = keysent
         df.loc[i, 'titles'] = title
-        df.loc[i, 'contents'] = '\n'.join(kss.split_sentences(df.loc[i, 'contents']))
+        # df.loc[i, 'contents'] = '\n'.join(kss.split_sentences(df.loc[i, 'contents']))
         df.loc[i, 'contents'] = '\n'.join(re.split('\. |\? ', df.loc[i, 'contents']))
         df.loc[i, 'words'] = words(df.loc[i, 'contents'])
 
-    df[['titles', 'keywords', 'words', 'contents']].to_csv('./natenews_data/' + output_fname)
+    df[['titles', 'keysent', 'contents']].to_csv('./natenews_data/' + output_fname)
 
 
 

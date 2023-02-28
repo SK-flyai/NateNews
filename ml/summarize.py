@@ -20,11 +20,11 @@ class TextRank:
     bert 기반 추출적 요약 텍스트 랭크 알고리즘
     문장들 간에 유사도를 구하고 그 기반으로 중요한 문장 추출
     """
-    def __init__(self, model_path="sinjy1203/ko-sbert-natenews"):
+    def __init__(self):
         """
         self.embedding_model: kobert으로 학습시킨 sentencebert
         """
-        self.embedding_model = SentenceTransformer(model_path)
+        pass
 
     def similarity_matrix_(self, sentence_embedding: np.ndarray) -> np.ndarray:
         """
@@ -92,13 +92,8 @@ class KeySentence:
         key_sent = keysent.predict(본문내용)
 
     """
-    def __init__(self, model_path='sinjy1203/ko-sbert-natenews'):
-        """
-        Args:
-            model_path: huggingface hub에 있는 finetuning한 sbert model
-
-        """
-        self.model = SentenceTransformer(model_path)
+    def __init__(self, model):
+        self.model = model
 
     def mss_(self, doc_embedding: np.ndarray, candidate_embeddings: np.ndarray,
              candidates: List[str], top_n: int, nr_candidates: int,
@@ -190,7 +185,7 @@ class KeySentence:
 
         return [candidates[idx] for idx in sents_idx]
 
-    def predict(self, doc: str, title: str, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
+    def predict(self, doc_embedding, doc, mode: str = 'mmr', top_n: int = 1, nr_candidates: int = 10,
                 diversity: float = 0.2, title_w: float = 0.5) -> List[str]:
         """
         뉴스본문에서 주요문장들을 리턴
@@ -208,9 +203,10 @@ class KeySentence:
         """
         # candidates = kss.split_sentences(doc) # 뉴스본문에서 문장들 구분
         # candidates = doc.split('. ')
+        doc = re.sub('\.* *\\n+', '. ', doc)  # 문장을 잘 나누기 위한 빌드업
         candidates = re.split('\. |\? ', doc)
+        candidates = list(filter(lambda x: len(x) >= 15, candidates))
 
-        doc_embedding = self.model.encode([doc, title]) # 뉴스본문의 임베딩
         candidate_embeddings = self.model.encode(candidates) # 각 문장들의 임베딩들
 
         main_sents = None

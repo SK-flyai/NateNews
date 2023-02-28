@@ -1,0 +1,5 @@
+distiluse-base-multilingual-cased-v2
+paraphrase-multilingual-mpnet-base-v2
+jhgan/ko-sbert-sts
+bongsoo/kpf-sbert-v1.1
+sinjy1203/ko-sbert-natenews

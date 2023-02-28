@@ -161,7 +161,10 @@ if __name__ == '__main__':
     df = news.load_data()
 
     ##
-    tokenizer(df.loc[401, 'contents'])
+    data = df[df['titles'] == '이기영, 동거녀 둔기로 10번 내리쳐 살해했다…"사이코패스 진단"']
+
+    ##
+    tokenizer(df.loc[2015, 'contents'])
 
     ##
     sents = re.split('\. |\? ', df.loc[401, 'contents'])

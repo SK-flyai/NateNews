@@ -26,8 +26,8 @@ class KeyBERT:
         keybert = KeyBERT(model_path='sinjy1203/ko-sbert-natenews')
         키워드들 5개 = keybert.pred(뉴스내용한개)
     """
-    def __init__(self, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
-                 model_path="sinjy1203/ko-sbert-natenews", user_words_path: str = './user_words'):
+    def __init__(self, model, tagger: Tagger, tag: Union[str, Tuple[str]] = ('NNP', 'NNG'),
+                user_words_path: str = './user_words'):
         """
         Args:
             tagger: 형태소분석기
@@ -36,7 +36,7 @@ class KeyBERT:
             user_words_path: 사용자사전 위치
 
         """
-        self.model = SentenceTransformer(model_path)
+        self.model = model
         self.tokenizer = CustomTokenizer(
             tagger, tag=tag, user_words_path=user_words_path) # 뉴스본문에서 고유명사 후보군 추출에 사용되는 tokenizer
 
@@ -135,7 +135,7 @@ class KeyBERT:
         return [words[idx] for idx in keywords_idx]
         # return [words[idx] for idx in keywords_idx]
 
-    def predict(self, doc: str, title: str, ngram_range: Tuple[int, int] = (1, 1),
+    def predict(self, doc_embedding, doc, ngram_range: Tuple[int, int] = (1, 1),
                 mode: str = 'mmr', top_n: int = 5, nr_candidates: int = 10,
                 diversity: float = 0.2, title_w: float = 0.5) -> List[str]:
         """
@@ -158,10 +158,6 @@ class KeyBERT:
             return []
         candidates = count.get_feature_names_out()
 
-        # 뉴스의 임베딩 = 본문 * (1- title_w) + 제목 * title_w
-        doc_embedding = self.model.encode([doc, title])
-
-        # doc_embedding = self.model.encode([title])
         candidate_embeddings = self.model.encode(candidates)
 
         keyword = None
