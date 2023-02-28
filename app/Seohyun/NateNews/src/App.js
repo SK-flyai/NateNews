@@ -4,6 +4,8 @@ import { ThemeProvider } from "styled-components/native";
 import { theme } from "./theme";
 import { NavigationContainer } from "@react-navigation/native";
 import Sidebar from "./navigations/Sidebar";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Please report"]);
 
 const App = () => {
   return (

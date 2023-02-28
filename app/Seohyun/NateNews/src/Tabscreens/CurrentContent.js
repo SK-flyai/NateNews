@@ -141,7 +141,7 @@ const CurrentContent = ({ route }) => {
                 setModalVisible1(false);
                 console.log(modalLink[i]);
                 console.log(recKeywords);
-                fetch("http://192.168.0.13:5000/push_url", {
+                fetch("http://172.23.252.17:5000/push_url", {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",

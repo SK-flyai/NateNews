@@ -12,6 +12,7 @@ from bareunpy import Tagger
 import time
 from sentence_transformers import SentenceTransformer
 
+
 class NewsModel:
     """
     최종 키워드와 핵심문장 예측 클래스
@@ -23,6 +24,7 @@ class NewsModel:
     keysent_model = KeySentence(model_path=model_path)
 
     """
+
     def __init__(self, tagger: Tagger, model_path: str = 'sinjy1203/ko-sbert-natenews',
                  user_words_path: str = './user_words'):
         """
@@ -32,7 +34,8 @@ class NewsModel:
             user_words_path: 사용자 사전 위치
         """
         self.model = SentenceTransformer(model_path)
-        self.word_model = KeyBERT(self.model, tagger=tagger, user_words_path=user_words_path)
+        self.word_model = KeyBERT(
+            self.model, tagger=tagger, user_words_path=user_words_path)
         self.keysent_model = KeySentence(self.model)
 
     def predict(self, doc: str, title: str, word_top_n: int = 5, sent_top_n: int = 1,
@@ -52,7 +55,7 @@ class NewsModel:
         """
         doc = re.sub('/사진=', '', doc)
         doc = ' ' + doc
-        doc = re.sub(' [가-힣]{2,3} 기자| [가-힣]{2,3} 특파원', '', doc)
+        doc = re.sub('[가-힣]{2,3} 기자|[가-힣]{2,3} 특파원', '', doc)
         doc = re.sub('=', '', doc)
         doc_embedding = self.model.encode([doc, title])
         keywords = self.word_model.predict(doc_embedding, doc, top_n=word_top_n, title_w=title_w,
@@ -109,7 +112,8 @@ if __name__ == '__main__':
     tagger = Tagger('koba-MO2S2DI-MJDUZUA-XLVQTHI-MOMZA6A')
     model = NewsModel(tagger=tagger, model_path='bongsoo/kpf-sbert-v1.1')
     st = time.time()
-    keywords, keysents = model.predict(content, title, word_top_n=5, sent_top_n=3)
+    keywords, keysents = model.predict(
+        content, title, word_top_n=5, sent_top_n=3)
     print(time.time()-st)
 
 ##
