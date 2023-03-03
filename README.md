@@ -1,31 +1,26 @@
 # NateNews
 ---
-Implement app to show NateNews easily
+### SKT FLY AI 2nd(호날두조)
+키워드 기반 뉴스 추천 서비스
 
-* Branch name
-1. ml/`FEATURE_NAME`
-2. front/`FEATURE_NAME`
-3. back/`FEATURE_NAME`
-4. crawl/`FEATURE_NAME`
+## 앱
+![App flow](./images/app_flow.png)
+1. Nate에서 크롤링(인기 기사 페이지 / 기사 본문 html)
+2. BeautifulSoup 파싱 및 전처리
+3. Flask 통신
+4. React Native로 렌더링
 
+## 기본 앱 화면
+![Display1](./images/app_display1.png)
+__네이트 화면과 유사하게 구성__
 
-* Commit message
-1. Feat: `DESC` / 새로운 기능 추가
-2. FIX: `DESC` / 버그 수정
-3. Style: `DESC` / 단순한 코드 포맷 변경
-4. Comment: `DESC` / 주석 추가 및 변경
-5. Rename: `DESC` / 파일, 폴더명 수정 or 위치 변경
-6. Remove: `DESC` / 파일 삭제
-7. Docs: `DESC` / 문서 수정
-8. Initial commit / 초기 커밋(파일 생성 등..)
+## 기사 화면
+![Display2](./images/app_display2.png)
+* NLP모델(`SBERT` 기반) 추론 결과로 주요 문장 / 핵심 키워드 추출
+* 핵심 키워드에 대한 기사 추천(네이트 뉴스 내부 검색엔진 이용)
 
-
-* folders(__temporary__)\
-/\
-L ml\
-L app\
-L crawl
-
-
-* playground 디렉토리\
-디렉토리 내의 \*.ipynb 는 .gitignore 걸어놨습니다. 해당 디렉토리에서 자유롭게 실험해주세요 :)
+## Model Desc.
+![Model](./images/model.png)
+* 한국언론진흥재단의 `kpfSBERT` 모델을 finetuning
+* 네이트의 기사 약 10,000개(100개씩 100일)에 대해 전처리 수행 후 학습
+* 기사간의 유사도를 학습하는 Self-Supervised 방법으로 학습
