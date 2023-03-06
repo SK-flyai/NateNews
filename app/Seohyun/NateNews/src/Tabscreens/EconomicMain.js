@@ -1,56 +1,297 @@
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+// 상단 탭 기준 종합
+
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
+import { Dimensions } from "react-native";
+import { Pressable, TouchableOpacity } from "react-native";
+import data from "../flask/ranking.json";
+import { IP } from "../ippath";
+const { width } = Dimensions.get("window");
+const Imagewidth = width * 0.3;
+const SmallImageWidth = width * 0.15;
 
-const hotkeywords = [
-  "1. 뉴진스",
-  "2. 르세라핌",
-  "3. 아이브",
-  "4. 프로미스나인",
-  "5. 에스파",
-  "6. 소녀시대",
-  "7. 블랙핑크",
-  "8. 아이즈원",
-  "9. 레드벨벳",
-  "10. 트와이스",
-];
+function EconomicMain({ navigation }) {
+  const links = [];
+  const titles = [];
+  const categories = [];
+  const presses = [];
+  const dates = [];
+  const contents = [];
+  const images = [];
+  var urlLink = "";
+  const [result, setResult] = useState(null);
 
-const HotKeyword = () => {
-  const [keywordIndex, setKeywordIndex] = useState(0);
+  const urlPushClick = (titlesend, docsend) => {
+    console.log(`urlPushClicked`);
+    fetch("http://" + IP + ":5000/push_url", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: titlesend, doc: docsend }),
+    })
+      .then((response) => response.json())
+      .then((data) => setResult(data.message))
+      .catch((error) => setResult(error.message));
+  };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setKeywordIndex((keywordIndex + 1) % hotkeywords.length);
-    }, 1000);
+  for (var key in data.eco) {
+    links.push(key);
+    titles.push(data.eco[key].title);
+    categories.push(data.eco[key].category);
+    presses.push(data.eco[key].press);
+    dates.push(data.eco[key].date);
+    contents.push(data.eco[key].content);
+    for (var key2 in data.eco[key].image) {
+      images.push(key2);
+      break;
+    }
+  }
 
-    return () => clearInterval(interval);
-  }, [keywordIndex]);
+  const views = [];
+  for (let i = 0; i < 5; i++) {
+    const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
+    const [aspectRatio, setAspectRatio] = useState(null);
 
-  const currentKeyword = hotkeywords[keywordIndex];
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
 
-  return (
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Text style={{ color: "blue", fontWeight: "bold", fontSize: 17 }}>
-        인기 검색어 :{" "}
-      </Text>
-      <View style={{ width: 120 }}>
-        <Text
-          style={{ color: "black", fontWeight: "bold", fontSize: 18 }}
-          numberOfLines={1}
-          ellipsizeMode="tail"
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
+
+    const fview = isFirstView ? (
+      <Image style={Istyle} source={{ uri: images[i] }} />
+    ) : null;
+    const nameView = isFirstView
+      ? {
+          marginLeft: "1%",
+          width: width - (imageWidth + 20),
+          justifyContent: "center",
+          fontWeight: "bold",
+        }
+      : {
+          marginLeft: "1%",
+          width: width * 0.93,
+          marginVertical: "2%",
+          justifyContent: "center",
+        };
+    const newDivider = isFirstView ? (
+      <View style={{ marginVertical: "2%" }} />
+    ) : (
+      <View style={styles.divider} />
+    );
+
+    views.push(
+      <View styles={{ flex: 1 }} key={i}>
+        {newDivider}
+        <TouchableOpacity
+          onPress={() => {
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
+            navigation.navigate("EconomicContent", links[i]);
+          }}
         >
-          {currentKeyword}
-        </Text>
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            {fview}
+
+            <View style={nameView}>
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
       </View>
-    </View>
-  );
-};
+    );
+  }
 
-const App = () => {
+  const views2 = [];
+  for (let i = 5; i < 20; i++) {
+    const urlsend = links[i];
+    const titlesend = titles[i];
+    const docsend = contents[i];
+    const [aspectRatio, setAspectRatio] = useState(null);
+
+    useEffect(() => {
+      Image.getSize(
+        images[0],
+        (width, height) => {
+          setAspectRatio(width / height);
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    }, []);
+
+    const isFirstView = i === 0; // check if it's the first view
+    const imageWidth = isFirstView ? Imagewidth : SmallImageWidth; // set image width based on isFirstView
+    const imageHeight = isFirstView ? Imagewidth * 0.7 : width * 0.12; // set image width based on isFirstView
+    const num = isFirstView ? 2 : 1;
+    const Istyle = isFirstView
+      ? {
+          width: imageWidth,
+          aspectRatio,
+          backgroundColor: "white",
+        }
+      : {
+          width: imageWidth,
+          height: imageHeight,
+          backgroundColor: "black",
+          resizeMode: "stretch",
+        };
+
+    views2.push(
+      <View styles={{ flex: 1 }} key={i}>
+        <View style={styles.divider} />
+        <TouchableOpacity
+          onPress={() => {
+            // urlPushClick(urlsend);
+            urlPushClick(titlesend, docsend);
+            navigation.navigate("EconomicContent", links[i]);
+          }}
+        >
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <Image style={Istyle} source={{ uri: images[i] }} />
+
+            <View
+              style={{
+                marginLeft: "1%",
+                width: width * 0.8,
+                justifyContent: "center",
+              }}
+            >
+              <Text numberOfLines={num} style={{ fontWeight: "bold" }}>
+                {titles[i].replace(/ /g, "\u00A0")}
+              </Text>
+
+              <Text style={{ fontSize: 12, marginTop: 3, color: "#d6ccc2" }}>
+                {presses[i]}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <HotKeyword />
-    </View>
-  );
-};
+    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          marginHorizontal: "3%",
+          marginTop: "3%",
+        }}
+      >
+        <Text style={{ fontSize: 25, fontWeight: "bold" }}>경제 인기뉴스</Text>
+        <View style={{ flex: 1 }}>{views}</View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <View style={[styles.middle]}>
+          <Text>2030 부산 액스포</Text>
+        </View>
+        <View
+          style={[
+            styles.middle,
+            { borderLeftWidth: 1 },
+            { borderRightWidth: 1 },
+          ]}
+        >
+          <Text>20대 대통령 윤석열</Text>
+        </View>
+        <View style={styles.middle}>
+          <Text>코로나 19 현황</Text>
+        </View>
+      </View>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: "white",
+          marginHorizontal: "3%",
+        }}
+      >
+        <Text style={{ fontSize: 20, fontWeight: "bold" }}>경제 주요뉴스</Text>
 
-export default App;
+        <View style={{ flex: 1 }}>{views2}</View>
+      </View>
+
+      <View style={[styles.divider, { borderBottomWidth: 10 }]} />
+    </ScrollView>
+  );
+}
+
+export default EconomicMain;
+
+const styles = StyleSheet.create({
+  divider: {
+    borderBottomColor: "#e0e0e0",
+    borderBottomWidth: 1,
+    marginVertical: "1%",
+  },
+  firstViewContainer: {
+    backgroundColor: "lightgrey",
+    width: 150,
+    justifyContent: "center",
+  },
+  mainnews: {
+    marginVertical: "2%",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "white",
+    flexDirection: "row",
+  },
+  textcontainer: {
+    flex: 1,
+    marginLeft: "1%",
+    backgroundColor: "white",
+  },
+  middle: {
+    flex: 1,
+    borderColor: "#e0e0e0",
+    paddingVertical: "2%",
+
+    marginVertical: "3%",
+    borderTopWidth: 10,
+    borderBottomWidth: 15,
+
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

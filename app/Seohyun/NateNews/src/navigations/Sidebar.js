@@ -10,6 +10,7 @@ import Tab from "./Tab";
 import axios from "axios";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Header from "./Header";
+import { IP } from "../ippath";
 
 const Drawer = createDrawerNavigator();
 
@@ -25,7 +26,7 @@ const styles = StyleSheet.create({
 const Sidebar = () => {
   const flaskButtonClick = async () => {
     try {
-      const response = await axios.get("http://192.168.11.162:5000/crawl");
+      const response = await axios.get("http://" + IP + ":5000/crawl");
       console.log(response.data.output);
     } catch (error) {
       console.error(error);

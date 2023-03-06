@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     tokenizer = CustomTokenizer(tagger=tagger)
 
-    pred_range = (400, 450)
+    pred_range = (300, 350)
 
     # model_path = "./ko-sbert-natenews"
     # word_model = KeyBERT(model_path=model_path)

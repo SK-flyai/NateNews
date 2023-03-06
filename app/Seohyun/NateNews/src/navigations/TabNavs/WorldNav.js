@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { Platform } from "react-native";
 import WorldMain from "../../Tabscreens/WorldMain";
 import WorldContent from "../../Tabscreens/WorldContent";
+import WorldContent2 from "../../Tabscreens/WorldContent2";
 
 const Stack = createStackNavigator();
 
@@ -36,6 +37,29 @@ const WorldNav = () => {
       <Stack.Screen // Page3 - '세계' Tab (뉴스 기사 본문)
         name="WorldContent"
         component={WorldContent}
+        options={{
+          headerShown: false,
+          headerStyle: {
+            backgroundColor: "#FA5858",
+          },
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 25,
+            color: "#ffffff",
+            ...Platform.select({
+              ios: {
+                fontFamily: "Futura",
+              },
+              android: {
+                fontFamily: "monospace",
+              },
+            }),
+          },
+        }}
+      />
+      <Stack.Screen // Page3 - '세계' Tab (뉴스 기사 본문)
+        name="WorldContent2"
+        component={WorldContent2}
         options={{
           headerShown: false,
           headerStyle: {

@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import styled from "styled-components/native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   View,
@@ -8,18 +6,432 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  Pressable,
+  BackHandler,
+  SafeAreaView,
 } from "react-native";
 import { Divider } from "react-native-elements";
-import { Button } from "react-native-elements";
 import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
+import { Dimensions } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+const { width } = Dimensions.get("window");
+import data from "../flask/ranking.json";
+import data2 from "../flask/recommend.json";
+import { IP } from "../ippath";
+const Imagewidth = width * 0.3;
+const SmallImageWidth = width * 0.15;
+
+const recSentences = [];
+const recKeywords = [];
+const recLinks = [];
+
+const recImages = [];
+const recTitles = [];
+const recContents = [];
+const recDates = [];
+const recPresses = [];
+
+var tempTitle = [];
+var tempPress = [];
+var tempDate = [];
+var tempContent = [];
+var tempImage = [];
+
+let keywordnum = 0;
+
+var title = "";
+var press = "";
+var date = "";
+var content = "";
+var img = "";
+
+for (var key1 in data2.keyword) {
+  recKeywords.push(key1 + "  ");
+  recLinks.push(Object.keys(data2.keyword[key1]));
+  tempTitle = [];
+  tempPress = [];
+  tempDate = [];
+  tempContent = [];
+  tempImage = [];
+
+  for (var key2 in data2.keyword[key1]) {
+    tempTitle.push(data2.keyword[key1][key2].title + "\n\n");
+    tempPress.push(data2.keyword[key1][key2].press);
+    tempDate.push(data2.keyword[key1][key2].date);
+    tempContent.push(data2.keyword[key1][key2].content);
+    tempImage.push(data2.keyword[key1][key2].image);
+  }
+  recTitles.push(tempTitle);
+  recImages.push(tempImage);
+  recPresses.push(tempPress);
+  recDates.push(tempDate);
+  recContents.push(tempContent);
+}
+
+for (var key2 in data2.sentence) {
+  recSentences.push(data2.sentence[key2].replace(/ /g, "\u00A0") + "\n\n");
+}
+
+let keywordcnt = recKeywords.length;
+let keywordlist = [];
+let modalTitle = [];
+let modalPress = [];
+let modalLink = [];
+let modalDate = [];
+let modalContent = [];
+let modalImage = [];
+let vv = [];
+let lenlen = 0;
+
+const SocialContent = ({ route }) => {
+  const link = route.params;
+  const navigation = useNavigation();
+  const [count, setCount] = useState(0);
+  const [result, setResult] = useState(null);
+  const Refresh = () => {
+    setCount(count + 1);
+  };
+  if (count == 0) {
+    title = data.soc[link].title;
+    category = data.soc[link].category;
+    press = data.soc[link].press;
+    date = data.soc[link].date;
+    content = data.soc[link].content;
+    caption = data.soc[link].caption;
+  }
+  for (var key3 in data.soc[link].image) {
+    img = key3;
+    break;
+  }
+
+  const [param1, setParam1] = useState("parameter 1 value");
+  const [param2, setParam2] = useState("parameter 2 value");
+
+  const [aspectRatio, setAspectRatio] = useState(null);
+  console.log("CNT : ", count);
+
+  const [isModalVisible1, setModalVisible1] = useState(false);
+  const CloseModal = () => {
+    setModalVisible1(!isModalVisible1);
+  };
+  const toggleModal1 = (keywordnum) => {
+    setModalVisible1(!isModalVisible1);
+    console.log(keywordnum);
+    modalLink = recLinks[keywordnum];
+    lenlen = recLinks[keywordnum].length;
+    modalTitle = recTitles[keywordnum];
+    modalPress = recPresses[keywordnum];
+    modalDate = recDates[keywordnum];
+    modalContent = recContents[keywordnum];
+    modalImage = recImages[keywordnum];
+
+    if (!isModalVisible1) {
+      vv = [];
+
+      for (let i = 0; i < lenlen; i++) {
+        const title = (String(i + 1) + ". " + modalTitle[i]).replace(
+          / /g,
+          "\u00A0"
+        );
+
+        vv.push(
+          <View key={i} style={{ width: width * 0.85 }}>
+            <TouchableOpacity
+              onPress={() => {
+                setModalVisible1(false);
+                console.log(modalLink[i]);
+                console.log(recKeywords);
+                fetch("http://" + IP + ":5000/push_url", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    title: modalTitle[i],
+                    doc: modalContent[i],
+                  }),
+                })
+                  .then((response) => response.json())
+                  .then((data) => setResult(data.message))
+                  .catch((error) => setResult(error.message));
+
+                navigation.navigate("SocialContent2", {
+                  param1: modalLink[i],
+                  param2: recKeywords[i],
+                  param3: modalTitle[i],
+                  param4: modalPress[i],
+                  param5: modalDate[i],
+                  param6: modalContent[i],
+                  param7: modalImage[i],
+                });
+                Refresh();
+              }}
+            >
+              <View>
+                <Text>{title}</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+      console.log("1312312312313123123");
+    }
+  };
+
+  useEffect(() => {
+    Image.getSize(
+      img,
+      (width, height) => {
+        setAspectRatio(width / height);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  }, []);
+
+  // const CloseModal = () => {
+  //   setModalVisible1(!isModalVisible1);
+  // };
+
+  useEffect(() => {
+    const handleBackButton = () => {
+      if (isModalVisible1) {
+        setModalVisible1(false);
+
+        return true; // indicate that the back key was handled
+      }
+      return false; // default behavior of back key
+    };
+
+    BackHandler.addEventListener("hardwareBackPress", handleBackButton);
+
+    return () => {
+      BackHandler.removeEventListener("hardwareBackPress", handleBackButton);
+    };
+  }, [isModalVisible1]);
+
+  const newContect = content.replace(/ /g, "\u00A0");
+
+  keywordlist = Array.from({ length: keywordcnt }, (_, i) => {
+    const keywordnum = i;
+    return (
+      <Pressable
+        key={i}
+        onPress={() => toggleModal1(i)}
+        android_ripple={{ color: "#e0e0e0" }}
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 20,
+          }}
+        >
+          {"#"}
+          {recKeywords[i]}
+        </Text>
+      </Pressable>
+    );
+  });
+
+  //
+
+  const views3 = [];
+  for (let i = 0; i < keywordcnt; i++) {
+    const urlsend = recLinks[i];
+    views3.push(
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            toggleModal1();
+            navigation.navigate("SocialContent2", {
+              param1: "https://news.nate.com/view/20230226n07184",
+              param2: "이승우",
+            });
+            Refresh();
+          }}
+        >
+          <View>
+            <Text>{urlsend + "\n"}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  console.log(recLinks[0]);
+  //
+  console.log("TTT : ", title);
+  return (
+    <SafeAreaView
+      style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
+    >
+      <View style={{ flex: 1, backgroundColor: "white" }}>
+        <ScrollView style={{ flex: 1, borderWidth: 1, borderColor: "#e0e0e0" }}>
+          {/* <Divider style={{ height: 30 }} /> */}
+          <View style={{ flex: 1, backgroundColor: "white" }}>
+            <Text
+              style={{
+                fontSize: 17,
+                ...Platform.select({
+                  ios: {
+                    fontFamily: "Futura",
+                  },
+                  android: {
+                    fontFamily: "monospace",
+                  },
+                }),
+              }}
+            >
+              {/* 편의점 직원 살해 후 달아난 30대男…16살부터 상습 강도질
+              {"\n"} */}
+              {title.replace(/ /g, "\u00A0")}
+            </Text>
+            <Text style={{ color: "grey" }}>{date}</Text>
+            <Text style={{ color: "grey" }}>{press}</Text>
+            <View
+              style={{ flexDirection: "row", marginTop: 10, marginBottom: 10 }}
+            >
+              {/*댓글 버튼*/}
+              <TouchableOpacity style={{ marginRight: 15 }}>
+                <Icon3 name="comments" size={30} color="black" />
+              </TouchableOpacity>
+
+              {/*공유 버튼*/}
+              <TouchableOpacity>
+                <Icon2 name="share-alternative" size={30} color="black" />
+              </TouchableOpacity>
+            </View>
+            {/* 기사 제목, 날짜, 언론사 정보 가져와서 여기 넣기*/}
+          </View>
+          <Divider style={{ height: 5 }} />
+
+          <Image
+            style={{
+              width: width,
+              aspectRatio,
+              marginTop: 15,
+              // resizeMode: "contain",
+              // height: width * aspectRatio,
+            }}
+            source={{
+              uri: img,
+            }}
+          />
+
+          <Divider style={{ height: 5 }} />
+
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                padding: 5,
+                marginTop: 10,
+                fontSize: 15,
+              }}
+            >
+              {newContect}
+            </Text>
+            <View style={{ marginTop: "5%", marginLeft: "3%" }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                핵심 문장
+              </Text>
+            </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>{"\n"}</Text>
+
+              <View
+                style={{
+                  flex: 1,
+                  width: width * 0.85,
+                  // backgroundColor: "#edede9",
+                  backgroundColor: "#edf2f4",
+                  borderRadius: 6,
+                  padding: "5%",
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 15,
+                  }}
+                >
+                  {recSentences}
+                </Text>
+              </View>
+            </View>
+            <View style={{ marginTop: "5%", marginLeft: "3%" }}>
+              <Text style={{ fontSize: 22, fontWeight: "bold" }}>
+                주요 키워드
+              </Text>
+            </View>
+            <View
+              style={{
+                flexDirection: "row",
+                width: width,
+                marginVertical: "5%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Text>{keywordlist}</Text>
+            </View>
+          </View>
+
+          {/*Modal (팝업 바)*/}
+          <Modal
+            visible={isModalVisible1}
+            style={styles.bottomModal}
+            onRequestClose={() => {
+              if (isModalVisible1) {
+                setModalVisible1(false);
+              }
+            }}
+          >
+            <View style={styles.modalContent}>
+              <Pressable style={styles.closeButton} onPress={CloseModal}>
+                <Text style={styles.closeButtonText}>X</Text>
+              </Pressable>
+              <ScrollView>
+                <Text
+                  style={{
+                    padding: 5,
+                    marginTop: 10,
+                    fontSize: 15,
+                  }}
+                >
+                  <View>
+                    <TouchableOpacity onPress={CloseModal}>
+                      <Text style={{ width: width }}>{vv}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </Text>
+              </ScrollView>
+            </View>
+          </Modal>
+        </ScrollView>
+      </View>
+    </SafeAreaView>
+  );
+};
+
+export default SocialContent;
 
 const styles = StyleSheet.create({
   // 기사 제목 style
   container: {
     flex: 1,
-    width: "100%",
+    width: width,
+    paddingHorizontal: "1%",
+    backgroundColor: "white",
   },
   item: {
     padding: 18,
@@ -43,140 +455,27 @@ const styles = StyleSheet.create({
   bottomModal: {
     justifyContent: "flex-end",
     margin: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   modalContent: {
     backgroundColor: "white",
-    padding: 30,
+    padding: "6%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 4,
+    height: "80%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 8,
+    right: 10,
+    backgroundColor: "red",
+    borderRadius: 20,
+    padding: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
-
-const Container = styled.View`
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  background-color: ${({ theme }) => theme.background};
-  padding: 0 5px;
-`;
-
-const SocialContent = ({ navigation }) => {
-  const insets = useSafeAreaInsets();
-
-  const Pic1path = "../../assets/Images/ArticlePic1.png";
-
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  // 이미지 버튼 함수 (Modal에서 사용)
-  const imagePress = () => {
-    console.log("Image Clicked!");
-    setModalVisible(true);
-  };
-
-  return (
-    <Container insets={insets}>
-      <Divider style={{ height: 30 }} />
-      <View style={{ backgroundColor: "white" }}>
-        <Text
-          style={{
-            fontSize: 17,
-            ...Platform.select({
-              ios: {
-                fontFamily: "Futura",
-              },
-              android: {
-                fontFamily: "monospace",
-              },
-            }),
-          }}
-        >
-          편의점 직원 살해 후 달아난 30대男…16살부터 상습 강도질
-          {"\n"}
-        </Text>
-        <Text style={{ color: "grey" }}>2023-02-08 22:14</Text>
-        <Text style={{ color: "grey" }}>2023-02-09 18:56 {"<최종 수정>"}</Text>
-        <Text style={{ color: "grey" }}>동아일보 원문</Text>
-        <View style={{ flexDirection: "row", marginTop: 10, marginBottom: 10 }}>
-          {/*댓글 버튼*/}
-          <TouchableOpacity style={{ marginRight: 15 }}>
-            <Icon3 name="comments" size={30} color="black" />
-          </TouchableOpacity>
-
-          {/*공유 버튼*/}
-          <TouchableOpacity>
-            <Icon2 name="share-alternative" size={30} color="black" />
-          </TouchableOpacity>
-        </View>
-        {/* 기사 제목, 날짜, 언론사 정보 가져와서 여기 넣기*/}
-      </View>
-      <Divider style={{ height: 5 }} />
-      <ScrollView
-        style={[styles.container, { borderWidth: 1, borderColor: "#e0e0e0" }]}
-      >
-        <TouchableOpacity onPress={imagePress}>
-          <Image
-            style={{ width: 420, height: 210, marginTop: 15 }}
-            source={require(Pic1path)}
-          />
-        </TouchableOpacity>
-        <Divider style={{ height: 5 }} />
-
-        {/*Modal (팝업 바)*/}
-        <Modal isVisible={isModalVisible} style={styles.bottomModal}>
-          <View style={styles.modalContent}>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Text>You Clicked On Modal !{"\n"}</Text>
-            <Button title="Hide Modal" onPress={() => setModalVisible(false)} />
-          </View>
-        </Modal>
-        <Text style={{ padding: 5, marginTop: 10, fontSize: 15 }}>
-          인천에서 편의점 직원을 흉기로 찔러 살해한 뒤 위치추적
-          전자장치(전자발찌)를 훼손하고 도주한 30대 남성이 10대 때부터 상습
-          강도질을 해온 것으로 전해졌다.경찰은 이 남성의 사진을 공개하고 행방을
-          쫓고 있다.{"\n"}
-          {"\n"}9일 법조계와 경찰 등에 따르면 도주한 A 씨(32)는 16살 때인 2007년
-          무면허 상태에서 오토바이를 훔쳐 달아나 절도 등 혐의로 소년보호 처분을
-          받았다. 이후 수차례 특수절도 혐의로 체포돼 소년원에서 복역했다.{"\n"}
-          {"\n"}2011년에는 소년원에서 나온 지 한 달도 되지 않아 특수강도 등
-          5건의 범행을 잇달아 저질렀다. A 씨는 같은해 7월 같은 혐의로
-          법원으로부터 징역 3년 6개월을 선고받고 복역하다가 2014년 5월
-          가석방됐다. 2014년에는 인천 부평구의 한 중고명품 판매장에서 업주를
-          흉기로 찌른 뒤 현금 80만 원을 훔쳐 달아났다가 경찰에 체포됐다. A 씨는
-          이 사건으로 징역 7년, 전자발찌 부착 10년 명령을 받았다.{"\n"}
-          {"\n"} A 씨는 전날 오후 10시 52분경 인천 계양구의 한 편의점에서 30대
-          직원 B 씨를 흉기로 살해하고 도주했다. 그는 범행 후 계양구 효성동의 한
-          아파트 인근에서 차고 있던 전자발찌를 훼손한 뒤 흰색 K5택시를 타고
-          달아났다. 경찰에 따르면 A 씨는 키 170cm에 도주 당시 검은색 상하의를
-          착용하고 있었다. 인천보호관찰소는 100여 명의 직원을 투입해 경찰과 함께
-          폐쇄회로(CC)TV 등을 토대로 A 씨의 도주 경로를 추적 중이다.{"\n"}
-          {"\n"}인천에서 편의점 직원을 흉기로 찔러 살해한 뒤 위치추적
-          전자장치(전자발찌)를 훼손하고 도주한 30대 남성이 10대 때부터 상습
-          강도질을 해온 것으로 전해졌다.경찰은 이 남성의 사진을 공개하고 행방을
-          쫓고 있다.{"\n"}
-          {"\n"}9일 법조계와 경찰 등에 따르면 도주한 A 씨(32)는 16살 때인 2007년
-          무면허 상태에서 오토바이를 훔쳐 달아나 절도 등 혐의로 소년보호 처분을
-          받았다. 이후 수차례 특수절도 혐의로 체포돼 소년원에서 복역했다.{"\n"}
-          {"\n"}2011년에는 소년원에서 나온 지 한 달도 되지 않아 특수강도 등
-          5건의 범행을 잇달아 저질렀다. A 씨는 같은해 7월 같은 혐의로
-          법원으로부터 징역 3년 6개월을 선고받고 복역하다가 2014년 5월
-          가석방됐다. 2014년에는 인천 부평구의 한 중고명품 판매장에서 업주를
-          흉기로 찌른 뒤 현금 80만 원을 훔쳐 달아났다가 경찰에 체포됐다. A 씨는
-          이 사건으로 징역 7년, 전자발찌 부착 10년 명령을 받았다.{"\n"}
-          {"\n"} A 씨는 전날 오후 10시 52분경 인천 계양구의 한 편의점에서 30대
-          직원 B 씨를 흉기로 살해하고 도주했다. 그는 범행 후 계양구 효성동의 한
-          아파트 인근에서 차고 있던 전자발찌를 훼손한 뒤 흰색 K5택시를 타고
-          달아났다. 경찰에 따르면 A 씨는 키 170cm에 도주 당시 검은색 상하의를
-          착용하고 있었다. 인천보호관찰소는 100여 명의 직원을 투입해 경찰과 함께
-          폐쇄회로(CC)TV 등을 토대로 A 씨의 도주 경로를 추적 중이다.
-        </Text>
-      </ScrollView>
-    </Container>
-  );
-};
-
-export default SocialContent;

@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import Icon2 from "react-native-vector-icons/Entypo";
 import Icon3 from "react-native-vector-icons/Foundation";
 import { Dimensions } from "react-native";
+import { IP } from "../ippath";
 
 const { width } = Dimensions.get("window");
 

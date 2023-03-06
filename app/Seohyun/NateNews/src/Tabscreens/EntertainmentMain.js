@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, Image, StyleSheet } from "react-native";
 import { Dimensions } from "react-native";
 import SearchBar from "../components/Searchbar";
-
+import { IP } from "../ippath";
 import { Pressable } from "react-native";
 
 const { width } = Dimensions.get("window");
